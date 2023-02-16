@@ -1,4 +1,4 @@
-.. image:: ./logo/logo_transparent.svg
+.. image:: ./logo/logo.svg
    :align: center
 
 noise2read: turn noise to signal in short reads

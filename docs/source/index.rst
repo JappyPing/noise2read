@@ -1,4 +1,4 @@
-.. image:: logo.svg
+.. image:: ../logo/logo.svg
    :align: center
 
 ===================
