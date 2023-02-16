@@ -1,4 +1,4 @@
-.. image:: logo_transparent.svg
+.. image:: logo.svg
    :align: center
 
 ===================
