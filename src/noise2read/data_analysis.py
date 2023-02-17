@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-30 09:35:18
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:10:42
+# @Last Modified time: 2023-02-18 00:15:44
 
 from collections import Counter
 import collections
@@ -123,13 +123,13 @@ class DataAnalysis():
         correct_counts_lst = correct_read2count_val_lst[ : self.config.top_n * 10]
         
         # self.workbook_flie = xlsxwriter.Workbook(self.result_file)
-        worksheet = self.workbook_flie.add_worksheet('AbundanceChange')
+        worksheet = self.workbook_flie.add_worksheet('Read Count')
         # Use the worksheet object to write
         # data via the write() method.
         worksheet.write('A1', 'Read')
         worksheet.write('B1', 'Count after Correction')
         worksheet.write('C1', 'Count before Correction')
-        worksheet.write('D1', 'Abundance change percentage')
+        worksheet.write('D1', 'Change in percentage')
         worksheet.write('E1', 'Rank after Correction')
         worksheet.write('F1', 'Rank before Correction')
 
@@ -422,7 +422,7 @@ class DataAnalysis():
         self.evaluation_metircs(read_level, 'Read level') 
         rawset_entropy = self.set_entropy(len(raw_err_seqs), len(raw_errfreee_seqs), total_reads_num)
         correctset_entropy = self.set_entropy(len(correct_err_seqs), len(correct_errfree_seqs), total_reads_num)
-        self.save_entropy('Purity', rawset_entropy, correctset_entropy)
+        self.save_entropy('Purity entropy', rawset_entropy, correctset_entropy)
         return
 
     def evaluation_without_groundtruth(self, raw_read2count, correct_read2count, total_reads_num):
@@ -440,7 +440,16 @@ class DataAnalysis():
 
         # entropy = self.noise2signal_entropy(raw_read2count, correct_read2count, total_reads_num)
         entropy = self.noise2read_entropy(raw_read2count, correct_read2count, total_reads_num)
-        self.save_entropy('Entropy H', entropy[0], entropy[1]) 
+        # self.save_entropy('Entropy H', entropy[0], entropy[1]) 
+        self.logger.info("{}: raw dataset entropy: {}, correct dataset entropy: {}".format('Entropy H', entropy[0], entropy[1]))
+        worksheet3 = self.workbook_flie.add_worksheet('Non-frequent Entropy')
+        worksheet3.write('A1', 'H')
+        worksheet3.write('A2', entropy[0])
+        worksheet3.write('B1', "H'")
+        worksheet3.write('B2', entropy[1]) 
+        worksheet3.write('C1', '\u0394 H')
+        worksheet3.write('C2', entropy[0] - entropy[1]) 
+
         self.workbook_flie.close()
         # total_variation = self.total_variation_differnce(raw_read2count, correct_read2count, total_reads_num)
         # print("Total variation distance: {}".format(total_variation))
@@ -583,10 +592,10 @@ class DataAnalysis():
         return
 
     def entropy_item(self, shared_vars, freq):
-        total_freq, n, delta = shared_vars
+        total_freq, n = shared_vars
         if freq > 0:
             p = freq / total_freq
-            result = - delta * (p * math.log2(p)/ math.log2(n))
+            result = - p * math.log2(p)/ math.log2(n)
         return result
 
     def noise2read_entropy(self, raw_read2count, correct_read2count, total_num):
@@ -602,10 +611,10 @@ class DataAnalysis():
         for read in non_frequent_raw_reads:
             raw_entropy_items.append(raw_read2count[read])
 
-        raw_nonFre_reads_num = sum(raw_entropy_items)
+        raw_nonFre_reads_total_num = sum(raw_entropy_items)
         # raw entropy
-        n = len(non_frequent_raw_reads)
-        shared_vars1 = raw_nonFre_reads_num, n, 1
+        raw_unique_num = len(non_frequent_raw_reads)
+        shared_vars1 = raw_nonFre_reads_total_num, raw_unique_num
         with WorkerPool(self.config.num_workers, shared_objects=shared_vars1, start_method='fork') as pool:
             raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
         raw_entropy = sum(raw_entropy_lst) 
@@ -617,8 +626,10 @@ class DataAnalysis():
             correct_entropy_items.append(correct_read2count[read])
 
         # correct entropy
-        correct_nonFre_reads_num = len(non_frequent_correct_reads)
-        shared_vars2 = correct_nonFre_reads_num, n, 1
+        correct_nonFre_reads_total_num = sum(correct_entropy_items)
+
+        correct_unique_num = len(non_frequent_correct_reads)
+        shared_vars2 = correct_nonFre_reads_total_num, correct_unique_num
 
         with WorkerPool(self.config.num_workers, shared_objects=shared_vars2, start_method='fork') as pool:
             correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
@@ -636,18 +647,26 @@ class DataAnalysis():
             correct_kept_counts.append(correct_read2count[read])
             raw_kept_counts.append(raw_read2count[read])
 
-        shared_vars3 = total_num, n, 1
+        raw_kept_total_num = sum(raw_kept_counts)
+
+        unique_kept_reads_num = len(kept_reads)
+        shared_vars3 = raw_kept_total_num, unique_kept_reads_num
         with WorkerPool(self.config.num_workers, shared_objects=shared_vars3, start_method='fork') as pool:
             raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
 
-        with WorkerPool(self.config.num_workers, shared_objects=shared_vars3, start_method='fork') as pool:
+        correct_kept_total_num = sum(correct_kept_counts)
+        shared_vars4 = correct_kept_total_num, unique_kept_reads_num
+        with WorkerPool(self.config.num_workers, shared_objects=shared_vars4, start_method='fork') as pool:
             correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
 
         raw_removed_reads = raw_unique_reads - correct_unique_reads
         raw_removed_items = []
         for read in raw_removed_reads:
             raw_removed_items.append(raw_read2count[read])
-        with WorkerPool(self.config.num_workers, shared_objects=shared_vars3, start_method='fork') as pool:
+        removed_total_num = sum(raw_removed_items)
+        unique_removed_num = len(raw_removed_reads)
+        shared_vars5 = removed_total_num, unique_removed_num
+        with WorkerPool(self.config.num_workers, shared_objects=shared_vars5, start_method='fork') as pool:
             raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
         for i in raw_removed_entropy_items_lst:
             if i <=0:
@@ -691,13 +710,16 @@ class DataAnalysis():
         """
         self.logger.info("{}: raw dataset entropy: {}, correct dataset entropy: {}".format(sheet_name, raw_set_entropy, correct_entropy))
         worksheet3 = self.workbook_flie.add_worksheet(sheet_name)
-        worksheet3.write('A1', 'H')
+        worksheet3.write('A1', 'E')
         worksheet3.write('A2', raw_set_entropy)
-        worksheet3.write('B1', "H'")
+        worksheet3.write('B1', "E'")
         worksheet3.write('B2', correct_entropy) 
-        worksheet3.write('C1', '\u0394 H')
+        worksheet3.write('C1', '\u0394 E')
         worksheet3.write('C2', raw_set_entropy - correct_entropy) 
         return   
+
+    #############################################################################################################
+    # Warning: the following functions have been deprecated and may contain bugs. If you want to use, you must check every row carefully.
 
     '''
     def noise2signal_entropy(self, raw_read2count, correct_read2count, total_num):
@@ -1425,4 +1447,11 @@ class DataAnalysis():
         self.gain2heatmap(entropy_item_lst)
 
         return [raw_entropy, correct_entropy]
+
+    def entropy_item(self, shared_vars, freq):
+        total_freq, n, delta = shared_vars
+        if freq > 0:
+            p = freq / total_freq
+            result = - delta * (p * math.log2(p)/ math.log2(n))
+        return result
     '''
