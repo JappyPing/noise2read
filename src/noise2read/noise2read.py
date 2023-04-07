@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:12:04
+# @Last Modified time: 2023-04-05 17:34:22
 
 from noise2read.config import Config
 import sys, getopt
@@ -13,23 +13,37 @@ import os
 from noise2read.simulation import Simulation
 from noise2read.utils import custom_logger, usage
 from noise2read.data_preprocessing import DataProcessing
+from contextlib import redirect_stdout
 
 def main():
     argv = sys.argv[1:]
     # create logger
     logger = custom_logger("noise2read", debug_mode=False)
+
     ##############################################################
     try:
         # opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:o:l:h:", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "over_sampling", "libray_layout", "help"]) 
-        opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:l:h:", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "libray_layout", "help"]) 
+        opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:l:h", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "libray_layout", "help"]) 
+        script_name = sys.argv[0]
+        input_commands = [script_name]
+
+        for opt, arg in opts:
+            input_commands.append(opt)
+            if arg:
+                input_commands.append(arg)
+
+        for arg in args:
+            input_commands.append(arg)
+        logger.info("Commands: " + " ".join(input_commands))
+        
         if opts:
             opts_dict = dict(opts)
             opts_keys = list(opts_dict.keys())
             tar_set = set(opts_keys)
-            # print(tar_set)
+
             h_lst = list({'-h', '--help'}.intersection(tar_set))
             if h_lst:
-                usage()                
+                usage()           
                 sys.exit()  
             else: 
                 m_lst = list({"-m", "--module"}.intersection(tar_set))
@@ -50,12 +64,15 @@ def main():
                 # r1_lst = list({"-1", "--read1"}.intersection(tar_set))
                 # r2_lst = list({"-2", "--read1"}.intersection(tar_set))
                 # align_lst = list({"-A", "--Alignment"}.intersection(tar_set))
+                    
                 if m_lst:
                     module_arg = opts_dict[m_lst[0]]
+                        
                 else:
                     logger.error("Not select any module, using command noise2read -h/--help for usage.")
                     sys.exit()
                 available_cpu_cores = os.cpu_count()
+
 ############################################################################################################################
                 if module_arg == "correction":
                     # try: 
@@ -415,10 +432,13 @@ def main():
                         config.num_workers = available_cpu_cores - 2
                     Simulation(logger, config).simulation()
 ############################################################################################################################
+                # elif module_arg == "extract_isolates": 
+
                 else:
                     # logger.error("Invalid module name, please check.")
                     logger.error("Input wrong module name, using command noise2read -h/--help for usage.")
                     sys.exit()
+        
         else:
             logger.error("No valid arguments input, using command noise2read -h/--help for usage")
     except getopt.GetoptError as err:

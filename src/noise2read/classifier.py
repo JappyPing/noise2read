@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:10:03
+# @Last Modified time: 2023-04-07 16:58:10
 
 import optuna
 from sklearn.model_selection import train_test_split
@@ -53,7 +53,7 @@ class MLClassifier:
 
         sm = SMOTE(random_state=0)
         self.X_resampled, self.y_resampled = sm.fit_resample(self.x_train, self.y_train)
-        self.logger.info(f'After over-sampling {sorted(collections.Counter(self.y_resampled).items())}')
+        self.logger.info(f'After over-sampling: {sorted(collections.Counter(self.y_resampled).items())}')
 
         # rus = RandomUnderSampler(random_state=42)
         # self.X_resampled, self.y_resampled = rus.fit_resample(self.x_train, self.y_train)
@@ -148,9 +148,10 @@ class MLClassifier:
         trial.report(test_accuracy, trial.number)
         if trial.should_prune():
             raise optuna.TrialPruned()
-
-        self.logger.info("Train Accuracy: {}, Test Accuracy: {}".format(train_accuracy, test_accuracy))
-        self.logger.info("Train F1: {}, Test F1: {}".format(train_f1, test_f1))
+        
+        self.logger.info( " Trial " + trial.number)
+        self.logger.info("      Train Accuracy: {}, Test Accuracy: {}".format(train_accuracy, test_accuracy))
+        self.logger.info("      Train F1: {}, Test F1: {}".format(train_f1, test_f1))
         trial.set_user_attr(key="best_model", value=xgbc) # save model
 
         # results = xgbc.evals_result()
@@ -174,9 +175,11 @@ class MLClassifier:
         # study = optuna.create_study(study_name = self.study_name,
         #     pruner=optuna.pruners.MedianPruner(n_warmup_steps=5), direction="maximize" 
         # ) #, interval_steps=10 n_startup_trials=5, 
+        self.logger.info("-------------------------------------------------------------")
         study = optuna.create_study(study_name = self.study_name, direction="maximize")
         study.optimize(self.objective, n_trials, show_progress_bar=False, gc_after_trial=True)
         # print(study.best_trial)
+        
         self.logger.info(f'Study Name: {self.study_name}')
         self.logger.info('Number of finished trials: {}'.format(len(study.trials)))
         self.logger.info('Best trial:')
@@ -192,8 +195,8 @@ class MLClassifier:
         # self.objective(best_trial)
         # # # the user attribute is overwritten by re-evaluation
         # assert best_trial.user_attrs != best_trial_copy.user_attrs
-        if best_trial.value < self.config.best_accuracy:
-            self.logger.warning(f"The stduy {self.study_name} output bad best trial accuracy of {best_trial.value}, which may result in bad error correction performance.")
+        # if best_trial.value < self.config.best_accuracy:
+        #     self.logger.warning(f"The stduy {self.study_name} output lower best trial accuracy of {best_trial.value} than the pre-set self.config.best_accuracy, which may result in bad error correction performance.")
         # fig1 = optuna.visualization.plot_optimization_history(study)
         # fig1.write_image(os.path.join(self.config.result_dir, "optimization_history.png"))
 
@@ -221,6 +224,7 @@ class MLClassifier:
         # show the plot
         fig.savefig(os.path.join(self.config.result_dir, self.study_name + '_train-test-logloss.png'))
         predictions = best_model.predict_proba(self.ambi_data)[:, 1]
-
+        
+        self.logger.info("-------------------------------------------------------------")
         del study
         return predictions

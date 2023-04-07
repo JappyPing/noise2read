@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:11:24
+# @Last Modified time: 2023-04-07 16:44:23
 
 import os
 from Bio import SeqIO
@@ -62,7 +62,8 @@ class ErrorCorrection():
             genuine_ambi_errs_df, new_negative_df, high_ambi_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df, edit_dis=1)
             # correct errors
             genuine_corrected_file = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
-            self.logger.info("1nt-edit-distance based genuine and ambiguous errors corrected.")
+            self.logger.info("Genuine and ambiguous errors corrected.")
+            
             del genuine_ambi_errs_df, genuine_df, negative_df, ambiguous_df, unique_seqs
             ###############################################################################################
             # IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, genuine_corrected_file, self.config.result_dir, self.config.iso_change_detail, self.config.min_iters)
@@ -76,7 +77,9 @@ class ErrorCorrection():
             #####################################################################
             non_isolates_correct = self.all_in_one_high_ambiguous_err_correction(genuine_corrected_file, high_ambi_df)
             del high_ambiguous_df
+            self.logger.info("High ambiguous errors corrected.")
             self.logger.info('1nt-edit-distance based Errors Correction finished.')
+            self.logger.info("#############################################")
         else:
             genuine_ambi_errs_df, new_negative_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df=None, edit_dis=1)
             # correct errors

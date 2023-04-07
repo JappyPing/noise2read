@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-30 09:35:18
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-18 00:15:44
+# @Last Modified time: 2023-04-07 17:01:36
 
 from collections import Counter
 import collections
@@ -25,6 +25,8 @@ import seaborn as sns
 import matplotlib as mpl
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from random import shuffle
+from tqdm import tqdm
+from mpire import WorkerPool
 
 class DataAnalysis():
     """
@@ -40,6 +42,7 @@ class DataAnalysis():
         """
         self.logger = logger
         self.config = config
+        self.logger.info("-------------------------------------------------------------")
         self.logger.info(f'Raw dataset: {config.input_file}')
         self.logger.info(f'Correct dataset: {config.correct_data}')
         self.logger.info(f'Ground truth dataset: {config.ground_truth_data}')
@@ -100,16 +103,38 @@ class DataAnalysis():
         self.raw_len2seqs_dict = {}
         self.raw_len_lst = []
         total_reads_num = 0
+        
+        raw_record_dict = {}
+        correct_record_dict = {}
+        id_lst = []
         for raw_item, correct_item in zip(raw_record_iterator, correct_record_iterator):
+            raw_id = str(raw_item.id)
             raw_seq = str(raw_item.seq)
+
+            cor_id = str(correct_item.id)
+            cor_seq = str(correct_item.seq)
+            
             raw_seqs.append(raw_seq)
-            correct_seqs.append(str(correct_item.seq))
+            correct_seqs.append(cor_seq)
             
             ll = len(raw_seq)
             self.raw_len_lst.append(ll)
             self.raw_len2seqs_dict.setdefault(ll, []).append(raw_seq)
             total_reads_num += 1
+            
+            raw_record_dict[raw_id] = raw_seq
+            correct_record_dict[cor_id] = cor_seq
+            
+            id_lst.append(raw_id)
 
+        corrected_reads_num = 0
+
+        for item in tqdm(id_lst):
+            ori_read = raw_record_dict[item]
+            cor_read = correct_record_dict[item]
+            if str(cor_read) != str(ori_read):
+                corrected_reads_num += 1
+                
         raw_read2count = Counter(raw_seqs)
         correct_read2count = Counter(correct_seqs)
 
@@ -153,6 +178,10 @@ class DataAnalysis():
         self.logger.debug(f'Ground truth: {self.config.ground_truth_data}')
         if self.config.ground_truth_data:
             self.evaluation_with_groundtruth()
+        self.logger.info("noise2read corrected {} reads out of {} ({:.6f}) reads".format(corrected_reads_num, total_reads_num, corrected_reads_num/total_reads_num))
+        raw_unique_num = len(raw_read2count)
+        correct_unique_num = len(correct_read2count)
+        self.logger.info("Unique reads decreased by {} from {} to {} ({:.6f}) reads".format(raw_unique_num - correct_unique_num, raw_unique_num, correct_unique_num, (raw_unique_num - correct_unique_num)/raw_unique_num))
         # no ground truth entropy
         self.evaluation_without_groundtruth(raw_read2count, correct_read2count, total_reads_num)
         return
@@ -341,7 +370,7 @@ class DataAnalysis():
             if total_positive_reads < cor_positive_reads:
                 read_level['tp'] += 0
                 read_level['fn'] += total_positive_reads
-                self.logger.warning(f'Read-level Evaluation: introduced additional {cor_positive_reads - total_positive_reads} positive reads after correction for UMI {str(umi)}') 
+                # self.logger.warning(f'Read-level Evaluation: introduced additional {cor_positive_reads - total_positive_reads} positive reads after correction for UMI {str(umi)}') 
             if total_negative_reads < cor_negative_reads:
                 read_level['tn'] += total_negative_reads
                 read_level['fp'] += 0
@@ -442,6 +471,8 @@ class DataAnalysis():
         entropy = self.noise2read_entropy(raw_read2count, correct_read2count, total_reads_num)
         # self.save_entropy('Entropy H', entropy[0], entropy[1]) 
         self.logger.info("{}: raw dataset entropy: {}, correct dataset entropy: {}".format('Entropy H', entropy[0], entropy[1]))
+        self.logger.info("Information Gain: {}".format(entropy[0] - entropy[1]))
+        
         worksheet3 = self.workbook_flie.add_worksheet('Non-frequent Entropy')
         worksheet3.write('A1', 'H')
         worksheet3.write('A2', entropy[0])
@@ -591,11 +622,10 @@ class DataAnalysis():
 
         return
 
-    def entropy_item(self, shared_vars, freq):
-        total_freq, n = shared_vars
+    def entropy_item(self, total_freq, freq):
         if freq > 0:
             p = freq / total_freq
-            result = - p * math.log2(p)/ math.log2(n)
+            result = - p * math.log2(p)
         return result
 
     def noise2read_entropy(self, raw_read2count, correct_read2count, total_num):
@@ -613,9 +643,7 @@ class DataAnalysis():
 
         raw_nonFre_reads_total_num = sum(raw_entropy_items)
         # raw entropy
-        raw_unique_num = len(non_frequent_raw_reads)
-        shared_vars1 = raw_nonFre_reads_total_num, raw_unique_num
-        with WorkerPool(self.config.num_workers, shared_objects=shared_vars1, start_method='fork') as pool:
+        with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
             raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
         raw_entropy = sum(raw_entropy_lst) 
 
@@ -628,10 +656,7 @@ class DataAnalysis():
         # correct entropy
         correct_nonFre_reads_total_num = sum(correct_entropy_items)
 
-        correct_unique_num = len(non_frequent_correct_reads)
-        shared_vars2 = correct_nonFre_reads_total_num, correct_unique_num
-
-        with WorkerPool(self.config.num_workers, shared_objects=shared_vars2, start_method='fork') as pool:
+        with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
             correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
         correct_entropy = sum(correct_entropy_lst)
         ##################################################################################
@@ -647,26 +672,18 @@ class DataAnalysis():
             correct_kept_counts.append(correct_read2count[read])
             raw_kept_counts.append(raw_read2count[read])
 
-        raw_kept_total_num = sum(raw_kept_counts)
-
-        unique_kept_reads_num = len(kept_reads)
-        shared_vars3 = raw_kept_total_num, unique_kept_reads_num
-        with WorkerPool(self.config.num_workers, shared_objects=shared_vars3, start_method='fork') as pool:
+        with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
             raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
 
-        correct_kept_total_num = sum(correct_kept_counts)
-        shared_vars4 = correct_kept_total_num, unique_kept_reads_num
-        with WorkerPool(self.config.num_workers, shared_objects=shared_vars4, start_method='fork') as pool:
+        with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
             correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
 
         raw_removed_reads = raw_unique_reads - correct_unique_reads
         raw_removed_items = []
         for read in raw_removed_reads:
             raw_removed_items.append(raw_read2count[read])
-        removed_total_num = sum(raw_removed_items)
-        unique_removed_num = len(raw_removed_reads)
-        shared_vars5 = removed_total_num, unique_removed_num
-        with WorkerPool(self.config.num_workers, shared_objects=shared_vars5, start_method='fork') as pool:
+
+        with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
             raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
         for i in raw_removed_entropy_items_lst:
             if i <=0:
@@ -1454,4 +1471,98 @@ class DataAnalysis():
             p = freq / total_freq
             result = - delta * (p * math.log2(p)/ math.log2(n))
         return result
+
+
+    def entropy_item(self, shared_vars, freq):
+        total_freq, n = shared_vars
+        if freq > 0:
+            p = freq / total_freq
+            # result = - p * math.log2(p) / math.log2(n)
+            result = - p * math.log2(p)
+        return result
+
+    def noise2read_entropy(self, raw_read2count, correct_read2count, total_num):
+
+        raw_unique_reads = set(raw_read2count.keys())
+        correct_unique_reads = set(correct_read2count.keys())
+
+        frequent_reads = set([k for k, v in raw_read2count.items() if v > self.config.high_freq_thre])
+
+        # raw dataset
+        non_frequent_raw_reads = raw_unique_reads - frequent_reads
+        raw_entropy_items = []
+        for read in non_frequent_raw_reads:
+            raw_entropy_items.append(raw_read2count[read])
+
+        raw_nonFre_reads_total_num = sum(raw_entropy_items)
+        # raw entropy
+        non_frequent_raw_unique_num = len(non_frequent_raw_reads)
+
+        shared_vars1 = raw_nonFre_reads_total_num, non_frequent_raw_unique_num
+        with WorkerPool(self.config.num_workers, shared_objects=shared_vars1, start_method='fork') as pool:
+            raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
+        raw_entropy = sum(raw_entropy_lst) 
+
+        # correct dateset
+        non_frequent_correct_reads = correct_unique_reads - frequent_reads
+        correct_entropy_items = []
+        for read in non_frequent_correct_reads:
+            correct_entropy_items.append(correct_read2count[read])
+
+        # correct entropy
+        correct_nonFre_reads_total_num = sum(correct_entropy_items)
+
+        # correct_unique_num = len(non_frequent_correct_reads)
+        shared_vars2 = correct_nonFre_reads_total_num, non_frequent_raw_unique_num
+
+        with WorkerPool(self.config.num_workers, shared_objects=shared_vars2, start_method='fork') as pool:
+            correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
+        correct_entropy = sum(correct_entropy_lst)
+        ##################################################################################
+        #information gain (\delta I) heatmap
+        new_reads = correct_unique_reads - raw_unique_reads
+        new_reads_num = len(new_reads)
+        self.logger.info("Wrongly introduced {} new reads".format(new_reads_num))
+
+        raw_kept_counts = []
+        correct_kept_counts = []
+        kept_reads = correct_unique_reads & raw_unique_reads
+        for read in kept_reads:
+            correct_kept_counts.append(correct_read2count[read])
+            raw_kept_counts.append(raw_read2count[read])
+
+        # unique_kept_reads_num = len(kept_reads)
+        raw_unique_num = len(raw_unique_reads)
+        shared_vars3 = total_num, raw_unique_num
+        with WorkerPool(self.config.num_workers, shared_objects=shared_vars3, start_method='fork') as pool:
+            raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
+
+        correct_kept_total_num = sum(correct_kept_counts)
+        # shared_vars4 = correct_kept_total_num, unique_kept_reads_num
+        shared_vars4 = total_num, raw_unique_num
+        with WorkerPool(self.config.num_workers, shared_objects=shared_vars4, start_method='fork') as pool:
+            correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
+
+        raw_removed_reads = raw_unique_reads - correct_unique_reads
+        raw_removed_items = []
+        for read in raw_removed_reads:
+            raw_removed_items.append(raw_read2count[read])
+        # removed_total_num = sum(raw_removed_items)
+        # unique_removed_num = len(raw_removed_reads)
+        shared_vars5 = total_num, raw_unique_num
+        with WorkerPool(self.config.num_workers, shared_objects=shared_vars5, start_method='fork') as pool:
+            raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
+        for i in raw_removed_entropy_items_lst:
+            if i <=0:
+                print('Warning')
+        entropy_item_lst = []
+        for i, j in zip(raw_kept_entropy_lst, correct_kept_entropy_lst):
+            entropy_item_lst.append(i - j)
+        entropy_item_lst.extend(raw_removed_entropy_items_lst)
+        if new_reads_num > 0:
+            entropy_item_lst.extend([np.nan] * new_reads_num)
+        shuffle(entropy_item_lst)
+        self.gain2heatmap(entropy_item_lst)
+        return [raw_entropy, correct_entropy]
+
     '''

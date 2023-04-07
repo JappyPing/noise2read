@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:10:55
+# @Last Modified time: 2023-04-07 16:58:38
 
 import editdistance
 import networkx as nx
@@ -270,12 +270,13 @@ class DataGneration():
         subgraph_num = len(subgraphs)
         shared_obs = subgraphs, edit_dis
         idx = 0
+        self.logger.info("  Extracting genuine and ambiguous errors...")
         with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
             for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num), progress_bar=self.config.verbose):
                 if genu_ambi_lst[0]:
                     genuine_lst.extend(genu_ambi_lst[0])
                     ambiguous_lst.extend(genu_ambi_lst[1])
-                    
+        self.logger.info("      Extraction done.")                    
         # with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
         #     with tqdm(total=subgraph_num, desc=self.logger.info("Extract samples with genuine errors"), miniters=int(subgraph_num/self.config.min_iters)) as pbar:   
         #         for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)):
@@ -420,6 +421,8 @@ class DataGneration():
             MultiVariables: MultiVariables for next step error correction
         """
         # 1nt-edit-distance-based graph
+        self.logger.info("-------------------------------------------------------------")
+        self.logger.info("1nt-edit-distance read graph error correction")
         graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(self.config.input_file, edit_dis)
         seq_max_len = max(seqs_lens_lst)
         seq_min_len = min(seqs_lens_lst)
@@ -449,6 +452,7 @@ class DataGneration():
         Returns:
             DataFrame: one pandas dataframe saving isolated high frequency reads
         """
+        self.logger.info("  Extracting negative samples...")
         if not nx.is_connected(graph):
             self.logger.debug("G is a connected graph: {}".format(nx.is_connected(graph)))
             isolates = set(list(nx.isolates(graph)))        
@@ -470,6 +474,7 @@ class DataGneration():
                 negative_df.loc[len(negative_df)] = line  
         if self.config.verbose:
             negative_df.to_csv(negative_csv, index=False) 
+        self.logger.info("      Extraction done!")
         return negative_df
 
     def extract_isolates(self, graph, unique_seqs, seqs2id_dict):
@@ -484,6 +489,7 @@ class DataGneration():
         Returns:
             files: two files of isolates and non-isolates based on constructed graph
         """
+        self.logger.info("  Extracting isolated nodes.")
         if not nx.is_connected(graph):
             self.logger.debug("G is a connected graph: {}".format(nx.is_connected(graph)))
             isolates = set(list(nx.isolates(graph)))
@@ -518,7 +524,7 @@ class DataGneration():
         extract_records(self.config.result_dir, name_lst, self.config.input_file, isolates_file)
         extract_records(self.config.result_dir, non_name_lst, self.config.input_file, non_isolates_file)
 
-        self.logger.info("Isolated nodes extraction completed.")
+        self.logger.info("      Extraction done.")
         return isolates_file, non_isolates_file
 
     def generate_graph(self, data_set, edit_dis):
@@ -536,8 +542,7 @@ class DataGneration():
         #     self.logger.error("No input file!")
         #     # os._exit(0)
         # else:
-        self.logger.info(data_set)
-
+        self.logger.info("Input dataset '% s'" % data_set)
         record_iterator, file_type = parse_data(data_set)
         seqs2id_dict = {}
         total_seqs = []
@@ -554,7 +559,8 @@ class DataGneration():
         read_count = Counter(total_seqs)
         high_freq = []
         low_freq = []
-        for read, frequency in tqdm(read_count.items(), desc=self.logger.info("Read Counts"), miniters=int(len(read_count)/self.config.min_iters)):
+
+        for read, frequency in tqdm(read_count.items(), desc=self.logger.info("Adding nodes to " + str(edit_dis) + "-edit-distance read graph..."), miniters=int(len(read_count)/self.config.min_iters)):
             if not graph.has_node(read):
                 graph.add_node(read, count = frequency, flag=False)  
             if frequency >= self.config.high_freq_thre:
@@ -565,13 +571,15 @@ class DataGneration():
             self.logger.error("Error Correction Failed as no high-frequency reads detected.")
             sys.exit(1)
         self.logger.debug(len(read_count))
+
         ######################################################
         edges_lst = []
         if edit_dis == 1:
             shared_unique_seqs = unique_seqs
         elif edit_dis == 2:
             shared_unique_seqs = low_freq
-
+        
+        self.logger.info("Searching edges for constructing " + str(edit_dis) + "-edit-distance read graph...")
         with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
             if edit_dis == 1:
                 for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, progress_bar=self.config.verbose):
@@ -594,7 +602,7 @@ class DataGneration():
             self.logger.debug(len(edges_lst))
             self.logger.debug(edges_lst[0])
             graph.add_edges_from(edges_lst)
-
+        self.logger.info(str(edit_dis) + "-edit-distance read graph construction finished.")
         ########################################################
         # save graphs
         if self.config.graph_visualization or self.config.save_graph:
@@ -766,7 +774,7 @@ class DataGneration():
         """
         high_ambiguous_df = pd.DataFrame(columns=["idx", "StartRead", "StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])
         idx = 0
-        for s in tqdm(subgraphs, desc=self.logger.info("Extract samples of high ambiguous errors from 1nt-edit-distance graph"), miniters=int(len(subgraphs)/self.config.min_iters)):
+        for s in tqdm(subgraphs, desc=self.logger.info("    Extracting high ambiguous errors from 1nt-edit-distance graph"), miniters=int(len(subgraphs)/self.config.min_iters)):
             edges_lst = [e for e in s.edges()]
             if len(edges_lst) > 0:
                 for (a, b) in edges_lst:
@@ -788,6 +796,7 @@ class DataGneration():
         if self.config.verbose:
             high_ambiguous_csv = self.config.result_dir + "high_ambiguous_1nt.csv"
             high_ambiguous_df.to_csv(high_ambiguous_csv, index=False)  
+        self.logger("       Extraction done!")
         return high_ambiguous_df
 
 '''

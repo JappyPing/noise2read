@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:11:43
+# @Last Modified time: 2023-04-07 16:47:06
 
 from typing import Counter
 import numpy as np
@@ -64,7 +64,7 @@ class Reads2Vectors():
         return features 
 
     def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
-        self.logger.info("Embedding genuine and high ambiguous data.")
+        self.logger.info("  Embedding genuine and high ambiguous data.")
         genuine_reads_lst1 = []
         negtive_reads_lst1 = []
         ambiguous_reads_lst1 = []
@@ -218,7 +218,7 @@ class Reads2Vectors():
         return train, labels, ambiguous
 
     def all_in_one_embedding(self, total_reads, genuine_df, negative_df, ambiguous_df, high_flag):
-        self.logger.info("Embedding genuine and ambiguous data.")
+        self.logger.info("  Embedding genuine and ambiguous data.")
         genuine_reads_lst1 = []
         negtive_reads_lst1 = []
         ambiguous_reads_lst1 = []

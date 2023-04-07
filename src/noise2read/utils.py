@@ -2,23 +2,23 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:12:28
+# @Last Modified time: 2023-04-06 12:42:53
 
 from Bio import SeqIO
 import gzip
 # from Bio.SeqRecord import SeqRecord
 # from Bio.Seq import Seq
-from tqdm import tqdm
-from mpire import WorkerPool
 import logging
 from colorlog import ColoredFormatter
 import copy
 import random
 import editdistance
 import os
+import datetime
 
-def custom_logger(root_name, debug_mode) -> logging.Logger:
-    logger = logging.getLogger(root_name)
+def custom_logger(root_name, debug_mode) -> logging.Logger: 
+    logger = logging.getLogger(root_name)    
+    
     formatter = ColoredFormatter(
         "%(green)s[%(asctime)s] %(blue)s%(name)s %(log_color)s%(levelname)-8s%(reset)s %(message)s",
         datefmt=None,
@@ -37,17 +37,17 @@ def custom_logger(root_name, debug_mode) -> logging.Logger:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
-
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
     
-    # # Output full log
-    # file_handler = logging.FileHandler('noise2read.log')
-    # file_handler.setLevel(logging.INFO)
-    # # formatter = logging.Formatter(log_format)
-    # file_handler.setFormatter(formatter)
-    # logger.addHandler(file_handler)
+    # Output full log
+    file_handler = logging.FileHandler( datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + 'noise2read.log')
+
+    file_handler.setLevel(logging.INFO)
+
+    # formatter = logging.Formatter(log_format)
+    logger.addHandler(file_handler)
 
     # # Output warning log
     # file_handler = logging.FileHandler('noise2read.Warning.log')
@@ -342,18 +342,18 @@ def error_type_classification(read1, read2):
 def usage():
     # print(" ")
     print("noise2read Usage:")
-    print("   Mandatary:")
+    print("   Mandatory:")
     print("     -m|--module                   module selection")
     print("   Modules: [correction, amplicon_correction, umi_correction, mimic_umi, real_umi, evaluation, simulation]")
     # print(" ")
     print("1. Using config file")
     print("     noise2read -m|--module <module_name> -c <path_configuration_file>")
-    print("   Mandatary:")
+    print("   Mandatory:")
     print("     -c|--config                   input configuration file")
     # print(" ")
     print("2. Using command line with the default parameters")
     print("     noise2read -m|--module <module_name> -i <path_raw_data.fastq|fasta|fa|fq>")
-    print("   Mandatary:")
+    print("   Mandatory:")
     print("     -i|--input                    input raw data to be corrected")
     print("   Options:")
     print("     -d|--directory                set output directory")
