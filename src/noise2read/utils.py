@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-06 12:42:53
+# @Last Modified time: 2023-04-07 17:22:18
 
 from Bio import SeqIO
 import gzip
@@ -42,7 +42,7 @@ def custom_logger(root_name, debug_mode) -> logging.Logger:
     logger.addHandler(stream_handler)
     
     # Output full log
-    file_handler = logging.FileHandler( datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + 'noise2read.log')
+    file_handler = logging.FileHandler( datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_") + 'noise2read.log')
 
     file_handler.setLevel(logging.INFO)
 
