@@ -7,19 +7,34 @@ To use noise2read, please create anaconda virtual environment (because current n
 1. pip and conda
 <<<<<<<<<<<<<<<<
 
-1.1 Creating Conda Environment
-------------------------------
+1.1 Creating Virtual Environment
+--------------------------------
+conda
+-----
 .. code-block:: console
 
-   (base) $ conda create -n noise2read python=3.8
+   (base) $ conda create -n noise2read_env python=3.8
+
+Or 
+
+python venv
+-----------
+.. code-block:: console
+
+   $ mkdir noise2read
+   $ cd noise2read
+   $ python -m venv noise2read_env
+   $ source noise2read_env/bin/activate
+
+Notes: make sure you have installed and currently using python 3
 
 1.2 Installing conda distributed dependency
 -------------------------------------------
 
 .. code-block:: console
 
-   (noise2read) $ conda install -c bioconda seqtk
-   (noise2read) $ conda install -c bioconda bcool
+   (noise2read_env) $ conda install -c bioconda seqtk
+   (noise2read_env) $ conda install -c bioconda bcool
 
 Optional to install pygraphviz if you don't need the visualised read graph.
 
@@ -32,7 +47,7 @@ Optional to install pygraphviz if you don't need the visualised read graph.
 
 .. code-block:: console
 
-   (noise2read) $ pip install noise2read
+   (noise2read_env) $ pip install noise2read
 
 .. code-block:: console
 
@@ -52,7 +67,7 @@ Optional to install pygraphviz if you don't need the visualised read graph.
 
 will be installed automatically
 
-2. source code clone
+1. source code clone
 <<<<<<<<<<<<<<<<<<<<
 2.1 Creating Virtual Environment 
 --------------------------------
@@ -60,20 +75,30 @@ conda
 -----
 .. code-block:: console
 
-   (base) $ conda create -n noise2read python=3.8
+   (base) $ conda create -n noise2read_env python=3.8
 
-pip
----
+Or 
+
+python venv
+-----------
 .. code-block:: console
 
-   (base) $ conda create -n noise2read python=3.8
+   $ mkdir noise2read
+   $ cd noise2read
+   $ python -m venv noise2read_env
+   $ source noise2read_env/bin/activate
 
--- code-block:: console
+Notes: make sure you have installed and currently using python 3
 
-   git clone https://github.com/Jappy0/noise2read.git
+2.1 Git clone 
+--------------------------------
+.. code-block:: console
 
+   (noise2read_env)$ git clone https://github.com/Jappy0/noise2read.git
+   (noise2read_env)$ cd noise2read
+   (noise2read_env)$ pip install -e .
 
-1. Bioconda version
+3. Bioconda version
 <<<<<<<<<<<<<<<<<<<
 
 Bioconda channel-based noise2read version will be released after published.
