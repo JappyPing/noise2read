@@ -5,13 +5,13 @@ QuickStart
 Easy Install
 ============
 
-1. `noise2read <https://pypi.org/project/noise2read/>`_ is currently distributed on `PyPI <https://pypi.org/project/noise2read/>`_, quick install noise2read in the build environment.
+`noise2read <https://pypi.org/project/noise2read/>`_ is currently distributed on `PyPI <https://pypi.org/project/noise2read/>`_, quick install noise2read in the build environment.
 
 .. code-block:: console
 
     pip install noise2read
 
-1. and then install three conda distributed packages of seqtk bcool and pygraphviz, respectively.
+and then install three conda distributed packages of seqtk bcool and pygraphviz, respectively.
 
 .. code-block:: console
 
