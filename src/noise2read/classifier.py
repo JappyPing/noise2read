@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-07 16:58:10
+# @Last Modified time: 2023-04-07 22:31:52
 
 import optuna
 from sklearn.model_selection import train_test_split
@@ -149,7 +149,7 @@ class MLClassifier:
         if trial.should_prune():
             raise optuna.TrialPruned()
         
-        self.logger.info( " Trial " + trial.number)
+        self.logger.info( " Trial " + str(trial.number))
         self.logger.info("      Train Accuracy: {}, Test Accuracy: {}".format(train_accuracy, test_accuracy))
         self.logger.info("      Train F1: {}, Test F1: {}".format(train_f1, test_f1))
         trial.set_user_attr(key="best_model", value=xgbc) # save model

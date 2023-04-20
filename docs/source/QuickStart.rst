@@ -21,7 +21,7 @@ Easy Install
 
     conda install -c bioconda bcool
 
-Optional to install pygraphviz if you don't need the visualised read graph.
+Optional to install pygraphviz if you need the visualised read graph.
 
 .. code-block:: console
 

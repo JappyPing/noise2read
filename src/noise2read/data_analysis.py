@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-30 09:35:18
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-07 17:01:36
+# @Last Modified time: 2023-04-11 17:09:30
 
 from collections import Counter
 import collections
@@ -178,7 +178,7 @@ class DataAnalysis():
         self.logger.debug(f'Ground truth: {self.config.ground_truth_data}')
         if self.config.ground_truth_data:
             self.evaluation_with_groundtruth()
-        self.logger.info("noise2read corrected {} reads out of {} ({:.6f}) reads".format(corrected_reads_num, total_reads_num, corrected_reads_num/total_reads_num))
+        self.logger.info("corrected {} reads out of {} ({:.6f}) reads".format(corrected_reads_num, total_reads_num, corrected_reads_num/total_reads_num))
         raw_unique_num = len(raw_read2count)
         correct_unique_num = len(correct_read2count)
         self.logger.info("Unique reads decreased by {} from {} to {} ({:.6f}) reads".format(raw_unique_num - correct_unique_num, raw_unique_num, correct_unique_num, (raw_unique_num - correct_unique_num)/raw_unique_num))

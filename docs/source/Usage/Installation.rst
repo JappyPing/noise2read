@@ -54,10 +54,26 @@ will be installed automatically
 
 2. source code clone
 <<<<<<<<<<<<<<<<<<<<
+2.1 Creating Virtual Environment 
+--------------------------------
+conda
+-----
+.. code-block:: console
 
-TODO
+   (base) $ conda create -n noise2read python=3.8
 
-3. Bioconda version
+pip
+---
+.. code-block:: console
+
+   (base) $ conda create -n noise2read python=3.8
+
+-- code-block:: console
+
+   git clone https://github.com/Jappy0/noise2read.git
+
+
+1. Bioconda version
 <<<<<<<<<<<<<<<<<<<
 
-Bioconda channel-based noise2read version will be released late.
+Bioconda channel-based noise2read version will be released after published.
