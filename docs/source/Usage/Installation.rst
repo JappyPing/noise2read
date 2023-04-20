@@ -9,16 +9,15 @@ To use noise2read, please create anaconda virtual environment (because current n
 
 1.1 Creating Virtual Environment
 --------------------------------
-conda
------
+using conda
+
 .. code-block:: console
 
    (base) $ conda create -n noise2read_env python=3.8
 
 Or 
+using python venv
 
-python venv
------------
 .. code-block:: console
 
    $ mkdir noise2read
@@ -64,23 +63,21 @@ Optional to install pygraphviz if you don't need the visualised read graph.
       mpire >= 2.5.0
       editdistance == 0.6.0
       imbalanced-learn == 0.9.1
+      seaborn >= 0.12.1
 
 will be installed automatically
 
-1. source code clone
+1. source code clone and Installation
 <<<<<<<<<<<<<<<<<<<<
 2.1 Creating Virtual Environment 
 --------------------------------
-conda
------
+using conda
 .. code-block:: console
 
    (base) $ conda create -n noise2read_env python=3.8
 
 Or 
-
-python venv
------------
+using python venv
 .. code-block:: console
 
    $ mkdir noise2read
@@ -90,7 +87,7 @@ python venv
 
 Notes: make sure you have installed and currently using python 3
 
-2.1 Git clone 
+2.1 Git clone and installing
 --------------------------------
 .. code-block:: console
 
@@ -98,7 +95,7 @@ Notes: make sure you have installed and currently using python 3
    (noise2read_env)$ cd noise2read
    (noise2read_env)$ pip install -e .
 
-3. Bioconda version
+1. Bioconda version
 <<<<<<<<<<<<<<<<<<<
 
 Bioconda channel-based noise2read version will be released after published.

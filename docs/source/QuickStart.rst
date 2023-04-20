@@ -44,7 +44,7 @@ Examples
 
     noise2read -m correction -i *.fa/fasta/fastq/fq -a True -g gpu_hist -d output_directory
 
-1. Correcting amplicon sequencing data with default parameters
+2. Correcting amplicon sequencing data with default parameters
 
 * Training with CPU
   

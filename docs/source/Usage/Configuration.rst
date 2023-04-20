@@ -52,10 +52,10 @@ You can configure some parameters using CLI mode with/without INI file configura
 .. code-block:: console
 
 
-1. INI file configuration
+2. INI file configuration 
 <<<<<<<<<<<<<<<<<<<<<<<<< 
 
-The following contents is the default setting for an INI file configuration.
+The following contents are the default setting for an INI file configuration.
 
 .. code-block:: console
 
@@ -63,11 +63,11 @@ The following contents is the default setting for an INI file configuration.
     ResultDir = "./result/"
 
     [SourceInputData]
-    input_file = path/to/data.fastq
+    input_file = path/to/data.fastq # change this to your full path data
     ground_truth_data = path/to/data.fastq # optional
 
     [General]
-    num_workers = -1
+    num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
     verbose = True
     min_iters = 100
     iso_change_detail = True

@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-05 17:34:22
+# @Last Modified time: 2023-04-20 14:53:24
 
 from noise2read.config import Config
 import sys, getopt
@@ -119,10 +119,10 @@ def main():
                     #         logger.exception("Wrongly set over_sampling")
                     #         raise
                     if config.num_workers <= 0:
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     ##############################################################
                     DG = DataGneration(logger, config)
                     if config.high_ambiguous:
@@ -207,10 +207,10 @@ def main():
                         logger.exception('Input file does not exsit.')
                         raise
                     if config.num_workers <= 0:
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     ##############################################################
                     DG = DataGneration(logger, config)
                     if config.high_ambiguous:
@@ -276,10 +276,10 @@ def main():
                         config.high_ambiguous = opts_dict[a_lst[0]] 
 
                     if config.num_workers <= 0:
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     ##############################################################
                     config.high_ambiguous=False
                     DG = DataGneration(logger, config)
@@ -308,10 +308,10 @@ def main():
                         config.result_dir = opts_dict[d_lst[0]] 
 
                     if config.num_workers <= 0:
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                 #############################################################
                     DP = DataProcessing( 
                         logger,
@@ -338,10 +338,10 @@ def main():
                     if d_lst:
                         config.result_dir = opts_dict[d_lst[0]] 
                     if config.num_workers <= 0:
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     DP = DataProcessing( 
                         logger,
                         config.num_workers,
@@ -386,10 +386,10 @@ def main():
                         sys.exit()
 
                     if config.num_workers <= 0:
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                 #############################################################
                     DataAnalysis(logger, config).evaluation()
 ############################################################################################################################
@@ -426,10 +426,10 @@ def main():
                     #         logger.exception("Wrongly set over_sampling")
                     #         raise
                     if config.num_workers <= 0:
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
-                        config.num_workers = available_cpu_cores - 2
+                        config.num_workers = available_cpu_cores
                     Simulation(logger, config).simulation()
 ############################################################################################################################
                 # elif module_arg == "extract_isolates": 
