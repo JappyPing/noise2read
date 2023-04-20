@@ -36,21 +36,35 @@ noise2read is a command-line interface (CLI) based tool to eliminate PCR and seq
 1.2 Optional CLI setting
 <<<<<<<<<<<<<<<<<<<<<<<<
 
-You can configure some parameters using CLI mode with/without INI file configuration. INI file configuration can set all the parameters except for module selection. With INI file configuration, the following parameters settings in the INI file will be invalid when setting them using CLI mode. The following parameters settings
+You can configure some parameters using CLI mode with/without INI file configuration. INI file configuration can set all the parameters except for module selection. The following parameters settings in the INI file will be invalid when setting them using CLI mode.
 
 .. code-block:: console
 
+    -u | --umi_file umi.fastq
 
 .. code-block:: console
 
+    -t | --true ground_truth.data.fastq
 
 .. code-block:: console
 
+    -r | --rectification corrected.data.fastq
 
 .. code-block:: console
 
+    -p | --parallel num_of_cpu_core
+
 .. code-block:: console
 
+    -a | --high_ambiguous True/False
+
+.. code-block:: console
+
+    -g | --tree_method gpu_hist/auto
+
+.. code-block:: console
+
+    -d | --directory */output_dir/
 
 2. INI file configuration 
 <<<<<<<<<<<<<<<<<<<<<<<<< 
@@ -60,15 +74,15 @@ The following contents are the default setting for an INI file configuration.
 .. code-block:: console
 
     [Paths]
-    ResultDir = "./result/"
+    ResultDir = "./result/" # set output directory
 
     [SourceInputData]
-    input_file = path/to/data.fastq # change this to your full path data
-    ground_truth_data = path/to/data.fastq # optional
+    input_file = path/to/data.fastq # set your data to be corrected
+    # ground_truth_data = path/to/data.fastq # only set when you have groundtruth data, otherwise comment it
 
     [General]
     num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
-    verbose = True
+    verbose = True 
     min_iters = 100
     iso_change_detail = True
     top_n = 100

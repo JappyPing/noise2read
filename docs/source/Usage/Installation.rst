@@ -68,7 +68,7 @@ Optional to install pygraphviz if you don't need the visualised read graph.
 will be installed automatically
 
 1. source code clone and Installation
-<<<<<<<<<<<<<<<<<<<<
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
 2.1 Creating Virtual Environment 
 --------------------------------
 using conda
