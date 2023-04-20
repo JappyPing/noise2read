@@ -67,7 +67,7 @@ Optional to install pygraphviz if you don't need the visualised read graph.
 
 will be installed automatically
 
-1. source code clone and Installation
+2. source code clone and Installation
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
 2.1 Creating Virtual Environment 
 --------------------------------
@@ -95,7 +95,7 @@ Notes: make sure you have installed and currently using python 3
    (noise2read_env)$ cd noise2read
    (noise2read_env)$ pip install -e .
 
-1. Bioconda version
+3. Bioconda version
 <<<<<<<<<<<<<<<<<<<
 
 Bioconda channel-based noise2read version will be released after published.
