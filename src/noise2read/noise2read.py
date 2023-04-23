@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-20 14:53:24
+# @Last Modified time: 2023-04-23 11:18:08
 
 from noise2read.config import Config
 import sys, getopt
@@ -107,7 +107,7 @@ def main():
                     if p_lst:
                         config.num_workers = int(opts_dict[p_lst[0]])      
                     if a_lst:
-                        config.high_ambiguous = opts_dict[a_lst[0]]
+                        config.high_ambiguous = bool(opts_dict[a_lst[0]])
                     if g_lst:
                         config.tree_method = opts_dict[g_lst[0]]
                     # if o_lst:
@@ -192,7 +192,7 @@ def main():
                     if p_lst:
                         config.num_workers = int(opts_dict[p_lst[0]])    
                     if a_lst:
-                        config.high_ambiguous = opts_dict[a_lst[0]] 
+                        config.high_ambiguous = bool(opts_dict[a_lst[0]])
                     if g_lst:
                         config.tree_method = opts_dict[g_lst[0]] 
                     # if o_lst:
@@ -272,8 +272,8 @@ def main():
                         config.result_dir = opts_dict[d_lst[0]] 
                     if p_lst:
                         config.num_workers = int(opts_dict[p_lst[0]])  
-                    if a_lst:
-                        config.high_ambiguous = opts_dict[a_lst[0]] 
+                    # if a_lst:
+                    #     config.high_ambiguous = bool(opts_dict[a_lst[0]])
 
                     if config.num_workers <= 0:
                         config.num_workers = available_cpu_cores
@@ -414,7 +414,7 @@ def main():
                     if d_lst:
                         config.result_dir = opts_dict[d_lst[0]] 
                     if a_lst:
-                        config.high_ambiguous = opts_dict[a_lst[0]]
+                        config.high_ambiguous = bool(opts_dict[a_lst[0]])
                     if g_lst:
                         config.tree_method = opts_dict[g_lst[0]]
                     # if o_lst:
