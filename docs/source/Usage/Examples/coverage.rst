@@ -1,10 +1,9 @@
-Real_UMI
+Coverage
 --------
 
-Take SARS_Cov_2 data as an example
+Take abundance change for the reference genome of SARS_Cov_2 as an example
 
-* Download the reference from 
-`D18_D21 <https://studentutsedu-my.sharepoint.com/personal/pengyao_ping_student_uts_edu_au/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fpengyao%5Fping%5Fstudent%5Futs%5Fedu%5Fau%2FDocuments%2Fnoise2read%5Fdata%2FD18%5FD21&view=0>`_
+* Download the reference from `D18_D21 <https://studentutsedu-my.sharepoint.com/personal/pengyao_ping_student_uts_edu_au/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fpengyao%5Fping%5Fstudent%5Futs%5Fedu%5Fau%2FDocuments%2Fnoise2read%5Fdata%2FD18%5FD21&view=0>`_
 
 Or NCBI
 
@@ -12,8 +11,7 @@ Or NCBI
 
     wget https://www.ncbi.nlm.nih.gov/nuccore/MN996528.1?report=fasta
 
-* Download original and corrected datasets
-`D18_D21 <https://studentutsedu-my.sharepoint.com/personal/pengyao_ping_student_uts_edu_au/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fpengyao%5Fping%5Fstudent%5Futs%5Fedu%5Fau%2FDocuments%2Fnoise2read%5Fdata%2FD18%5FD21&view=0>`_
+* Download original and corrected datasets from `D18_D21 <https://studentutsedu-my.sharepoint.com/personal/pengyao_ping_student_uts_edu_au/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fpengyao%5Fping%5Fstudent%5Futs%5Fedu%5Fau%2FDocuments%2Fnoise2read%5Fdata%2FD18%5FD21&view=0>`_
 
 * Get base coverage
 
