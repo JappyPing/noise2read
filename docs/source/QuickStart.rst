@@ -11,7 +11,7 @@ Easy Install
 
     pip install noise2read
 
-and then install three conda distributed packages of seqtk bcool and pygraphviz, respectively.
+and then install three conda distributed packages of seqtk, bcool and pygraphviz, respectively.
 
 .. code-block:: console
 

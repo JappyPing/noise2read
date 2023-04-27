@@ -1,7 +1,7 @@
 Correction
 ----------
-1. Download data set
-<<<<<<<<<<<<<<<<<<<<
+1. Download data sets raw and ground truth data sets 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
 
@@ -17,8 +17,8 @@ Or create it by yourself and copy the following contents
     ResultDir = "./result/" # set output directory
 
     [SourceInputData]
-    input_file = path/to/data.fastq # set your data to be corrected
-    # ground_truth_data = path/to/data.fastq # only set when you have groundtruth data, otherwise comment it
+    input_file = ./data/D1_D8/raw/D1_umi_SRR1543964.fastq # set your data to be corrected
+    ground_truth_data = ./data/D1_D8/true/D1_umi_SRR1543964.fastq # only set when you have groundtruth data, otherwise comment it
 
     [General]
     num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 

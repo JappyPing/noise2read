@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-23 11:18:08
+# @Last Modified time: 2023-04-25 18:21:29
 
 from noise2read.config import Config
 import sys, getopt
@@ -13,7 +13,8 @@ import os
 from noise2read.simulation import Simulation
 from noise2read.utils import custom_logger, usage
 from noise2read.data_preprocessing import DataProcessing
-from contextlib import redirect_stdout
+# from contextlib import redirect_stdout
+import noise2read
 
 def main():
     argv = sys.argv[1:]
@@ -23,7 +24,7 @@ def main():
     ##############################################################
     try:
         # opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:o:l:h:", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "over_sampling", "libray_layout", "help"]) 
-        opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:l:h", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "libray_layout", "help"]) 
+        opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:l:hv", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "libray_layout", "help", "version"]) 
         script_name = sys.argv[0]
         input_commands = [script_name]
 
@@ -42,9 +43,13 @@ def main():
             tar_set = set(opts_keys)
 
             h_lst = list({'-h', '--help'}.intersection(tar_set))
+            v_lst = list({'-v', '--version'}.intersection(tar_set))
             if h_lst:
                 usage()           
-                sys.exit()  
+                sys.exit() 
+            elif v_lst: 
+                print("Version: " + noise2read.__version__)
+                sys.exit()
             else: 
                 m_lst = list({"-m", "--module"}.intersection(tar_set))
                 c_lst = list({"-c", "--config"}.intersection(tar_set)) 
@@ -107,7 +112,8 @@ def main():
                     if p_lst:
                         config.num_workers = int(opts_dict[p_lst[0]])      
                     if a_lst:
-                        config.high_ambiguous = bool(opts_dict[a_lst[0]])
+                        config.high_ambiguous = eval(opts_dict[a_lst[0]])
+                        # print(config.high_ambiguous)
                     if g_lst:
                         config.tree_method = opts_dict[g_lst[0]]
                     # if o_lst:
@@ -192,7 +198,7 @@ def main():
                     if p_lst:
                         config.num_workers = int(opts_dict[p_lst[0]])    
                     if a_lst:
-                        config.high_ambiguous = bool(opts_dict[a_lst[0]])
+                        config.high_ambiguous = eval(opts_dict[a_lst[0]])
                     if g_lst:
                         config.tree_method = opts_dict[g_lst[0]] 
                     # if o_lst:
@@ -273,7 +279,7 @@ def main():
                     if p_lst:
                         config.num_workers = int(opts_dict[p_lst[0]])  
                     # if a_lst:
-                    #     config.high_ambiguous = bool(opts_dict[a_lst[0]])
+                    #     config.high_ambiguous = eval(opts_dict[a_lst[0]])
 
                     if config.num_workers <= 0:
                         config.num_workers = available_cpu_cores
@@ -414,7 +420,7 @@ def main():
                     if d_lst:
                         config.result_dir = opts_dict[d_lst[0]] 
                     if a_lst:
-                        config.high_ambiguous = bool(opts_dict[a_lst[0]])
+                        config.high_ambiguous = eval(opts_dict[a_lst[0]])
                     if g_lst:
                         config.tree_method = opts_dict[g_lst[0]]
                     # if o_lst:

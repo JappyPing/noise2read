@@ -1,7 +1,7 @@
 Examples
 --------
 
-noise2read contains .
+The example here implements the results in the work of nois2read.
 
 .. toctree::
     :maxdepth: 1  
