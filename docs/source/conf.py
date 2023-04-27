@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:02:09
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-20 15:24:48
+# @Last Modified time: 2023-04-27 14:53:51
 # Configuration file for the Sphinx documentation builder.
 import os
 import sys
@@ -70,7 +70,7 @@ myst_heading_anchors = 3
 #
 
 html_theme = "furo"
-html_title = "Short Reads Rectification"
+html_title = "**Short Reads Rectification**"
 language = "en"
 html_logo = "logo_transparent.svg"
 

@@ -30,30 +30,30 @@ Optional to install pygraphviz if you need the visualised read graph.
 ========
 Examples
 ========
-1. General correction for short reads set with default parameters.
+#. General correction for short reads set with default parameters.
    
-* Training with CPU
-  
-.. code-block:: console
+   * Training with CPU
+     
+   .. code-block:: console
 
-    noise2read -m correction -i *.fa/fasta/fastq/fq -a True -d output_directory
+       noise2read -m correction -i *.fa/fasta/fastq/fq -a True -d output_directory
 
-* Training with GPU
+   * Training with GPU
 
-.. code-block:: console
+   .. code-block:: console
 
-    noise2read -m correction -i *.fa/fasta/fastq/fq -a True -g gpu_hist -d output_directory
+       noise2read -m correction -i *.fa/fasta/fastq/fq -a True -g gpu_hist -d output_directory
 
-2. Correcting amplicon sequencing data with default parameters
+#. Correcting amplicon sequencing data with default parameters
 
-* Training with CPU
-  
-.. code-block:: console
+    * Training with CPU
+    
+    .. code-block:: console
 
-    noise2read -m amplicon_correction -i *.fa/fasta/fastq/fq -a True -d output_directory
+        noise2read -m amplicon_correction -i *.fa/fasta/fastq/fq -a True -d output_directory
 
-* Training with GPU
-  
-.. code-block:: console
+    * Training with GPU
+    
+    .. code-block:: console
 
-    noise2read -m amplicon_correction -i *.fa/fasta/fastq/fq -a True -g gpu_hist -d output_directory
+        noise2read -m amplicon_correction -i *.fa/fasta/fastq/fq -a True -g gpu_hist -d output_directory

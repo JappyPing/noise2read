@@ -19,6 +19,7 @@ Open the dataset using fastq-dump
 
 * Configuration file (simulation.ini)
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+Download from `simulation.ini <https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/simulation.ini>`n_estimators
 
 .. code-block:: console
 

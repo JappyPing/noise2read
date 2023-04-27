@@ -3,7 +3,7 @@ Simulation
 
 This module generates simulated datasets with mimic UMIs.
 
-#. Usage
+* Usage
 
 .. code-block:: console
 

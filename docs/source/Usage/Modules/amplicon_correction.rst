@@ -3,30 +3,30 @@ Amplicon_correction
 
 Correction errors for Amplicon sequencing data
 
-#. Run with ini configuration
+* Run with ini configuration
    
 .. code-block:: console
 
     nois2read -m amplicon_correction -c config.ini
 
-Or
+**Or**
 
-#. Run the commands only 
+* Run the commands only 
 
-* Evaluating without ground truth data
+  * Evaluating without ground truth data
 
-.. code-block:: console
+  .. code-block:: console
 
-    nois2read -m amplicon_correction -i path/to/raw.fastq -d ./results/ -p 60
+      nois2read -m amplicon_correction -i path/to/raw.fastq -d ./results/ -p 60
 
-* Evaluating with ground truth data
+  * Evaluating with ground truth data
 
-.. code-block:: console
+  .. code-block:: console
 
-    nois2read -m amplicon_correction -i path/to/raw.fastq -t path/to/true.fastq -r path/to/corrected.fastq -d ./results/ 
+      nois2read -m amplicon_correction -i path/to/raw.fastq -t path/to/true.fastq -r path/to/corrected.fastq -d ./results/ 
 
-* Training with GPU (default CPU)
-  
-.. code-block:: console
+  * Training with GPU (default CPU)
+    
+  .. code-block:: console
 
-    nois2read -m amplicon_correction -i path/to/raw.fastq -d ./results/ -g gpu_hist
+      nois2read -m amplicon_correction -i path/to/raw.fastq -d ./results/ -g gpu_hist

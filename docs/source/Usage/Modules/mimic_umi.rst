@@ -3,7 +3,7 @@ Mimic_UMI
 
 This module generates mimic UMIs for simulated datasets in order to evaluate using UMI tags rather sequencing IDs by the instruments.
 
-#. Usage
+* Usage
 
 .. code-block:: console
 

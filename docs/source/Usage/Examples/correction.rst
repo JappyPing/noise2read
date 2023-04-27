@@ -1,80 +1,81 @@
 Correction
 ----------
 
-1. Configuration file (config.ini)
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the other datasets, change the dataset name in the configuration.
 
-#. Download it using
+#. Configuration file (config.ini)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-.. code-block:: console
+    * Download it using
 
-    wget https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/D1_D8_config.ini
+    .. code-block:: console
 
-Or 
-#. create a new file by yourself and copy the following contents
+        wget https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/D1_D8_config.ini
 
-.. code-block:: console
+    **Or** 
 
-    [Paths]
-    ResultDir = "./result/" # set output directory
+    * create a new file by yourself and copy the following contents
 
-    [SourceInputData]
-    input_file = ./data/D1_D8/raw/D1_umi_SRR1543964.fastq # set your data to be corrected
-    ground_truth_data = ./data/D1_D8/true/D1_umi_SRR1543964.fastq # only set when you have groundtruth data, otherwise comment it
+    .. code-block:: console
 
-    [General]
-    num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
-    verbose = True 
-    min_iters = 100
-    iso_change_detail = True
-    top_n = 100
+        [Paths]
+        ResultDir = "./result/" # set output directory
 
-    [GraphSetup]
-    high_freq_thre = 5
-    max_error_freq = 4
-    save_graph = False
-    graph_visualization = False
-    drawing_graph_num = 50
+        [SourceInputData]
+        input_file = ./data/D1_D8/raw/D1_umi_SRR1543964.fastq # set your data to be corrected
+        ground_truth_data = ./data/D1_D8/true/D1_umi_SRR1543964.fastq # only set when you have groundtruth data, otherwise comment it
 
-    [EmbeddingSetup]
-    entropy_kmer = 3
-    entropy_q = 2
-    kmer_freq = 3
-    read_type = DNA
+        [General]
+        num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
+        verbose = True 
+        min_iters = 100
+        iso_change_detail = True
+        top_n = 100
 
-    [AmbiguousSetup]
-    ambiguous_error_node_degree = 4
-    high_ambiguous = False 
-    # high ambiguous predict probability difference
-    proba_deviation = 0.6  
+        [GraphSetup]
+        high_freq_thre = 5
+        max_error_freq = 4
+        save_graph = False
+        graph_visualization = False
+        drawing_graph_num = 50
 
-    [ModelTuningSetup]
-    n_trials = 1
-    n_estimators = 10 
-    test_size = 0.1 # default        
-    random_state = 32 # default  
-    tree_method = 'auto'
-    learning_rate_min = 1e-3 # default     
-    learning_rate_max = 1e-1 # default 
-    max_depth_min = 3 # default     
-    max_depth_max = 15 # default     
-    max_depth_step = 1 # default 
-    num_boost_round_min = 200 # default     
-    num_boost_round_max = 300 # default     
-    num_boost_round_step = 10 # default 
-    subsample_min = 0.8 # default     
-    subsample_max = 1 # default     
-    colsample_bytree_min = 0.8 # default     
-    colsample_bytree_max = 1 # default     
-    verbose_eval = True
-    # xgboostclassifier seed
-    seed = 32 # default 
-    # optuna best trial accuracy
-    best_accuracy = 0.75
+        [EmbeddingSetup]
+        entropy_kmer = 3
+        entropy_q = 2
+        kmer_freq = 3
+        read_type = DNA
 
-2. Run
+        [AmbiguousSetup]
+        ambiguous_error_node_degree = 4
+        high_ambiguous = False 
+        # high ambiguous predict probability difference
+        proba_deviation = 0.6  
+
+        [ModelTuningSetup]
+        n_trials = 1
+        n_estimators = 10 
+        test_size = 0.1 # default        
+        random_state = 32 # default  
+        tree_method = 'auto'
+        learning_rate_min = 1e-3 # default     
+        learning_rate_max = 1e-1 # default 
+        max_depth_min = 3 # default     
+        max_depth_max = 15 # default     
+        max_depth_step = 1 # default 
+        num_boost_round_min = 200 # default     
+        num_boost_round_max = 300 # default     
+        num_boost_round_step = 10 # default 
+        subsample_min = 0.8 # default     
+        subsample_max = 1 # default     
+        colsample_bytree_min = 0.8 # default     
+        colsample_bytree_max = 1 # default     
+        verbose_eval = True
+        # xgboostclassifier seed
+        seed = 32 # default 
+        # optuna best trial accuracy
+        best_accuracy = 0.75
+
+#. Run
 <<<<<<
 .. code-block:: console
 

@@ -6,30 +6,30 @@ noise2read is a command-line interface (CLI) based tool to eliminate PCR and seq
 .. 1. Command line Options
 .. <<<<<<<<<<<<<<<<<<<<<<<
 
-1. Indispensable CLI setting
+#. Indispensable CLI setting
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-#. Module selection
-  
-Using noise2read, you must select the module name from ["correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first.
+    * Module selection
+    
+    Using noise2read, you must select the module name from ["correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first.
 
-.. code-block:: console
+    .. code-block:: console
 
-    -m | --module module_name
+        -m | --module module_name
 
-#. Setting configuration file or input dataset
+    * Setting configuration file or input dataset
 
-* configuration
+      * configuration
 
-.. code-block:: console
+      .. code-block:: console
 
-    -c | --config config.ini
+          -c | --config config.ini
 
-* Input Read dataset
+      * Input Read dataset
 
-.. code-block:: console
+      .. code-block:: console
 
-    -i | --input data.fastq
+          -i | --input data.fastq
 
 #. Optional CLI setting
 
@@ -63,7 +63,7 @@ You can set some parameters using CLI mode with/without INI file configuration. 
 
     -d | --directory */output_dir/
 
-2. INI file configuration 
+#. INI file configuration 
 <<<<<<<<<<<<<<<<<<<<<<<<< 
 
 The following contents are the default setting for an INI file configuration.
