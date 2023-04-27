@@ -9,7 +9,6 @@ Nois2read mainly developed to correct NGS sequencing data, but it also provides 
 
     correction
     amplicon_correction
-    umi_correction
     real_umi
     mimic_umi
     evaluation

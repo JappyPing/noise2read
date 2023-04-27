@@ -1,7 +1,7 @@
 Configuration
 -------------
 
-noise2read is a command-line interface (CLI) based tool to eliminate PCR and sequencing errors for short reads. It utilises CLI means and INI file for configuring the parameters. 
+noise2read is a command-line interface (CLI) based tool to eliminate PCR and sequencing errors for short reads. It utilises CLI mode and INI file for configuring the parameters. 
 
 .. 1. Command line Options
 .. <<<<<<<<<<<<<<<<<<<<<<<

@@ -1,15 +1,26 @@
 Real_UMI
 --------
-1. Download data set
-<<<<<<<<<<<<<<<<<<<<
+
+Take the dataset `SRR1543694 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR1543694&display=data-access>`_ as an example.
+
+1. Download dataset
+
 .. code-block:: console
 
+    wget https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR1543694/SRR1543694
     
+Open the dataset using fastq-dump
 
+.. code-block:: console
 
-2. Configuration file (config.ini)
+    fastq-dump --split-3 SRR1543694
+
+2. Generate real sequencing data with UMI-based ground truth
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+* Configuration file (config.ini)
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-Download it from **
+Download it from `real_umi_config.ini <>`
 
 Or create it by yourself and copy the following contents
 
@@ -19,66 +30,15 @@ Or create it by yourself and copy the following contents
     ResultDir = "./result/" # set output directory
 
     [SourceInputData]
-    input_file = path/to/data.fastq # set your data to be corrected
-    # ground_truth_data = path/to/data.fastq # only set when you have groundtruth data, otherwise comment it
-
-    [General]
-    num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
-    verbose = True 
-    min_iters = 100
-    iso_change_detail = True
-    top_n = 100
-
-    [GraphSetup]
-    high_freq_thre = 5
-    max_error_freq = 4
-    save_graph = False
-    graph_visualization = False
-    drawing_graph_num = 50
-
-    [EmbeddingSetup]
-    entropy_kmer = 3
-    entropy_q = 2
-    kmer_freq = 3
-    read_type = DNA
-
-    [AmbiguousSetup]
-    ambiguous_error_node_degree = 4
-    high_ambiguous = False 
-    # high ambiguous predict probability difference
-    proba_deviation = 0.6  
-
-    [ModelTuningSetup]
-    n_trials = 1
-    n_estimators = 10 
-    test_size = 0.1 # default        
-    random_state = 32 # default  
-    tree_method = 'auto'
-    learning_rate_min = 1e-3 # default     
-    learning_rate_max = 1e-1 # default 
-    max_depth_min = 3 # default     
-    max_depth_max = 15 # default     
-    max_depth_step = 1 # default 
-    num_boost_round_min = 200 # default     
-    num_boost_round_max = 300 # default     
-    num_boost_round_step = 10 # default 
-    subsample_min = 0.8 # default     
-    subsample_max = 1 # default     
-    colsample_bytree_min = 0.8 # default     
-    colsample_bytree_max = 1 # default     
-    verbose_eval = True
-    # xgboostclassifier seed
-    seed = 32 # default 
-    # optuna best trial accuracy
-    best_accuracy = 0.75
+    input_file = ./SRR1543694.fastq # set your data to be corrected
 
     [RealUMI]
     umi_start = 0
     umi_end = 12
     non_umi_start = 24
-    
-3. Generate real sequencing data with UMI-based ground truth
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+* Run
+ 
 .. code-block:: console
 
     nois2read -m real_umi -i config.ini

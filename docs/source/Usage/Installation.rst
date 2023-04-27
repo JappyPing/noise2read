@@ -72,6 +72,7 @@ will be installed automatically
 2.1 Creating Virtual Environment 
 --------------------------------
 using conda
+
 .. code-block:: console
 
    (base) $ conda create -n noise2read_env python=3.8
@@ -99,4 +100,4 @@ Notes: make sure you have installed and currently using python 3
 3. Bioconda version
 <<<<<<<<<<<<<<<<<<<
 
-Bioconda channel-based noise2read version will be released after published.
+Bioconda channel-based noise2read will be released after paper published.

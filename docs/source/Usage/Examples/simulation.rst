@@ -1,5 +1,24 @@
 Simulation
 ----------
+Take the dataset `SRR12060401 https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR12060401&display=data-access`_ as an example.
+
+1. Download dataset
+
+.. code-block:: console
+
+    wget https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR12060401/SRR12060401
+    
+Open the dataset using fastq-dump
+
+.. code-block:: console
+
+    fastq-dump --split-3 SRR12060401
+
+1. Generate simulated data with mimic UMIs
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+* Configuration file (simulation.ini)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 .. code-block:: console
 
@@ -7,7 +26,7 @@ Simulation
     ResultDir = "./result/" # set output directory
 
     [SourceInputData]
-    input_file = path/to/data.fastq # set your data to be corrected
+    input_file = ./SRR12060401.fastq # set your data to be corrected
     # ground_truth_data = path/to/data.fastq # only set when you have groundtruth data, otherwise comment it
 
     [General]
@@ -60,18 +79,11 @@ Simulation
     # optuna best trial accuracy
     best_accuracy = 0.75
 
-    [RealUMI]
-    umi_start = 0
-    umi_end = 12
-    non_umi_start = 24
-
-    [Amplicon]
-    amplicon_low_freq = 50
-    amplicon_high_freq = 1500
-    amplicon_threshold_proba = 0.9
-    amplicon_error_node_degree = 4
-
     [Simulation]
     substations = True
     indels = False
     error_rate = 0.001
+
+.. code-block:: console
+
+    nois2read -m simulation -c simulation.ini
