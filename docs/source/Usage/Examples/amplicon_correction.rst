@@ -5,8 +5,8 @@ Correction errors for Amplicon sequencing data.
 
 Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the other datasets, change the dataset name in the configuration.
 
-1. Configuration file (config.ini)
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+1. Configuration
+<<<<<<<<<<<<<<<<
 
 * Download it using
 
