@@ -6,13 +6,14 @@ Correction
 
 Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the other datasets, change the dataset name in the configuration.
 
-Download it using
+#. Download it using
 
 .. code-block:: console
 
     wget https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/D1_D8_config.ini
 
-Or create a new file by yourself and copy the following contents
+Or 
+#. create a new file by yourself and copy the following contents
 
 .. code-block:: console
 

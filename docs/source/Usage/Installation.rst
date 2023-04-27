@@ -87,7 +87,9 @@ using python venv
    $ python -m venv noise2read_env
    $ source noise2read_env/bin/activate
 
-Notes: make sure you have installed and currently using python 3
+.. note:: 
+
+   make sure you have installed python 3 when using python venv environment
 
 2.1 Git clone and installing
 --------------------------------
@@ -97,7 +99,7 @@ Notes: make sure you have installed and currently using python 3
    (noise2read_env)$ cd noise2read
    (noise2read_env)$ pip install -e .
 
-3. Bioconda version
+1. Bioconda version
 <<<<<<<<<<<<<<<<<<<
 
 Bioconda channel-based noise2read will be released after paper published.

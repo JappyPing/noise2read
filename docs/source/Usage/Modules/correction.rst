@@ -1,6 +1,6 @@
 Correction
 ----------
-1. Run with ini configuration
+#. Run with ini configuration
    
 .. code-block:: console
 
@@ -8,7 +8,7 @@ Correction
 
 Or
 
-2. Run the commands only 
+#. Run the commands only 
 
 * Evaluating without ground truth data
 

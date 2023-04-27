@@ -3,7 +3,7 @@ Real_UMI
 
 This module generates UMI-based ground truth datasets using UMI-based sequencing data to evaluate computational error correction algorithms.
 
-Usage
+#. Usage
 
 * INI configuration
   

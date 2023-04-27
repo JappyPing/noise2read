@@ -3,7 +3,7 @@ Evaluation
 
 Correcting NGS sequencing datasets using nois2read, it will automatically produce the evaluation results. If you want to use this module to evaluate your own algorithms, 
 
-1. Using the following configuration to set your input
+#. Using the following configuration to set your input
 
 .. code-block:: console
 
@@ -27,7 +27,7 @@ and run
     nois2read -m evaluation -c config.ini
 
 
-2. Using the commands only 
+#. Using the commands only 
 
 * without ground truth data
 

@@ -3,7 +3,7 @@ Amplicon_correction
 
 Correction errors for Amplicon sequencing data
 
-1. Run with ini configuration
+#. Run with ini configuration
    
 .. code-block:: console
 
@@ -11,7 +11,7 @@ Correction errors for Amplicon sequencing data
 
 Or
 
-2. Run the commands only 
+#. Run the commands only 
 
 * Evaluating without ground truth data
 
