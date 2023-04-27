@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:02:09
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-27 14:53:51
+# @Last Modified time: 2023-04-27 15:29:39
 # Configuration file for the Sphinx documentation builder.
 import os
 import sys
@@ -10,7 +10,7 @@ from typing import Any, Dict
 # -- Project information
 
 project = 'noise2read'
-copyright = '2022, Pengyao Ping'
+copyright = '2023, Pengyao Ping'
 author = 'Pengyao Ping'
 
 release = '0.1'
@@ -70,9 +70,9 @@ myst_heading_anchors = 3
 #
 
 html_theme = "furo"
-html_title = "**Short Reads Rectification**"
+html_title = "Short Reads Rectification"
 language = "en"
-html_logo = "logo_transparent.svg"
+html_logo = "../../logo/logo.svg"
 
 html_static_path = ["_static"]
 # html_css_files = ["pied-piper-admonition.css"]
