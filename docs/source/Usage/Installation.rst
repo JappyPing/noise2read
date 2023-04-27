@@ -2,7 +2,7 @@
 Installation
 ============
 
-To use noise2read, please create anaconda virtual environment (because current noise2read depend on two Conda packages and several pip packages), and then install noise2read using pip. Besides, when installing noise2read, it will automatically install all the pip dependencies. 
+To use noise2read, please create virtual environment because noise2read depend on two Conda packages and several pip packages, and then install noise2read using pip. Besides, when installing noise2read, it will automatically install all the pip dependencies. 
 
 1. pip and conda
 <<<<<<<<<<<<<<<<
@@ -35,7 +35,7 @@ Notes: make sure you have installed and currently using python 3
    (noise2read_env) $ conda install -c bioconda seqtk
    (noise2read_env) $ conda install -c bioconda bcool
 
-Optional to install pygraphviz if you don't need the visualised read graph.
+Optional to install pygraphviz if you need the visualised read graph.
 
 .. code-block:: console
 
@@ -78,6 +78,7 @@ using conda
 
 Or 
 using python venv
+
 .. code-block:: console
 
    $ mkdir noise2read

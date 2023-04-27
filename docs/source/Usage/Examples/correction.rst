@@ -73,8 +73,8 @@ Or create a new file by yourself and copy the following contents
     # optuna best trial accuracy
     best_accuracy = 0.75
 
-2. Commands
-<<<<<<<<<<<
+2. Run
+<<<<<<
 .. code-block:: console
 
     nois2read -m correction -i D1_D8_config.ini
