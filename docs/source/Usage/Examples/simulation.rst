@@ -1,6 +1,6 @@
 Simulation
 ----------
-Take the dataset `SRR12060401 https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR12060401&display=data-access`_ as an example to generate simulated data with mimic UMIs.
+Take the dataset `SRR12060401 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR12060401&display=data-access>`_ as an example to generate simulated data with mimic UMIs.
 
 * Download dataset
 
@@ -16,7 +16,7 @@ Take the dataset `SRR12060401 https://trace.ncbi.nlm.nih.gov/Traces/?view=run_br
 
 * Configuration
 
-  * Download from `simulation.ini <https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/simulation.ini>`n_estimators
+  * Download `simulation.ini <https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/simulation.ini>`_.
 
   **Or**
 
