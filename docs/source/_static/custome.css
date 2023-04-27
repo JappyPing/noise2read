@@ -1,0 +1,15 @@
+/**
+ * @Author: Pengyao Ping
+ * @Date:   2023-04-27 17:50:35
+ * @Last Modified by:   Pengyao Ping
+ * @Last Modified time: 2023-04-27 17:50:41
+ */
+/* Adjust logo width */
+.logo img {
+    max-width: 150px; /* Change the value as needed */
+}
+
+/* Adjust title width */
+.header h1 {
+    width: 150px; /* Change the value as needed */
+}
