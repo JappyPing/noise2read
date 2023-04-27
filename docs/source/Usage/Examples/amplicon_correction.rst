@@ -1,20 +1,20 @@
 Amplicon_correction
 -------------------
 
-Correction errors for Amplicon sequencing data
+Correction errors for Amplicon sequencing data. 
 
-1. Download data set
-<<<<<<<<<<<<<<<<<<<<
+1. Configuration file (config.ini)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the other datasets, change the dataset name in the configuration.
+
+Download it using
+
 .. code-block:: console
 
+    wget https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/D1_D8_config.ini
 
-
-
-2. Configuration file (config.ini)
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-Download it from **
-
-Or create it by yourself and copy the following contents
+Or create a new file by yourself and copy the following contents
 
 .. code-block:: console
 
@@ -22,8 +22,8 @@ Or create it by yourself and copy the following contents
     ResultDir = "./result/" # set output directory
 
     [SourceInputData]
-    input_file = path/to/data.fastq # set your data to be corrected
-    # ground_truth_data = path/to/data.fastq # only set when you have groundtruth data, otherwise comment it
+    input_file = ./data/D1_D8/raw/D1_umi_SRR1543964.fastq # set your data to be corrected
+    ground_truth_data = ./data/D1_D8/true/D1_umi_SRR1543964.fastq # only set when you have groundtruth data, otherwise comment it
 
     [General]
     num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
@@ -75,14 +75,8 @@ Or create it by yourself and copy the following contents
     # optuna best trial accuracy
     best_accuracy = 0.75
 
-    [Amplicon]
-    amplicon_low_freq = 50
-    amplicon_high_freq = 1500
-    amplicon_threshold_proba = 0.9
-    amplicon_error_node_degree = 4
-
-3. Amplicon sequencing data correction
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2. Commands
+<<<<<<<<<<<
 .. code-block:: console
 
-    nois2read -m amplicon_correction -i config.ini
+    nois2read -m amplicon_correction -i D1_D8_config.ini

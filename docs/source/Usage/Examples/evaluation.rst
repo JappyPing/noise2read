@@ -1,5 +1,10 @@
 Evaluation
 ----------
+
+Correcting datasets using nois2read, it will automatically produce the evaluation results. If you want to use this module to evaluate your own algorithms, 
+
+1. Using the following configuration to set your input
+
 .. code-block:: console
 
     [Paths]
@@ -13,5 +18,23 @@ Evaluation
     num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
     verbose = True 
     min_iters = 100
-    iso_change_detail = True
     top_n = 100
+
+and run 
+
+.. code-block:: console
+
+    nois2read -m evaluation -c config.ini
+
+
+2. Using the commands only 
+
+without ground truth data
+.. code-block:: console
+
+    nois2read -m evaluation -i path/to/file/raw.fastq -r path/to/file/corrected.fastq -d ./results/ 
+
+with ground truth data
+.. code-block:: console
+
+    nois2read -m evaluation -i path/to/file/raw.fastq -t path/to/fil/true.fastq -r path/to/file/corrected.fastq -d ./results/ 

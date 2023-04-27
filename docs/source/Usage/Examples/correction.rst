@@ -1,15 +1,18 @@
 Correction
 ----------
-1. Download data sets raw and ground truth data sets 
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
-
-2. Configuration file (config.ini)
+1. Configuration file (config.ini)
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-Download it from **
 
-Or create it by yourself and copy the following contents
+Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the other datasets, change the dataset name in the configuration.
+
+Download it using
+
+.. code-block:: console
+
+    wget https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/D1_D8_config.ini
+
+Or create a new file by yourself and copy the following contents
 
 .. code-block:: console
 
@@ -70,13 +73,11 @@ Or create it by yourself and copy the following contents
     # optuna best trial accuracy
     best_accuracy = 0.75
 
-
-
-1. correction
-<<<<<<<<<<<<<
+2. Commands
+<<<<<<<<<<<
 .. code-block:: console
 
-    nois2read -m correction -i config.ini
+    nois2read -m correction -i D1_D8_config.ini
 
 
 
