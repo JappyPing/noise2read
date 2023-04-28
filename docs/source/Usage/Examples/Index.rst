@@ -7,11 +7,11 @@ Examples
 
 * Use the instructions presented in `Real_UMI <https://noise2read.readthedocs.io/en/latest/Usage/Examples/real_umi.html>`_, `Mimic_UMI <https://noise2read.readthedocs.io/en/latest/Usage/Examples/mimic_umi.html>`_, and `Simulation <https://noise2read.readthedocs.io/en/latest/Usage/Examples/simulation.html>`_ to generate these datasets from original sequencing datasets by yourself.
 
-* Case study of virus abundance level, please see `AbundanceLevel <>`_.
+* Case study of virus abundance level, please see `AbundanceLevel <https://noise2read.readthedocs.io/en/latest/Usage/Examples/AbundanceLevel.html>`_.
 
-* Case study of known isomiRs identification and SNPs profiling, please see `isomiRs_SNPs <>`_.
+* Case study of known isomiRs identification and SNPs profiling, please see `isomiRs_SNPs <https://noise2read.readthedocs.io/en/latest/Usage/Examples/isomiRs_SNPs.html>`_.
 
-* Case study of outcome sequence analysis for ABEs and CBEs, please see `ABEs_CBEs <>`_.
+* Case study of outcome sequence analysis for ABEs and CBEs, please see `ABEs_CBEs <https://noise2read.readthedocs.io/en/latest/Usage/Examples/ABEs_CBEs.html>`_.
 
 
 .. toctree::
