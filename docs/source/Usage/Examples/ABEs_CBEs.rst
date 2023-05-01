@@ -16,5 +16,5 @@ Outcome sequence analysis for ABEs and CBEs.
 
 .. code-block:: console
 
-    noise2read -m correction -i ./D32_D33/D32_ABE_outcome_seqs.fasta -a False -d ./ABE/
-    noise2read -m correction -i ./D32_D33/D32_CBE_outcome_seqs.fasta -a False -d ./CBE/
+    noise2read -m correction -i ./D32_D33/raw/D32_ABE_outcome_seqs.fasta -a False -d ./ABE/
+    noise2read -m correction -i ./D32_D33/raw/D33_CBE_outcome_seqs.fasta -a False -d ./CBE/

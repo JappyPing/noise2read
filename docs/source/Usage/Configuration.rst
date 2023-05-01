@@ -67,7 +67,7 @@ You can set some parameters using CLI mode with/without INI file configuration. 
 3. INI file configuration 
 <<<<<<<<<<<<<<<<<<<<<<<<< 
 
-The following contents are the default setting for an INI file configuration.
+The following contents are the default setting for noise2read using an INI file configuration. There is no need to set these if you only want to use the default parameters which have been embedded in the program.
 
 .. code-block:: console
 

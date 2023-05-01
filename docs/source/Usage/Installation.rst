@@ -2,12 +2,12 @@
 Installation
 ============
 
-To use noise2read, please create virtual environment because noise2read depend on two Conda packages and several pip packages, and then install noise2read using pip. Besides, when installing noise2read, it will automatically install all the pip dependencies. 
+Create virtual environments to run noise2read.
 
 1. Creating Virtual Environment
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-* using conda
+* using conda (recommended)
 
 .. code-block:: console
 
@@ -81,3 +81,8 @@ will be installed automatically
 <<<<<<<<<<<<<<<<<<<
 
 Bioconda channel-based noise2read will be released after paper published.
+
+5. Singularity version
+<<<<<<<<<<<<<<<<<<<<<<
+
+noise2read.simg will be released after paper published.
