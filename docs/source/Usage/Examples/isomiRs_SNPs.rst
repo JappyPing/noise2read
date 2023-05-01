@@ -6,7 +6,7 @@ isomiRs_SNPs
 .. code-block:: console  
 
     git clone https://github.com/Jappy0/noise2read
-    cd CaseStudies/IsomiRs_SNPs      
+    cd noise2read/CaseStudies/IsomiRs_SNPs      
 
 * Download datasets `D22_D31 <https://studentutsedu-my.sharepoint.com/personal/pengyao_ping_student_uts_edu_au/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fpengyao%5Fping%5Fstudent%5Futs%5Fedu%5Fau%2FDocuments%2Fnoise2read%5Fdata%2FD22%5FD31&view=0>`_ and move it to the directory of \*CaseStudies/IsomiRs_SNPs
 

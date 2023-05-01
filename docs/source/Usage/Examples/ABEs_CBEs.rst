@@ -8,7 +8,7 @@ Outcome sequence analysis for ABEs and CBEs.
 .. code-block:: console
 
     git clone https://github.com/Jappy0/noise2read
-    cd CaseStudies
+    cd noise2read/CaseStudies
     mkdir ABEs_CBEs
     cd ABEs_CBEs
 
