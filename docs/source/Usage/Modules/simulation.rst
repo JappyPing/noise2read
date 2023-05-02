@@ -7,4 +7,4 @@ This module generates simulated datasets with mimic UMIs.
 
 .. code-block:: console
 
-    nois2read -m simulation -i path/to/raw.fastq -d ./results/ 
+    noise2read -m simulation -i path/to/raw.fastq -d ./results/ 

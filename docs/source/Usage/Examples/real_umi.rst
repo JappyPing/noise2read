@@ -40,4 +40,4 @@ Take the dataset `SRR1543694 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_br
  
 .. code-block:: console
 
-    nois2read -m real_umi -c config.ini
+    noise2read -m real_umi -c config.ini

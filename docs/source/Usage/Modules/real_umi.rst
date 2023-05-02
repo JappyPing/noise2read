@@ -24,4 +24,4 @@ This module generates UMI-based ground truth datasets using UMI-based sequencing
     
   .. code-block:: console
 
-      nois2read -m real_umi -c config.ini
+      noise2read -m real_umi -c config.ini

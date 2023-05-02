@@ -31,7 +31,7 @@ Take the dataset `SRR12060401 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_b
       input_file = ./SRR12060401.fastq # set your data to be corrected
 
       [General]
-      num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
+      num_workers = -1 # if num_workers = -1 or 0, noise2read will use all the available cpus 
       verbose = True 
       min_iters = 100
       iso_change_detail = True
@@ -83,4 +83,4 @@ Take the dataset `SRR12060401 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_b
   
 .. code-block:: console
 
-    nois2read -m simulation -c simulation.ini
+    noise2read -m simulation -c simulation.ini

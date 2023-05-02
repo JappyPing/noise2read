@@ -7,4 +7,4 @@ This module generates mimic UMIs for simulated datasets in order to evaluate usi
 
 .. code-block:: console
 
-    nois2read -m mimi_umi -i path/to/raw.fastq -t path/to/true.fastq -d ./results/ 
+    noise2read -m mimi_umi -i path/to/raw.fastq -t path/to/true.fastq -d ./results/ 

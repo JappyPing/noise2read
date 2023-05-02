@@ -7,7 +7,7 @@ Take the datasets `D1_mix.fa <https://studentutsedu-my.sharepoint.com/personal/p
   
 .. code-block:: console
 
-    nois2read -m mimic_umi -i ./raw/D1_mix.fa -t ./true/D1_mix_tru.fa -d ./output_dir/
+    noise2read -m mimic_umi -i ./raw/D1_mix.fa -t ./true/D1_mix_tru.fa -d ./output_dir/
 
 .. note::
     How to generate miRNA simulated dataset, please see the `miREC <https://github.com/XuanrZhang/miREC/tree/main/Generate_SimulatedData>`_

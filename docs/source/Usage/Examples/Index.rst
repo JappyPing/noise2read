@@ -1,7 +1,7 @@
 Examples
 --------
 
-* The example here implements the results in the work of nois2read. 
+* The example here implements the results in the work of noise2read. 
 
 * Please firstly download datasets `D1_D8 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/ElxypUHIIqtDuyeQmmlZtQMBIzOa2YzFsMsqr7E6h0rVhQ?e=nWvTOh>`_, `D9_D13 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EuXgcO-EfgJIs1sw8lfbWGMBf8bIqGKoy8PIZjtnX8FqzA?e=Yi1dOE>`_, `D14_D17 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_, `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EnhmDePctr1Di9aQvxcHlbMBAo0sfU7p5KCdUh_wzBlxXA?e=YvaieT>`_, `D22_D31 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EtxNKC11__JNiVe61-WAA3YBVMYiSeDxVs6ZBphKXAi_Gw?e=btIVJh>`_, `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EmjKFVI9QklJrR8Xe0YJP1kBEq8F_SPeUa-Xwx98JQZRNw?e=EgmAaL>`_. 
 

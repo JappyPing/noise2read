@@ -3,7 +3,7 @@ Correction
 
 Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the other datasets, change the dataset name in the configuration.
 
-1. nois2read installation
+1. noise2read installation
 <<<<<<<<<<<<<<<<<<<<<<<<<   
 
 Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickStart.html>`_ or `Installation <https://noise2read.readthedocs.io/en/latest/Usage/Installation.html>`_.
@@ -15,16 +15,16 @@ Download UMI-based ground truth datasets `raw <https://studentutsedu-my.sharepoi
 
 .. code-block:: console
 
-  (noise2read_env)$ cd your_working_directory
-  (noise2read_env)$ mkdir data & cd data
-  (noise2read_env)$ mkdir raw & mkdir true
-  (noise2read_env)$ cd your_working_directory
+  cd your_working_directory
+  mkdir data & cd data
+  mkdir raw & mkdir true
+  cd your_working_directory
 
 .. note:: 
 
   Please note that the datasets raw and true have the same file name, move them in the different folders raw and true
 
-3. Configuration
+1. Configuration
 <<<<<<<<<<<<<<<<
 
 * Download it using
@@ -47,7 +47,7 @@ Download UMI-based ground truth datasets `raw <https://studentutsedu-my.sharepoi
     ground_truth_data = ./data/D1_D8/true/D1_umi_SRR1543964.fastq # only set when you have groundtruth data, otherwise comment it
 
     [General]
-    num_workers = -1 # if num_workers = -1 or 0, nois2read will use all the available cpus 
+    num_workers = -1 # if num_workers = -1 or 0, noise2read will use all the available cpus 
     verbose = True 
     min_iters = 100
     iso_change_detail = True
@@ -101,4 +101,4 @@ Download UMI-based ground truth datasets `raw <https://studentutsedu-my.sharepoi
     
 .. code-block:: console
 
-    (noise2read_env)$ nois2read -m correction -c D1_D8_config.ini
+    noise2read -m correction -c D1_D8_config.ini
