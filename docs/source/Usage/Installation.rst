@@ -29,7 +29,7 @@ Create virtual environments to run noise2read.
   
   make sure you have installed and currently using python 3
 
-1. Installing dependency
+2. Installing dependency
 ------------------------
 
 .. code-block:: console
@@ -43,7 +43,7 @@ Create virtual environments to run noise2read.
 
    conda install -c conda-forge pygraphviz
 
-1. Installing noise2read
+3. Installing noise2read
 ------------------------
 
 * Using pip
@@ -78,7 +78,7 @@ will be installed automatically
    cd noise2read
    pip install -e .
 
-1. Bioconda version
+4. Bioconda version
 <<<<<<<<<<<<<<<<<<<
 
 Bioconda channel-based noise2read will be released after paper published.
