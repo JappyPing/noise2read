@@ -1,7 +1,7 @@
 simulated_miRNAs
 ----------------
 
-This example implements the results for correcting simulated miRNAs data with mimic UMIs (`D14_D17 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_) by nois2read.
+This example implements the results for correcting simulated miRNAs data with mimic UMIs (`D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_) by nois2read.
 
 * nois2read installation
    
@@ -14,16 +14,30 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
     (noise2read_env)$ git clone https://github.com/Jappy0/noise2read
     (noise2read_env)$ cd noise2read/Examples/simulated_miRNAs
 
-* run
+* correcting D14
 
-* with high ambiguous errors correction
+  * with high ambiguous errors correction
 
-.. code-block:: console
+  .. code-block:: console
 
-    (noise2read_env)$ nois2read -m correction -i ../../config/simulated_miRNA.ini -a True
+      (noise2read_env)$ nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a True
 
-* without high ambiguous errors correction
+  * without high ambiguous errors correction
 
-.. code-block:: console
+  .. code-block:: console
 
-    (noise2read_env)$ nois2read -m correction -i ../../config/simulated_miRNA.ini -a False
+      (noise2read_env)$ nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a False
+
+* correcting D16
+
+  * with high ambiguous errors correction
+
+  .. code-block:: console
+
+      (noise2read_env)$ nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a True
+
+  * without high ambiguous errors correction
+
+  .. code-block:: console
+
+      (noise2read_env)$ nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a False

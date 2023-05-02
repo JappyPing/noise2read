@@ -101,4 +101,4 @@ Download UMI-based ground truth datasets `raw <https://studentutsedu-my.sharepoi
     
 .. code-block:: console
 
-    (noise2read_env)$ nois2read -m correction -i D1_D8_config.ini
+    (noise2read_env)$ nois2read -m correction -c D1_D8_config.ini
