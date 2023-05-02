@@ -7,11 +7,12 @@ Create virtual environments to run noise2read.
 1. Creating Virtual Environment
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-* using conda (recommended)
+* using conda (recommended because I developed noise2read using conda environment )
 
 .. code-block:: console
 
-  (base) $ conda create -n noise2read_env python=3.8
+  conda create -n noise2read_env python=3.8
+  conda activate noise2read_env
 
 **Or**
 
@@ -19,22 +20,22 @@ Create virtual environments to run noise2read.
 
 .. code-block:: console
 
-  $ mkdir noise2read
-  $ cd noise2read
-  $ python -m venv noise2read_env
-  $ source noise2read_env/bin/activate
+  mkdir noise2read
+  cd noise2read
+  python -m venv noise2read_env
+  source noise2read_env/bin/activate
 
 .. Note:: 
   
   make sure you have installed and currently using python 3
 
-2. Installing dependency
+1. Installing dependency
 ------------------------
 
 .. code-block:: console
 
-   (noise2read_env) $ conda install -c bioconda seqtk
-   (noise2read_env) $ conda install -c bioconda bcool
+   conda install -c bioconda seqtk
+   conda install -c bioconda bcool
 
 * Optional to install pygraphviz if you need the visualised read graph.
 
@@ -42,14 +43,14 @@ Create virtual environments to run noise2read.
 
    conda install -c conda-forge pygraphviz
 
-3. Installing noise2read
+1. Installing noise2read
 ------------------------
 
 * Using pip
   
 .. code-block:: console
 
-   (noise2read_env) $ pip install noise2read
+   pip install noise2read
 
 .. code-block:: console
 
@@ -73,11 +74,11 @@ will be installed automatically
 * source code clone and Installation 
 .. code-block:: console
 
-   (noise2read_env)$ git clone https://github.com/Jappy0/noise2read.git
-   (noise2read_env)$ cd noise2read
-   (noise2read_env)$ pip install -e .
+   git clone https://github.com/Jappy0/noise2read.git
+   cd noise2read
+   pip install -e .
 
-4. Bioconda version
+1. Bioconda version
 <<<<<<<<<<<<<<<<<<<
 
 Bioconda channel-based noise2read will be released after paper published.
