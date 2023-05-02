@@ -20,6 +20,7 @@ Examples
 
     correction
     amplicon_correction
+    simulated_miRNAs
     real_umi
     mimic_umi
     simulation
