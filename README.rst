@@ -35,13 +35,13 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 * correcting D14
 
-  * with high ambiguous errors correction
+  * with high ambiguous errors correction and using GPU for training
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a True
+      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a True -g gpu_hist
 
-  * without high ambiguous errors correction
+  * without high ambiguous errors correction and using CPU (default) for training
 
   .. code-block:: console
 
@@ -49,13 +49,13 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 * correcting D16
 
-  * with high ambiguous errors correction
+  * with high ambiguous errors correction and using GPU for training
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a True
+      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a True -g gpu_hist
 
-  * without high ambiguous errors correction
+  * without high ambiguous errors correction and using CPU (default) for training
 
   .. code-block:: console
 
