@@ -11,15 +11,16 @@ Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the oth
 Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickStart.html>`_ or `Installation <https://noise2read.readthedocs.io/en/latest/Usage/Installation.html>`_.
 
 2. Download datasets
-   
+<<<<<<<<<<<<<<<<<<<<
+
 Download UMI-based ground truth datasets `raw <https://studentutsedu-my.sharepoint.com/:u:/g/personal/pengyao_ping_student_uts_edu_au/EZnprFyUT2xPgeIsgpZBam8BFyuxfnLwnquLx1ek7bCOIA?e=7G8z3S>`_ and `true <https://studentutsedu-my.sharepoint.com/:u:/g/personal/pengyao_ping_student_uts_edu_au/EVzmag9mPHhAl7WU4wdVcnQBgO1s-PHxR0AYvh59WMhcAg?e=xmPrKc>`_ from `D1_D8 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/ElxypUHIIqtDuyeQmmlZtQMBIzOa2YzFsMsqr7E6h0rVhQ?e=nWvTOh>`_
 
 .. code-block:: console
 
-  (noise2read_env)$ cd working_directory
+  (noise2read_env)$ cd your_working_directory
   (noise2read_env)$ mkdir data & cd data
   (noise2read_env)$ mkdir raw & mkdir true
-  (noise2read_env)$ cd working_directory
+  (noise2read_env)$ cd your_working_directory
 
 .. note:: 
 
