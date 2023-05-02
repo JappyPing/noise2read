@@ -26,10 +26,12 @@ Take the dataset `SRR1543694 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_br
   .. code-block:: console
 
       [Paths]
-      ResultDir = "./result/" # set output directory
+      ResultDir = "./result/"
+      ; set output directory
 
       [SourceInputData]
-      input_file = ./SRR1543694.fastq # set your data to be corrected
+      input_file = ./SRR1543694.fastq
+      ;set your data to be corrected
 
       [RealUMI]
       umi_start = 0

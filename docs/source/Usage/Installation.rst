@@ -79,11 +79,11 @@ will be installed automatically
    pip install -e .
 
 4. Bioconda version
-<<<<<<<<<<<<<<<<<<<
+-------------------
 
 Bioconda channel-based noise2read will be released after paper published.
 
 5. Singularity version
-<<<<<<<<<<<<<<<<<<<<<<
+----------------------
 
 noise2read.simg will be released after paper published.
