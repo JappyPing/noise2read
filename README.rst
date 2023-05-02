@@ -39,13 +39,13 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a True -g gpu_hist
+      nois2read -m correction -c ../../config/D14.ini -a True -g gpu_hist
 
   * without high ambiguous errors correction and using CPU (default) for training
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a False
+      nois2read -m correction -c ../../config/D14.ini -a False
 
 * correcting D16
 
@@ -53,10 +53,10 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a True -g gpu_hist
+      nois2read -m correction -c ../../config/D16.ini -a True -g gpu_hist
 
   * without high ambiguous errors correction and using CPU (default) for training
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a False
+      nois2read -m correction -c ../../config/D16.ini -a False
