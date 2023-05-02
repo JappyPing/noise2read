@@ -19,13 +19,13 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/D14.ini -a True -g gpu_hist
+      noise2read -m correction -c ../../config/D14.ini -a True -g gpu_hist
 
   * without high ambiguous errors correction and using CPU (default) for training
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/D14.ini -a False
+      noise2read -m correction -c ../../config/D14.ini -a False
 
 * correcting D16
 
@@ -33,10 +33,10 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/D16.ini -a True -g gpu_hist
+      noise2read -m correction -c ../../config/D16.ini -a True -g gpu_hist
 
   * without high ambiguous errors correction and using CPU (default) for training
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/D16.ini -a False
+      noise2read -m correction -c ../../config/D16.ini -a False

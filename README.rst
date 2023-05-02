@@ -20,9 +20,9 @@ Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ to jump to i
 Examples
 ========
 
-These examples implement the results for correcting simulated miRNAs data with mimic UMIs (`D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_) by nois2read.
+These examples implement the results for correcting simulated miRNAs data with mimic UMIs (`D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_) by noise2read.
 
-* nois2read installation
+* noise2read installation
    
 Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickStart.html>`_ or `Installation <https://noise2read.readthedocs.io/en/latest/Usage/Installation.html>`_.
 
@@ -39,13 +39,13 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/D14.ini -a True -g gpu_hist
+      noise2read -m correction -c ../../config/D14.ini -a True -g gpu_hist
 
   * without high ambiguous errors correction and using CPU (default) for training
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/D14.ini -a False
+      noise2read -m correction -c ../../config/D14.ini -a False
 
 * correcting D16
 
@@ -53,10 +53,10 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/D16.ini -a True -g gpu_hist
+      noise2read -m correction -c ../../config/D16.ini -a True -g gpu_hist
 
   * without high ambiguous errors correction and using CPU (default) for training
 
   .. code-block:: console
 
-      nois2read -m correction -c ../../config/D16.ini -a False
+      noise2read -m correction -c ../../config/D16.ini -a False
