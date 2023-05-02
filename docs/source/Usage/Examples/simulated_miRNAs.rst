@@ -11,8 +11,8 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 .. code-block:: console
 
-    (noise2read_env)$ git clone https://github.com/Jappy0/noise2read
-    (noise2read_env)$ cd noise2read/Examples/simulated_miRNAs
+    git clone https://github.com/Jappy0/noise2read
+    cd noise2read/Examples/simulated_miRNAs
 
 * correcting D14
 
@@ -20,13 +20,13 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      (noise2read_env)$ nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a True
+      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a True
 
   * without high ambiguous errors correction
 
   .. code-block:: console
 
-      (noise2read_env)$ nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a False
+      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D14_umi_miRNA_mix.fa.fastq -t ./true/D14_umi_miRNA_mix.fa.fastq -a False
 
 * correcting D16
 
@@ -34,10 +34,10 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      (noise2read_env)$ nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a True
+      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a True
 
   * without high ambiguous errors correction
 
   .. code-block:: console
 
-      (noise2read_env)$ nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a False
+      nois2read -m correction -c ../../config/simulated_miRNA.ini -i ./raw/D16_umi_miRNA_mix.fa.fastq -t ./true/D16_umi_miRNA_mix.fa.fastq -a False
