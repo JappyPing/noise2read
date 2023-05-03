@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-04-27 23:04:36
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-03 15:15:21
+# @Last Modified time: 2023-05-03 16:44:54
 
 virus_name="Monkeypox"                                                 # the name of the virus
 ref="./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta"                               # the reference with full path
@@ -20,4 +20,4 @@ mkdir -p ./result/SARS_Cov_2/correct
 raw_cvg="./result/SARS_Cov_2/raw/prn_cvg.txt"
 correct_cvg="./result/SARS_Cov_2/correct/prn_cvg.txt"
 
-python "${DIR}"/draw.py ${virus_name} ${raw_cvg} ${correct_cvg}
+python "${DIR}"/monkey_draw.py ${virus_name} ${raw_cvg} ${correct_cvg}
