@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:10:21
+# @Last Modified time: 2023-05-03 22:02:17
 
 import configparser
 import os
@@ -35,7 +35,7 @@ class Config(object):
             if conf.has_option("General", "num_workers"):
                 self.num_workers = conf.getint("General", "num_workers")
             else:
-                self.num_workers = -1 # this set will use total cpu cores - 2  
+                self.num_workers = -1   
             if conf.has_option("General", "verbose"):
                 self.verbose = conf.getboolean("General", "verbose")
             else:
@@ -264,11 +264,11 @@ class Config(object):
                 self.min_read_count = conf.getint("Simulation", "min_read_count")
             else:
                 self.min_read_count = 30 # default
-            # Evaluation
-            if conf.has_option("Evaluation", "delta"):
-                self.delta = conf.getint("Evaluation", "delta")
-            else:
-                self.delta = 10 # default
+            # # Evaluation
+            # if conf.has_option("Evaluation", "delta"):
+            #     self.delta = conf.getint("Evaluation", "delta")
+            # else:
+            #     self.delta = 10 # default
 
         if config_file == None:
             # path
@@ -276,7 +276,7 @@ class Config(object):
             # input
             self.ground_truth_data = None  
             # general
-            self.num_workers = -1 # this set will use totalcpu - 2 
+            self.num_workers = -1 
             self.min_iters = 1000
             self.verbose = False 
             self.iso_change_detail = False     
@@ -345,8 +345,8 @@ class Config(object):
             self.indels = False
             self.error_rate = 0.001
 
-            # Evaluation
-            self.delta = 1
+            # # Evaluation
+            # self.delta = 1
 
             # # coverage
             # self.library_layout = 'PE'
