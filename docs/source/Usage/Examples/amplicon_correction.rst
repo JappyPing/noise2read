@@ -16,10 +16,10 @@ Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the oth
 
    .. code-block:: console
 
-   cd your_working_directory
-   mkdir data & cd data
-   mkdir raw & mkdir true
-   cd your_working_directory
+      cd your_working_directory
+      mkdir data & cd data
+      mkdir raw & mkdir true
+      cd your_working_directory
 
    .. note:: 
 
@@ -99,6 +99,7 @@ Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the oth
       best_accuracy = 0.75
 
 4. Run
+
    .. code-block:: console
 
       noise2read -m amplicon_correction -c D1_D8_config.ini
