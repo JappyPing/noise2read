@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-19 18:51:21
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-27 23:38:37
+# @Last Modified time: 2023-05-03 15:10:56
 import re
 import sys
 import os
@@ -178,7 +178,7 @@ def calc_coverage(ref_file, sam_file):
 	return prn_cvg_list
 
 def write_coverage_output(ref_file, sam_file):
-	rn_cvg_list, prn_cvg_list = calc_coverage(ref_file, sam_file)
+	prn_cvg_list = calc_coverage(ref_file, sam_file)
 	with open("prn_cvg.txt", "w+") as rncf:
 		for i1, v1 in enumerate(prn_cvg_list):
 			rncf.write(str(i1 + 1) + ": " + str(v1) + ", ")
@@ -189,8 +189,4 @@ if __name__ == '__main__':
 	sam_file = sys.argv[2]
 
 	cov_file = write_coverage_output(ref_file, sam_file)
-	# cov_file = '../figure_data/mpxv_genome.fa_prn_cvg.txt'
-	# cov_file = '/share/Jappy/figure_data/Monkeypox/corrected_prn_cvg.txt'
-	# cov_file = '/share/Jappy/figure_data/Monkeypox/original_prn_cvg.txt'
-	# draw_coverage(cov_file)
 

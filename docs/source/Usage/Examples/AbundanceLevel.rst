@@ -16,15 +16,30 @@ and move the datasets to the folder \*/noise2read/CaseStudies/AbundanceLevel
 
 * For the abundance analysis of SARS_Cov_2
 
-  * Get the base coverage by perfectly matching the raw reads to the SARS-Cov-2 genome
+* Get the base coverage by perfectly matching the raw reads to the SARS-Cov-2 genome
     
-  .. code-block:: console  
+.. code-block:: console  
 
-    ./get_coverage.sh -r ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta -1 ./D18_D21/SARS_Cov_2/raw/D18_SRR11092062_reduced_r1.fastq -2 ./D18_D21/SARS_Cov_2/raw/D19_SRR11092062_reduced_r2.fastq -o ./result/SARS_Cov_2/raw/
-    python ./get_coverage.py ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta ./result/SARS_Cov_2/raw/paired_real_narrowed_extract.sam 
+mkdir -p ./result/SARS_Cov_2/raw
+
+.. code-block:: console
+
+./get_coverage.sh -r ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta -1 ./D18_D21/SARS_Cov_2/raw/D18_SRR11092062_reduced_r1.fastq -2 ./D18_D21/SARS_Cov_2/raw/D19_SRR11092062_reduced_r2.fastq -o ./result/SARS_Cov_2/raw
+
+.. code-block:: console
+
+python ./get_coverage.py ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta ./result/SARS_Cov_2/raw/paired_real_narrowed_extract.sam 
+
+.. code-block:: console
+
+
+
+
     mv prn_cvg.txt  ./result/SARS_Cov_2/raw/prn_cvg.txt
 
   * Get the base coverage by perfectly matching the corrected reads to the SARS-Cov-2 genome
+
+mkdir -p ./result/SARS_Cov_2/correct
 
   .. code-block:: console  
 

@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-19 18:51:21
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-03 14:55:20
+# @Last Modified time: 2023-05-03 15:11:35
 #!/bin/bash
 DIR="$(cd "$(dirname "$0")" && pwd)"
 core_count=$(($( grep -c ^processor /proc/cpuinfo)-2))
@@ -199,10 +199,8 @@ echo "get matched reads"
 split_sam gene.sam
 extract_sam
 rm s_extract.sam gene.sam s_full_extract.sam
-
+python3 "${DIR}"/get_coverage.py "${ref}" extract.sam
 mv *.sam ${out_dir}
 mv *.txt ${out_dir}
-
-# python3 "${DIR}"/get_coverage.py "${ref}" extract.sam
 
 
