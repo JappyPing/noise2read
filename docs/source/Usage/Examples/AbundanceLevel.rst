@@ -10,7 +10,7 @@ The instructions for the case studies of the abundance changes for the reference
     git clone https://github.com/Jappy0/noise2read
     cd noise2read/CaseStudies/AbundanceLevel
 
-* Download the reference and original and corrected datasets from `D18_D21 <https://studentutsedu-my.sharepoint.com/personal/pengyao_ping_student_uts_edu_au/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fpengyao%5Fping%5Fstudent%5Futs%5Fedu%5Fau%2FDocuments%2Fnoise2read%5Fdata%2FD18%5FD21&view=0>`_
+* Download the reference and original and corrected datasets from `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EnhmDePctr1Di9aQvxcHlbMBAo0sfU7p5KCdUh_wzBlxXA?e=YvaieT>`_
 
 and move the datasets to the folder \*/noise2read/CaseStudies/AbundanceLevel
 
