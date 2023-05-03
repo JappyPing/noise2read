@@ -14,7 +14,7 @@ isomiRs_SNPs
 
 .. code-block:: console
 
-    python correction.py
+    python correction.py ./D22_D31/raw_no_adapters ./result/ ./D22_D31/corrected
 
 * Then run
 
