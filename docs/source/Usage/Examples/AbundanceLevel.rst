@@ -18,14 +18,12 @@ and move the datasets to the folder \*/noise2read/CaseStudies/AbundanceLevel
   
 .. code-block:: console 
 
-  chmod+x SARS_Cov_2_run.sh
   ./SARS_Cov_2_run.sh
 
 * For the abundance analysis of Monkeypox
 
 .. code-block:: console 
 
-  chmod+x Monkeypox_run.sh
   ./Monkeypox_run.sh
 
 .. * Get the base coverage by perfectly matching the raw reads to the SARS-Cov-2 genome
