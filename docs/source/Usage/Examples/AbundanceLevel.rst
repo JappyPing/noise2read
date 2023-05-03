@@ -16,14 +16,40 @@ and move the datasets to the folder \*/noise2read/CaseStudies/AbundanceLevel
 
 * For the abundance analysis of SARS_Cov_2
 
-.. code-block:: console
+  * Get the base coverage by perfectly matching the raw reads to the SARS-Cov-2 genome
+    
+  .. code-block:: console  
 
-    chmod +x SARS_Cov_2_run.sh
-    ./SARS_Cov_2_run.sh
+      ./get_coverage.sh -r ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta -1 ./D18_D21/SARS_Cov_2/raw/D18_SRR11092062_reduced_r1.fastq -2 ./D18_D21/SARS_Cov_2/raw/D19_SRR11092062_reduced_r2.fastq -o ./result/SARS_Cov_2/raw/
+
+  * Get the base coverage by perfectly matching the raw reads to the SARS-Cov-2 genome
+
+  .. code-block:: console  
+
+      ./get_coverage.sh -r ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta -1 ./D18_D21/SARS_Cov_2/corrected/D18_SRR11092062_reduced_r1.fastq -2 ./D18_D21/SARS_Cov_2/corrected/D19_SRR11092062_reduced_r2.fastq -o ./result/SARS_Cov_2/correct/
+
+  * Draw the base coverage results before and after correction
+
+  .. code-block:: console  
+
+      python ./draw.py SARS_Cov_2 ./result/SARS_Cov_2/raw/prn_cvg.txt ./result/SARS_Cov_2/correct/prn_cvg.txt
 
 * For the abundance analysis of Monkeypox
 
-.. code-block:: console
+  * Get the base coverage by perfectly matching the raw reads to the SARS-Cov-2 genome
+    
+  .. code-block:: console  
 
-    chmod +x Monkeypox_run.sh
-    ./Monkeypox_run.sh
+      ./get_coverage.sh -r ./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta -1 ./D18_D21/Monkeypox/raw/SRR22085311_1.fastq -2 ./D18_D21/Monkeypox/raw/SRR22085311_2.fastq -o ./result/Monkeypox/raw/
+
+  * Get the base coverage by perfectly matching the raw reads to the SARS-Cov-2 genome
+
+  .. code-block:: console  
+
+      ./get_coverage.sh -r ./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta -1 ./D18_D21/Monkeypox/corrected/SRR22085311_1.fastq -2 ./D18_D21/Monkeypox/corrected/SRR22085311_2.fastq -o ./result/Monkeypox/correct/
+
+  * Draw the base coverage results before and after correction
+
+  .. code-block:: console  
+
+      python ./draw.py Monkeypox ./result/Monkeypox/raw/prn_cvg.txt ./result/Monkeypox/correct/prn_cvg.txt
