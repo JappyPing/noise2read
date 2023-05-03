@@ -20,13 +20,17 @@ and move the datasets to the folder \*/noise2read/CaseStudies/AbundanceLevel
     
   .. code-block:: console  
 
-      ./get_coverage.sh -r ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta -1 ./D18_D21/SARS_Cov_2/raw/D18_SRR11092062_reduced_r1.fastq -2 ./D18_D21/SARS_Cov_2/raw/D19_SRR11092062_reduced_r2.fastq -o ./result/SARS_Cov_2/raw/
+    ./get_coverage.sh -r ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta -1 ./D18_D21/SARS_Cov_2/raw/D18_SRR11092062_reduced_r1.fastq -2 ./D18_D21/SARS_Cov_2/raw/D19_SRR11092062_reduced_r2.fastq -o ./result/SARS_Cov_2/raw/
+    python ./get_coverage.py ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta ./result/SARS_Cov_2/raw/paired_real_narrowed_extract.sam 
+    mv prn_cvg.txt  ./result/SARS_Cov_2/raw/prn_cvg.txt
 
   * Get the base coverage by perfectly matching the corrected reads to the SARS-Cov-2 genome
 
   .. code-block:: console  
 
-      ./get_coverage.sh -r ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta -1 ./D18_D21/SARS_Cov_2/corrected/D18_SRR11092062_reduced_r1.fastq -2 ./D18_D21/SARS_Cov_2/corrected/D19_SRR11092062_reduced_r2.fastq -o ./result/SARS_Cov_2/correct/
+    ./get_coverage.sh -r ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta -1 ./D18_D21/SARS_Cov_2/corrected/D18_SRR11092062_reduced_r1.fastq -2 ./D18_D21/SARS_Cov_2/corrected/D19_SRR11092062_reduced_r2.fastq -o ./result/SARS_Cov_2/correct/
+    python ./get_coverage.py ./D18_D21/SARS_Cov_2/ref/sars_cov_ref_MN996528.1.fasta ./result/SARS_Cov_2/correct/paired_real_narrowed_extract.sam
+    mv prn_cvg.txt  ./result/SARS_Cov_2/correct/prn_cvg.txt
 
   * Draw the base coverage results before and after correction
 
@@ -40,13 +44,17 @@ and move the datasets to the folder \*/noise2read/CaseStudies/AbundanceLevel
     
   .. code-block:: console  
 
-      ./get_coverage.sh -r ./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta -1 ./D18_D21/Monkeypox/raw/SRR22085311_1.fastq -2 ./D18_D21/Monkeypox/raw/SRR22085311_2.fastq -o ./result/Monkeypox/raw/
+    ./get_coverage.sh -r ./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta -1 ./D18_D21/Monkeypox/raw/SRR22085311_1.fastq -2 ./D18_D21/Monkeypox/raw/SRR22085311_2.fastq -o ./result/Monkeypox/raw/
+    python ./get_coverage.py ./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta ./result/Monkeypox/raw/paired_real_narrowed_extract.sam 
+    mv prn_cvg.txt  ./result/Monkeypox/raw/prn_cvg.txt
 
   * Get the base coverage by perfectly matching the corrected reads to the SARS-Cov-2 genome
 
   .. code-block:: console  
 
-      ./get_coverage.sh -r ./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta -1 ./D18_D21/Monkeypox/corrected/SRR22085311_1.fastq -2 ./D18_D21/Monkeypox/corrected/SRR22085311_2.fastq -o ./result/Monkeypox/correct/
+    ./get_coverage.sh -r ./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta -1 ./D18_D21/Monkeypox/corrected/SRR22085311_1.fastq -2 ./D18_D21/Monkeypox/corrected/SRR22085311_2.fastq -o ./result/Monkeypox/correct/
+    python ./get_coverage.py ./D18_D21/Monkeypox/ref/GCA_025947495.1_ASM2594749v1_genomic.fasta ./result/Monkeypox/correct/paired_real_narrowed_extract.sam 
+    mv prn_cvg.txt  ./result/Monkeypox/correct/prn_cvg.txt
 
   * Draw the base coverage results before and after correction
 
