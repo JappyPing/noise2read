@@ -7,7 +7,6 @@ Take dataset "D1_umi_SRR1543964.fastq" as an example, if you want to run the oth
 
 1. noise2read installation
 
-
    Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickStart.html>`_ or `Installation <https://noise2read.readthedocs.io/en/latest/Usage/Installation.html>`_.
 
 2. Download datasets
