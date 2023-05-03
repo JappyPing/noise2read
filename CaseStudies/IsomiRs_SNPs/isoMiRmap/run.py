@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-19 18:56:24
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-03 16:22:17
+# @Last Modified time: 2023-05-03 20:37:50
 import os
 
 raw_dir = "../D22_D31/raw_no_adapters/"
@@ -15,7 +15,8 @@ for file_name in file_names:
     os.system("python IsoMiRmap.py %s --p %s" % (raw, isomir_prfix))
 
 raw_result_dir = "../isomimap_result/raw"
-os.makedirs(raw_result_dir)
+if not os.path.exists(raw_result_dir):
+    os.makedirs(raw_result_dir)
 os.system('mv {}{} {}'.format("./", '*.txt', raw_result_dir))
 os.system('mv {}{} {}'.format("./", '*.html', raw_result_dir))
 os.system('mv {}{} {}'.format("./", '*.gff3', raw_result_dir))
@@ -30,7 +31,8 @@ for cor_file_name in cor_file_names:
     os.system("python IsoMiRmap.py %s --p %s" % (correct, cor_isomir_prfix))
 
 correct_result_dir = "../isomimap_result/corrected"
-os.makedirs(correct_result_dir)
+if not os.path.exists(correct_result_dir):
+    os.makedirs(correct_result_dir)
 os.system('mv {}{} {}'.format("./", '*.txt', correct_result_dir))
 os.system('mv {}{} {}'.format("./", '*.html', correct_result_dir))
 os.system('mv {}{} {}'.format("./", '*.gff3', correct_result_dir))
