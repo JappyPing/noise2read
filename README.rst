@@ -43,7 +43,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 Examples for correcting simulated miRNAs data with mimic UMIs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 ===========================================================================
 
-Take data sets (`D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_) as examples.
+Take data sets `D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_ as examples.
 
 * `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ installation
    
