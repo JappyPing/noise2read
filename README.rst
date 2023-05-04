@@ -19,7 +19,7 @@ Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ to jump to i
 Quick-run example
 =================
 
-Quick-run example for testing noise2read by setting only 1 trial for Optuna and 10 estimators for xGboost
+Quick-run example for testing noise2read by setting only 1 trial for Optuna and 10 estimators for xGboost which are not the parameters used in our paper.
 
 * noise2read installation
    
