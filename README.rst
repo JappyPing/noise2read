@@ -89,7 +89,7 @@ Examples for correcting outcome sequence of ABEs and CBEs by noise2read
     mkdir ABEs_CBEs
     cd ABEs_CBEs
 
-* Download datasets `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EmjKFVI9QklJrR8Xe0YJP1kBEq8F_SPeUa-Xwx98JQZRNw`_.
+* Download datasets `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EmjKFVI9QklJrR8Xe0YJP1kBEq8F_SPeUa-Xwx98JQZRNw>`_.
 
 * Using noise2read to correct the datasets
 
