@@ -16,8 +16,10 @@ Turn 'noise' to signal: accurately rectify millions of erroneous short reads thr
 Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ to jump to its documentation
 ================================================================================================
 
-Quick-run example for testing noise2read
-========================================
+Quick-run example
+=================
+
+Quick-run example for testing noise2read by setting only 1 trial for Optuna and 10 estimators for xGboost
 
 * noise2read installation
    
@@ -41,7 +43,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 Examples for correcting simulated miRNAs data with mimic UMIs by noise2read
 ===========================================================================
 
-Take data sets `D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_) as examples.
+Take data sets (`D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_) as examples.
 
 * noise2read installation
    
@@ -74,9 +76,8 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       noise2read -m correction -c ../../config/D14.ini -a False
 
-.. note:: 
-
-    Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
+  .. note:: 
+      Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
 * correcting D16
 
@@ -92,10 +93,9 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       noise2read -m correction -c ../../config/D16.ini -a False
 
-.. note:: 
+  .. note:: 
 
-    Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
-
+      Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
 Examples for correcting outcome sequence of ABEs and CBEs by noise2read
 =======================================================================
