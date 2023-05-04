@@ -11,9 +11,9 @@
 Turn 'noise' to signal: accurately rectify millions of erroneous short reads through graph learning on edit distances
 =====================================================================================================================
 
-`noise2read <https://noise2read.readthedocs.io/en/latest/>`__, originated in a computable rule translated from PCR erring mechanism that: a rare read is erroneous if it has a neighboring read of high abundance, turns erroneous reads into their original state without bringing up any non-existing sequences into the short read set(<300bp) including DNA and RNA sequencing (DNA/RNA-seq), small RNA, unique molecular identifiers (UMI) and amplicon sequencing data.
+`noise2read <https://noise2read.readthedocs.io/en/latest/>`_, originated in a computable rule translated from PCR erring mechanism that: a rare read is erroneous if it has a neighboring read of high abundance, turns erroneous reads into their original state without bringing up any non-existing sequences into the short read set(<300bp) including DNA and RNA sequencing (DNA/RNA-seq), small RNA, unique molecular identifiers (UMI) and amplicon sequencing data.
 
-Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ to jump to its documentation
+Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to jump to its documentation
 ================================================================================================
 
 Quick-run example
@@ -21,7 +21,7 @@ Quick-run example
 
 Quick-run example for testing `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ by setting only 1 trial for Optuna and 10 estimators for xGboost which are not the parameters used in our paper.
 
-* `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ installation
+* `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ installation
    
 Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickStart.html>`_ or `Installation <https://noise2read.readthedocs.io/en/latest/Usage/Installation.html>`_.
 
@@ -32,7 +32,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
     git clone https://github.com/Jappy0/noise2read
     cd noise2read/Examples/simulated_miRNAs
 
-* Quick-run testing `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ on D14
+* Quick-run testing `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ on D14
 
   * with high ambiguous errors correction and using GPU for training (running about 4 mins with 26 cores and GPU)
 
@@ -40,7 +40,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       noise2read -m correction -c ../../config/Quick_test.ini -a True -g gpu_hist
 
-Examples for correcting simulated miRNAs data with mimic UMIs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`__
+Examples for correcting simulated miRNAs data with mimic UMIs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 ===========================================================================
 
 Take data sets (`D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_) as examples.
@@ -97,7 +97,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
-Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`__
+Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 =======================================================================
 
 * Clone the codes
@@ -111,7 +111,7 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
 
 * Download datasets `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EmjKFVI9QklJrR8Xe0YJP1kBEq8F_SPeUa-Xwx98JQZRNw>`_.
 
-* Using `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ to correct the datasets
+* Using `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to correct the datasets
 
 .. code-block:: console
 
