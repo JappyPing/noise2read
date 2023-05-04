@@ -14,7 +14,7 @@ Correcting outcome sequence of ABEs and CBEs by noise2read
 
 * Download datasets `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EmjKFVI9QklJrR8Xe0YJP1kBEq8F_SPeUa-Xwx98JQZRNw>`_.
 
-* Using noise2read to correct the datasets
+* Using noise2read to correct the datasets. The running time of each experiment is about 13 minutes using 26 cores and GPU for training.
 
 .. code-block:: console
 

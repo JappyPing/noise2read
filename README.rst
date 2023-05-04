@@ -98,7 +98,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
       Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
 Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
-=======================================================================
+========================================================================
 
 * Clone the codes
 
@@ -111,7 +111,7 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
 
 * Download datasets `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EmjKFVI9QklJrR8Xe0YJP1kBEq8F_SPeUa-Xwx98JQZRNw>`_.
 
-* Using `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to correct the datasets
+* Using `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to correct the datasets. The running time of each experiment is about 13 minutes using 26 cores and GPU for training.
 
 .. code-block:: console
 
