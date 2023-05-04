@@ -16,6 +16,27 @@ Turn 'noise' to signal: accurately rectify millions of erroneous short reads thr
 Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ to jump to its documentation
 ================================================================================================
 
+Quick-run example for testing noise2read
+========================================
+
+* noise2read installation
+   
+Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickStart.html>`_ or `Installation <https://noise2read.readthedocs.io/en/latest/Usage/Installation.html>`_.
+
+* Clone the codes with datasets in github
+
+.. code-block:: console
+
+    git clone https://github.com/Jappy0/noise2read
+    cd noise2read/Examples/simulated_miRNAs
+
+* Quick-run testing noise2read on D14
+
+  * with high ambiguous errors correction and using GPU for training (running about 4 mins with 26 cores and GPU)
+
+  .. code-block:: console
+
+      noise2read -m correction -c ../../config/Quick_test.ini -a True -g gpu_hist
 
 Examples for correcting simulated miRNAs data with mimic UMIs by noise2read
 ===========================================================================
@@ -42,31 +63,30 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 * correcting D14
 
-  * with high ambiguous errors correction and using GPU for training (running about 4 mins with 26 cores and GPU)
+  * with high ambiguous errors correction and using GPU for training 
 
   .. code-block:: console
 
       noise2read -m correction -c ../../config/D14.ini -a True -g gpu_hist
 
-  * without high ambiguous errors correction and using CPU (default) for training (running about 4 mins with 26 cores)
-
+  * without high ambiguous errors correction and using CPU (default) for training 
   .. code-block:: console
 
       noise2read -m correction -c ../../config/D14.ini -a False
 
 .. note:: 
 
-    The latest noise2read  runs fast but produces slightly different corrected result from these under Examples/simulated_miRNAs/correct
+    Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
 * correcting D16
 
-  * with high ambiguous errors correction and using GPU for training (running about 3 mins with 26 cores and GPU)
+  * with high ambiguous errors correction and using GPU for training 
 
   .. code-block:: console
 
       noise2read -m correction -c ../../config/D16.ini -a True -g gpu_hist
 
-  * without high ambiguous errors correction and using CPU (default) for training (running about 3 mins with 26 cores)
+  * without high ambiguous errors correction and using CPU (default) for training 
 
   .. code-block:: console
 
@@ -74,7 +94,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 .. note:: 
 
-    The latest noise2read runs fast but produces slightly different corrected result from these under Examples/simulated_miRNAs/correct
+    Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
 
 Examples for correcting outcome sequence of ABEs and CBEs by noise2read

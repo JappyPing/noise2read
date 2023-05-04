@@ -31,7 +31,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       noise2read -m correction -c ../../config/D14.ini -a True -g gpu_hist
 
-  * without high ambiguous errors correction and using CPU (default) for training (running about 4 mins with 26 cores)
+  * without high ambiguous errors correction and using CPU (default) for training 
 
   .. code-block:: console
 
@@ -39,17 +39,17 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 .. note:: 
 
-    The latest noise2read  runs fast but produces slightly different corrected result from these under Examples/simulated_miRNAs/correct
+    Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
 * correcting D16
 
-  * with high ambiguous errors correction and using GPU for training (running about 3 mins with 26 cores and GPU)
+  * with high ambiguous errors correction and using GPU for training 
 
   .. code-block:: console
 
       noise2read -m correction -c ../../config/D16.ini -a True -g gpu_hist
 
-  * without high ambiguous errors correction and using CPU (default) for training (running about 3 mins with 26 cores)
+  * without high ambiguous errors correction and using CPU (default) for training 
 
   .. code-block:: console
 
@@ -57,4 +57,4 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 .. note:: 
 
-    The latest noise2read runs fast but produces slightly different corrected result from these under Examples/simulated_miRNAs/correct
+    Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
