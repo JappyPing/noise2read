@@ -1,7 +1,5 @@
-ABEs_CBEs
----------
-
-Outcome sequence analysis for ABEs and CBEs.
+Correcting outcome sequence of ABEs and CBEs by noise2read
+----------------------------------------------------------
 
 * Clone the codes
 
