@@ -14,7 +14,7 @@ Turn 'noise' to signal: accurately rectify millions of erroneous short reads thr
 `noise2read <https://noise2read.readthedocs.io/en/latest/>`_, originated in a computable rule translated from PCR erring mechanism that: a rare read is erroneous if it has a neighboring read of high abundance, turns erroneous reads into their original state without bringing up any non-existing sequences into the short read set(<300bp) including DNA and RNA sequencing (DNA/RNA-seq), small RNA, unique molecular identifiers (UMI) and amplicon sequencing data.
 
 Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to jump to its documentation
-================================================================================================
+===============================================================================================
 
 Quick-run example
 =================
@@ -41,7 +41,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
       noise2read -m correction -c ../../config/Quick_test.ini -a True -g gpu_hist
 
 Examples for correcting simulated miRNAs data with mimic UMIs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
-===========================================================================
+=============================================================================================================================
 
 Take data sets `D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_ as examples.
 
