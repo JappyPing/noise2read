@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-13 22:16:16
+# @Last Modified time: 2023-05-13 22:24:36
 
 import editdistance
 import networkx as nx
@@ -473,7 +473,7 @@ class DataGneration():
         negative_df = pd.DataFrame(columns=["StartRead","StartReadCount", "StartDegree"])
         for k in isolates:
             k_count = graph.nodes[k]['count']
-            if k_count >= self.config.high_freq_thre:
+            if k_count > self.config.high_freq_thre:
                 k_degree = graph.degree[k]
                 line = [k, k_count, k_degree]
                 negative_df.loc[len(negative_df)] = line  
