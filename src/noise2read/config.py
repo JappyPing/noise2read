@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-03 22:02:17
+# @Last Modified time: 2023-05-13 23:11:20
 
 import configparser
 import os
@@ -109,10 +109,10 @@ class Config(object):
                 self.read_type = 'DNA'
 
             # AmbiguousSetup
-            if conf.has_option("AmbiguousSetup", "ambiguous_error_node_degree"):
-                self.ambiguous_error_node_degree = conf.getint("AmbiguousSetup", "ambiguous_error_node_degree")
-            else:
-                self.ambiguous_error_node_degree = 4 # default 
+            # if conf.has_option("AmbiguousSetup", "ambiguous_error_node_degree"):
+            #     self.ambiguous_error_node_degree = conf.getint("AmbiguousSetup", "ambiguous_error_node_degree")
+            # else:
+            #     self.ambiguous_error_node_degree = 4 # default 
             if conf.has_option("AmbiguousSetup", "high_ambiguous"):
                 self.high_ambiguous = conf.getboolean("AmbiguousSetup", "high_ambiguous")
             else:
@@ -302,7 +302,7 @@ class Config(object):
             self.high_ambiguous = True 
             # high ambiguous predict probability difference
             self.proba_deviation = 0.6      # for base editing and lncRNA quant datasets 0.75 others 0.6 
-            self.ambiguous_error_node_degree = 4   # for base editing and lncRNA quant datasets 3 others 4 
+            # self.ambiguous_error_node_degree = 4   # for base editing and lncRNA quant datasets 3 others 4 
 
             # ModelTuningSetup
             self.n_trials = 20

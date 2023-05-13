@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-13 22:24:36
+# @Last Modified time: 2023-05-14 00:44:04
 
 import editdistance
 import networkx as nx
@@ -712,7 +712,7 @@ class DataGneration():
                     node_count = sub_graph.nodes[node]['count']
                     node_degree = sub_graph.degree[node]
                     line = []
-                    if node_count <= amplicon_low_freq and not sub_graph.nodes[node]['flag'] and node_degree <= self.config.amplicon_error_node_degree:
+                    if node_count <= amplicon_low_freq and not sub_graph.nodes[node]['flag']:# and node_degree <= self.config.amplicon_error_node_degree:
                         node_neis = [n for n in sub_graph.neighbors(node)]
                         # nei2count = []
                         nei_degree_count = []
