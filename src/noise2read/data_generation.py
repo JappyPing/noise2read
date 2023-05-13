@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-13 18:16:26
+# @Last Modified time: 2023-05-13 22:16:16
 
 import editdistance
 import networkx as nx
@@ -231,7 +231,7 @@ class DataGneration():
                         # first_nei, first_nei_count = nei2count[0]
                         first_nei, tt, first_nei_count = nei_degree_count[0]
                         first_nei_degree = sub_graph.degree[first_nei]
-                        if first_nei_count >= self.config.high_freq_thre:
+                        if first_nei_count > self.config.high_freq_thre:
                             line = [first_nei, first_nei_count, first_nei_degree, node, node_count, node_degree]
                             newline = self.err_type_classification(line)
                             genuine_df.loc[len(genuine_df)] = newline
