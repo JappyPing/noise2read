@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-23 16:01:09
+# @Last Modified time: 2023-05-13 18:16:26
 
 import editdistance
 import networkx as nx
@@ -32,7 +32,7 @@ class DataGneration():
                 config.num_workers (int): the number of subprocesses to use.
                 config.input_file (str): The filename including path to be corrected.
                 config.result_dir (str): Full pathname where the results will be saved.
-                config.high_freq_thre (int, optional): The threshold of the high frequency. Defaults to 5.
+                config.high_freq_thre (int, optional): The threshold of the high frequency. Defaults to 4.
                 config.max_error_freq (int, optional): The highest frequency of error sequences. Defaults to 3.
                 config.save_graph (bool, optional): If true, noise2read will save the construted graph to file. Defaults to False. 
                 config.graph_visualization (bool, optional): If true, noise2read will draw the connected subgraphs of the construted  graph. Defaults to False.
@@ -352,7 +352,8 @@ class DataGneration():
                         nei = node_neis[0]
                         nei_count = sub_graph.nodes[nei]['count']
                         nei_degree = sub_graph.degree[nei]
-                        if nei_count >= self.config.high_freq_thre:
+                        # if nei_count >= self.config.high_freq_thre:
+                        if nei_count > self.config.high_freq_thre:
                             line = [nei, nei_count, nei_degree, node, node_count, node_degree]
                             if edit_dis == 1:
                                 newline = self.err_type_classification(line)
@@ -363,20 +364,23 @@ class DataGneration():
                                 # gen_df.loc[len(gen_df)] = line 
                                 gen_lst.append(line)
                                 del line                                   
-                    elif node_degree <= self.config.ambiguous_error_node_degree:
+                    # elif node_degree <= self.config.ambiguous_error_node_degree: # comment this line on 13 May 2023
+                    else:
                         high_num = 0
                         nei2count = []
                         for nei in node_neis:
                             nei_count = sub_graph.nodes[nei]['count']
                             nei_degree = sub_graph.degree[nei]
-                            if nei_count >= self.config.high_freq_thre:
+                            # if nei_count >= self.config.high_freq_thre:
+                            if nei_count > self.config.high_freq_thre:
                                 high_num += 1
                                 nei2count.append((nei, nei_count))
                         if high_num == 1:             
                             nei2count.sort(key=lambda x:x[1], reverse=True)
                             first_nei, first_nei_count = nei2count[0]
                             first_nei_degree = sub_graph.degree[first_nei]
-                            if first_nei_count >= self.config.high_freq_thre:
+                            # if first_nei_count >= self.config.high_freq_thre:
+                            if first_nei_count > self.config.high_freq_thre:
                                 line = [first_nei, first_nei_count, first_nei_degree, node, node_count, node_degree]
                                 if edit_dis == 1:
                                     newline = self.err_type_classification(line)
@@ -391,7 +395,8 @@ class DataGneration():
                             # ambiguous errors
                             tmp_lst = []
                             for cre_nei, cur_nei_count in nei2count:
-                                if cur_nei_count >= self.config.high_freq_thre:
+                                # if cur_nei_count >= self.config.high_freq_thre:
+                                if cur_nei_count > self.config.high_freq_thre:
                                     cur_nei_degree = sub_graph.degree[nei]
                                     line = [cre_nei, cur_nei_count, cur_nei_degree, node, node_count, node_degree]
                                     if edit_dis == 1:
@@ -563,7 +568,8 @@ class DataGneration():
         for read, frequency in tqdm(read_count.items(), desc=self.logger.info("Adding nodes to " + str(edit_dis) + "nt-edit-distance read graph..."), miniters=int(len(read_count)/self.config.min_iters)):
             if not graph.has_node(read):
                 graph.add_node(read, count = frequency, flag=False)  
-            if frequency >= self.config.high_freq_thre:
+            # if frequency >= self.config.high_freq_thre:
+            if frequency > self.config.high_freq_thre:
                 high_freq.append(read)
             else:
                 low_freq.append(read)
@@ -782,7 +788,8 @@ class DataGneration():
                     b_count = s.nodes[b]['count']
                     a_degree = s.degree[a]
                     b_degree = s.degree[b]
-                    if a_count > self.config.high_freq_thre and b_count > self.config.high_freq_thre:
+                    if a_count > self.config.high_freq_thre and b_count > self.config.high_freq_thre: 
+                    # if a_count >= self.config.high_freq_thre and b_count >= self.config.high_freq_thre: # comment this line on 13 May 2023
                         a2b = [a, a_count, a_degree, b, b_count, b_degree]
                         new_a2b = self.err_type_classification(a2b) 
                         new_a2b.insert(0, idx)     
