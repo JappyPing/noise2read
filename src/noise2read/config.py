@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-13 23:11:20
+# @Last Modified time: 2023-05-14 12:27:00
 
 import configparser
 import os
@@ -206,10 +206,15 @@ class Config(object):
                 self.verbose_eval = False
                 
             # xgboostclassifier seed
-            if conf.has_option("ModelTuningSetup", "seed"):
-                self.seed = conf.getint("ModelTuningSetup", "seed")
+            if conf.has_option("ModelTuningSetup", "xgboost_seed"):
+                self.xgboost_seed = conf.getint("ModelTuningSetup", "xgboost_seed")
             else:
-                self.seed = 32 # default 
+                self.xgboost_seed = 32 # default 
+
+            if conf.has_option("ModelTuningSetup", "optuna_seed"):
+                self.optuna_seed = conf.getint("ModelTuningSetup", "optuna_seed")
+            else:
+                self.optuna_seed = 32 # default 
 
             if conf.has_option("ModelTuningSetup", "best_accuracy"):
                 self.best_accuracy = conf.getfloat("ModelTuningSetup", "best_accuracy")
@@ -307,7 +312,8 @@ class Config(object):
             # ModelTuningSetup
             self.n_trials = 20
             self.n_estimators = 400
-            self.test_size = 0.1 # default        
+            self.test_size = 0.1 # default 
+            # random state for SMOTE and train_test_split       
             self.random_state = 32 # default  
             self.tree_method = 'auto'
             self.learning_rate_min = 1e-3 # default     
@@ -324,7 +330,8 @@ class Config(object):
             self.colsample_bytree_max = 1 # default     
             self.verbose_eval = False
             # xgboostclassifier seed
-            self.seed = 32 # default 
+            self.xgboost_seed = 32 # default 
+            self.optuna_seed = 32
             # optuna best trial accuracy
             self.best_accuracy = 0.8
 

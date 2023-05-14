@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-14 00:44:04
+# @Last Modified time: 2023-05-14 10:14:20
 
 import editdistance
 import networkx as nx
@@ -216,7 +216,7 @@ class DataGneration():
                     node_count = sub_graph.nodes[node]['count']
                     node_degree = sub_graph.degree[node]
                     line = []
-                    if node_degree >= 1 and node_degree <= 4 and node_count <= self.config.max_error_freq and not sub_graph.nodes[node]['flag']:
+                    if node_degree >= 1 and node_count <= self.config.max_error_freq and not sub_graph.nodes[node]['flag']: #and node_degree <= 4
                         node_neis = [n for n in sub_graph.neighbors(node)]
                         # nei2count = []
                         nei_degree_count = []

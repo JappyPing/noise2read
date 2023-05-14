@@ -2,7 +2,9 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:11:17
+# @Last Modified time: 2023-05-14 11:00:24
+# The codes in this section for features construction are modified from https://github.com/Bonidia/MathFeature, if you re-use these codes or methods, please also cite the original publication of Robson P Bonidia, Douglas S Domingues, Danilo S Sanches, André C P L F de Carvalho, MathFeature: feature extraction package for DNA, RNA and protein sequences based on mathematical descriptors, Briefings in Bioinformatics, 2021; bbab434, https://doi.org/10.1093/bib/bbab434.
+
 
 import numpy as np
 import statistics

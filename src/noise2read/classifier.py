@@ -2,9 +2,10 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-07 22:31:52
+# @Last Modified time: 2023-05-14 12:26:00
 
 import optuna
+from optuna.samplers import TPESampler
 from sklearn.model_selection import train_test_split
 import os
 import xgboost as xgb
@@ -51,7 +52,7 @@ class MLClassifier:
         # self.logger.debug(f'{self.x_val}, {self.y_val.shape}, {len(self.x_val_weight)}')
         self.logger.info(f'The number of negative and positive samples: {sorted(collections.Counter(self.y_train).items())}')
 
-        sm = SMOTE(random_state=0)
+        sm = SMOTE(random_state=self.config.random_state)
         self.X_resampled, self.y_resampled = sm.fit_resample(self.x_train, self.y_train)
         self.logger.info(f'After over-sampling: {sorted(collections.Counter(self.y_resampled).items())}')
 
@@ -126,8 +127,8 @@ class MLClassifier:
         # xgbc.fit(self.x_train, self.y_train, eval_set=[(self.x_train, self.y_train),(self.x_test, self.y_test)],  verbose=True)
         # train_accuracy = xgbc.score(self.x_train, self.y_train)
 
-        xgbc = xgb.XGBClassifier(**param, pruning_callback=[pruning_callback], probability=True)
-        xgbc.fit(self.X_resampled, self.y_resampled, eval_set=[(self.X_resampled, self.y_resampled),(self.x_test, self.y_test)],  verbose=self.config.verbose_eval)
+        xgbc = xgb.XGBClassifier(**param, pruning_callback=[pruning_callback], probability=True, seed=self.config.xgboost_seed)
+        xgbc.fit(self.X_resampled, self.y_resampled, eval_set=[(self.X_resampled, self.y_resampled), (self.x_test, self.y_test)],  verbose=self.config.verbose_eval)
         
         # xgbc.fit(self.x_train, self.y_train, eval_set=[(self.x_train, self.y_train),(self.x_test, self.y_test)],  verbose=True)
         # xgbc.fit(self.x_train, self.y_train, eval_set=[(self.x_val, self.y_val)], verbose=False)
@@ -176,10 +177,11 @@ class MLClassifier:
         #     pruner=optuna.pruners.MedianPruner(n_warmup_steps=5), direction="maximize" 
         # ) #, interval_steps=10 n_startup_trials=5, 
         self.logger.info("-------------------------------------------------------------")
-        study = optuna.create_study(study_name = self.study_name, direction="maximize")
+        sampler = TPESampler(seed=self.config.optuna_seed)  # Make the sampler behave in a deterministic way.
+        study = optuna.create_study(study_name = self.study_name, direction="maximize", sampler=sampler)
         study.optimize(self.objective, n_trials, show_progress_bar=False, gc_after_trial=True)
         # print(study.best_trial)
-        
+
         self.logger.info(f'Study Name: {self.study_name}')
         self.logger.info('Number of finished trials: {}'.format(len(study.trials)))
         self.logger.info('Best trial:')
