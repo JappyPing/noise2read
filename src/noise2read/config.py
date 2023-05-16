@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-14 12:27:00
+# @Last Modified time: 2023-05-16 23:39:46
 
 import configparser
 import os
@@ -292,7 +292,7 @@ class Config(object):
 
             # GraphSetup
             self.high_freq_thre = 4
-            self.max_error_freq = 3
+            self.max_error_freq = 4
             self.save_graph = False
             self.graph_visualization = False
             self.drawing_graph_num = 50   

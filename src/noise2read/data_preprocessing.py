@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-02-16 11:11:05
+# @Last Modified time: 2023-05-16 23:46:38
 
 import collections
 from Bio import SeqIO
@@ -17,8 +17,11 @@ from tqdm import tqdm
 from Bio.Seq import Seq
 
 class DataProcessing():
-    def __init__(self, logger, num_workers, output_dir, umi_start=None, umi_end=None, non_umi_start=None):
+    # def __init__(self, logger, num_workers, output_dir, umi_start=None, umi_end=None, non_umi_start=None):
+    def __init__(self, logger, config):
         self.logger = logger
+        self.config = config
+        
         self.num_workers = num_workers
         self.output_dir = output_dir
         self.umi_start = umi_start
@@ -75,35 +78,38 @@ class DataProcessing():
 
     def real_umi_data(self, original_data):
         # step1: extract umis to a sperate fastq file
-        umi_raw_dataset, non_umi_raw_dataset = self.extract_umis(original_data, self.umi_start, self.umi_end, self.non_umi_start)
+        umi_raw_dataset, non_umi_raw_dataset = self.extract_umis(original_data, self.config.umi_start, self.config.umi_end, self.config.non_umi_start)
         # step2: correct umi errors
-        DG = DataGneration(
-            self.logger,
-            self.num_workers,
-            umi_raw_dataset, 
-            self.output_dir,
-            high_freq_thre = 5,
-            max_error_freq = 4,
-            save_graph = False,
-            graph_visualization = False,
-            drawing_graph_num = False,
-            high_ambiguous=False, 
-            verbose=True
-            )
+        self.config.input_file = umi_raw_dataset
+        DG = DataGneration(self.logger, self.config)
+        # DG = DataGneration(
+        #     self.logger,
+        #     self.config.num_workers,
+        #     umi_raw_dataset, 
+        #     self.config.output_dir,
+        #     high_freq_thre = self.config.high_freq_thre,
+        #     max_error_freq = self.config.max_error_freq,
+        #     save_graph = self.config.save_graph,
+        #     graph_visualization = self.config.graph_visualization,
+        #     drawing_graph_num = self.config.drawing_graph_num,
+        #     high_ambiguous=self.config.high_ambiguous, 
+        #     verbose=self.config.verbose
+        #     )
         genuine_df = DG.extract_umi_genuine_errs()
         # ##############################################################
-        EC = ErrorCorrection(
-            self.logger,
-            self.num_workers,
-            umi_raw_dataset,
-            self.output_dir,
-            read_max_len = self.umi_end - self.umi_start,
-            entropy_kmer=3, 
-            entropy_q=2, 
-            kmer_freq=3,
-            read_type="DNA",
-            iso_change_detail=False,
-            min_iters=100)
+        EC = ErrorCorrection(self.logger, self.config)
+        # EC = ErrorCorrection(
+        #     self.logger,
+        #     self.num_workers,
+        #     umi_raw_dataset,
+        #     self.output_dir,
+        #     read_max_len = self.umi_end - self.umi_start,
+        #     entropy_kmer=3, 
+        #     entropy_q=2, 
+        #     kmer_freq=3,
+        #     read_type="DNA",
+        #     iso_change_detail=False,
+        #     min_iters=100)
         corrected_file = EC.umi_correction(umi_raw_dataset, genuine_df)
 
         # base_name = umi_raw_dataset.split("/")[-1].split(".fastq")[0]
