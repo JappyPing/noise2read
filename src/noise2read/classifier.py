@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-14 12:26:00
+# @Last Modified time: 2023-05-16 18:27:41
 
 import optuna
 from optuna.samplers import TPESampler
@@ -44,7 +44,14 @@ class MLClassifier:
         self.label = label
         self.ambi_data = ambi_data
 
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.data, self.label, test_size=self.config.test_size, shuffle=True, random_state=self.config.random_state)
+        # Shuffle the data in a deterministic way
+        np.random.seed(self.config.random_state)
+        indices = np.random.permutation(len(self.data))
+        shuffled_data = self.data[indices]
+        shuffled_labels = self.label[indices]
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(shuffled_data, shuffled_labels, test_size=self.config.test_size, shuffle=False, random_state=self.config.random_state)
+
+        # self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.data, self.label, test_size=self.config.test_size, shuffle=True, random_state=self.config.random_state)
 
         # self.x_test, self.x_val, self.y_test, self.y_val, self.x_test_weight, self.x_val_weight = train_test_split(test_val_x, test_val_y, test_val_weight, test_size=0.50, random_state=self.config.random_state, shuffle=True)
         # self.x_test_weight, self.x_val_weight = train_test_split(test_val_weight, test_size=0.50, random_state=self.config.random_state, shuffle=False)

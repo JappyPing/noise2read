@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-14 11:01:46
+# @Last Modified time: 2023-05-16 22:55:31
 
 from typing import Counter
 import numpy as np
@@ -64,7 +64,7 @@ class Reads2Vectors():
         return features 
 
     def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
-        self.logger.info("  Embedding genuine and high ambiguous data.")
+        self.logger.info("Embedding genuine and high ambiguous data.")
         genuine_reads_lst1 = []
         negtive_reads_lst1 = []
         ambiguous_reads_lst1 = []
@@ -168,7 +168,7 @@ class Reads2Vectors():
             cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
             negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
 
-        # # isolates negative
+        # isolates negative
         for idx, row in negative_df.iterrows():
             read = row['StartRead']
             pos_reads = enumerate_ed1_seqs(read)
@@ -218,7 +218,7 @@ class Reads2Vectors():
         return train, labels, ambiguous
 
     def all_in_one_embedding(self, total_reads, genuine_df, negative_df, ambiguous_df, high_flag):
-        self.logger.info("  Embedding genuine and ambiguous data.")
+        self.logger.info("Embedding genuine and ambiguous data.")
         genuine_reads_lst1 = []
         negtive_reads_lst1 = []
         ambiguous_reads_lst1 = []
