@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-17 09:56:47
+# @Last Modified time: 2023-05-17 11:27:10
 
 import configparser
 import os
@@ -306,15 +306,15 @@ class Config(object):
             # AmbiguousSetup
             self.high_ambiguous = True 
             # high ambiguous predict probability difference
-            self.proba_deviation = 0.6      # for base editing and lncRNA quant datasets 0.75 others 0.6 
+            self.proba_deviation = 0.95      # for base editing and lncRNA quant datasets 0.75 others 0.6 
             # self.ambiguous_error_node_degree = 4   # for base editing and lncRNA quant datasets 3 others 4 
 
             # ModelTuningSetup
-            self.n_trials = 20
+            self.n_trials = 30
             self.n_estimators = 400
             self.test_size = 0.1 # default 
             # random state for SMOTE and train_test_split       
-            self.random_state = 32 # default  
+            self.random_state = 42 # default  
             self.tree_method = 'auto'
             self.learning_rate_min = 1e-3 # default     
             self.learning_rate_max = 1e-1 # default 
@@ -330,8 +330,8 @@ class Config(object):
             self.colsample_bytree_max = 1 # default     
             self.verbose_eval = False
             # xgboostclassifier seed
-            self.xgboost_seed = 32 # default 
-            self.optuna_seed = 32
+            self.xgboost_seed = 42 # default 
+            self.optuna_seed = 42
             # optuna best trial accuracy
             self.best_accuracy = 0.8
 
