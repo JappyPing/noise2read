@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-17 11:27:10
+# @Last Modified time: 2023-05-17 16:03:22
 
 import configparser
 import os
@@ -74,7 +74,7 @@ class Config(object):
             if conf.has_option("GraphSetup", "max_error_freq"):
                 self.max_error_freq = conf.getint("GraphSetup", "max_error_freq")
             else:
-                self.max_error_freq = 3
+                self.max_error_freq = 4
 
             if conf.has_option("GraphSetup", "save_graph"):
                 self.save_graph = conf.getboolean("GraphSetup", "save_graph")
@@ -120,13 +120,13 @@ class Config(object):
             if conf.has_option("AmbiguousSetup", "proba_deviation"):
                 self.proba_deviation = conf.getfloat("AmbiguousSetup", "proba_deviation")
             else:
-                self.proba_deviation = 0.6 # default 
+                self.proba_deviation = 0.95 # default 
 
             # ModelTuningSetup
             if conf.has_option("ModelTuningSetup", "n_trials"):
                 self.n_trials = conf.getint("ModelTuningSetup", "n_trials")
             else:
-                self.n_trials = 20
+                self.n_trials = 30
                 
             if conf.has_option("ModelTuningSetup", "n_estimators"):
                 self.n_estimators = conf.getint("ModelTuningSetup", "n_estimators")
@@ -140,7 +140,7 @@ class Config(object):
             if conf.has_option("ModelTuningSetup", "random_state"):
                 self.random_state = conf.getint("ModelTuningSetup", "random_state")
             else:
-                self.random_state = 32 # default  
+                self.random_state = 42 # default  
 
             if conf.has_option("ModelTuningSetup", "tree_method"):
                 self.tree_method = conf.get("ModelTuningSetup", "tree_method")
@@ -209,17 +209,17 @@ class Config(object):
             if conf.has_option("ModelTuningSetup", "xgboost_seed"):
                 self.xgboost_seed = conf.getint("ModelTuningSetup", "xgboost_seed")
             else:
-                self.xgboost_seed = 32 # default 
+                self.xgboost_seed = 42 # default 
 
             if conf.has_option("ModelTuningSetup", "optuna_seed"):
                 self.optuna_seed = conf.getint("ModelTuningSetup", "optuna_seed")
             else:
-                self.optuna_seed = 32 # default 
+                self.optuna_seed = 42 # default 
 
             if conf.has_option("ModelTuningSetup", "best_accuracy"):
                 self.best_accuracy = conf.getfloat("ModelTuningSetup", "best_accuracy")
             else:
-                self.best_accuracy = 0.8 # default     
+                self.best_accuracy = 0.85 # default     
 
             # real umi
             if conf.has_option("RealUMI", "umi_start"):
@@ -242,17 +242,26 @@ class Config(object):
             if conf.has_option("Amplicon", "amplicon_high_freq"):
                 self.amplicon_high_freq = conf.getint("Amplicon", "amplicon_high_freq")
             else:
-                self.amplicon_high_freq = 1500 # default   
+                self.amplicon_high_freq = 5000 # default   
             if conf.has_option("Amplicon", "amplicon_threshold_proba"):
                 self.amplicon_threshold_proba = conf.getfloat("Amplicon", "amplicon_threshold_proba")
             else:
                 self.amplicon_threshold_proba = 0.85 # default   
-            if conf.has_option("Amplicon", "amplicon_error_node_degree"):
-                self.amplicon_error_node_degree = conf.getint("Amplicon", "amplicon_error_node_degree")
-            else:
-                self.amplicon_error_node_degree = 4 # default   
+            # if conf.has_option("Amplicon", "amplicon_error_node_degree"):
+            #     self.amplicon_error_node_degree = conf.getint("Amplicon", "amplicon_error_node_degree")
+            # else:
+            #     self.amplicon_error_node_degree = 4 # default   
 
             # Simulation
+            if conf.has_option("Simulation", "min_freq"):
+                self.min_freq = conf.getint("Simulation", "min_freq")
+            else:
+                self.min_freq = 4 # default
+            if conf.has_option("Simulation", "min_read_count"):
+                self.min_read_count = conf.getint("Simulation", "min_read_count")
+            else:
+                self.min_read_count = 30 # default
+                
             if conf.has_option("Simulation", "substations"):
                 self.substations = conf.getboolean("Simulation", "substations")
             else:
@@ -260,15 +269,23 @@ class Config(object):
             if conf.has_option("Simulation", "indels"):
                 self.indels = conf.getboolean("Simulation", "indels")
             else:
-                self.indels = False
-            if conf.has_option("Simulation", "error_rate"):
-                self.error_rate = conf.getfloat("Simulation", "error_rate")
+                self.indels = True
+
+            if conf.has_option("Simulation", "error_rate1"):
+                self.error_rate1 = conf.getfloat("Simulation", "error_rate1")
             else:
-                self.error_rate = 0.001 # default
-            if conf.has_option("Simulation", "min_read_count"):
-                self.min_read_count = conf.getint("Simulation", "min_read_count")
+                self.error_rate1 = 0.03 # default
+
+            if conf.has_option("Simulation", "error_rate2"):
+                self.error_rate2 = conf.getfloat("Simulation", "error_rate2")
             else:
-                self.min_read_count = 30 # default
+                self.error_rate2 = 0.005 # default
+
+            if conf.has_option("Simulation", "sim_random_state"):
+                self.sim_random_state = conf.getint("Simulation", "sim_random_state")
+            else:
+                self.sim_random_state = 42 # default
+                
             # # Evaluation
             # if conf.has_option("Evaluation", "delta"):
             #     self.delta = conf.getint("Evaluation", "delta")
@@ -333,7 +350,7 @@ class Config(object):
             self.xgboost_seed = 42 # default 
             self.optuna_seed = 42
             # optuna best trial accuracy
-            self.best_accuracy = 0.8
+            self.best_accuracy = 0.85
 
             # real umi
             self.umi_start = 0
@@ -342,16 +359,16 @@ class Config(object):
 
             #amplicon
             self.amplicon_low_freq = 50
-            self.amplicon_high_freq = 1500
+            self.amplicon_high_freq = 5000
             self.amplicon_threshold_proba = 0.85
-            self.amplicon_error_node_degree = 4
+            # self.amplicon_error_node_degree = 4
 
             # simulation
             self.min_freq = 4
-            self.min_read_count = 29
+            self.min_read_count = 30
             self.substations = True
             self.indels = True
-            self.error_rate1 = 0.01
+            self.error_rate1 = 0.03
             self.error_rate2 = 0.005
             self.sim_random_state = 42
 
