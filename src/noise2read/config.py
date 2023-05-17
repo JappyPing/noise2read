@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-16 23:39:46
+# @Last Modified time: 2023-05-17 09:56:47
 
 import configparser
 import os
@@ -347,10 +347,13 @@ class Config(object):
             self.amplicon_error_node_degree = 4
 
             # simulation
-            self.min_read_count = 30
+            self.min_freq = 4
+            self.min_read_count = 29
             self.substations = True
-            self.indels = False
-            self.error_rate = 0.001
+            self.indels = True
+            self.error_rate1 = 0.01
+            self.error_rate2 = 0.005
+            self.sim_random_state = 42
 
             # # Evaluation
             # self.delta = 1

@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-16 23:46:38
+# @Last Modified time: 2023-05-17 10:24:07
 
 import collections
 from Bio import SeqIO
@@ -22,23 +22,18 @@ class DataProcessing():
         self.logger = logger
         self.config = config
         
-        self.num_workers = num_workers
-        self.output_dir = output_dir
-        self.umi_start = umi_start
-        self.umi_end = umi_end
-        self.non_umi_start = non_umi_start
-        if os.path.exists(self.output_dir):
-            self.logger.info("Directory '% s' already exists" % self.output_dir)
+        if os.path.exists(self.config.result_dir):
+            self.logger.info("Directory '% s' already exists" % self.config.result_dir)
         else:
-            os.makedirs(self.output_dir)
-        if os.path.exists(self.output_dir + 'raw/'):
-            self.logger.info("Directory '% s' already exists" % self.output_dir + 'raw/')
+            os.makedirs(self.config.result_dir)
+        if os.path.exists(self.config.result_dir + 'raw/'):
+            self.logger.info("Directory '% s' already exists" % self.config.result_dir + 'raw/')
         else:
-            os.makedirs(self.output_dir + 'raw/')       
-        if os.path.exists(self.output_dir + 'true/'):
-            self.logger.info("Directory '% s' already exists" % self.output_dir + 'true/')
+            os.makedirs(self.config.result_dir + 'raw/')       
+        if os.path.exists(self.config.result_dir + 'true/'):
+            self.logger.info("Directory '% s' already exists" % self.config.result_dir + 'true/')
         else:
-            os.makedirs(self.output_dir + 'true/') 
+            os.makedirs(self.config.result_dir + 'true/') 
                
     def extract_umis(self, original_data, umi_start, umi_end, non_umi_start):
         record_iterator, ff_type = parse_data(original_data) 
