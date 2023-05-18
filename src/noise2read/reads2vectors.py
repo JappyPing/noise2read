@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-18 19:12:59
+# @Last Modified time: 2023-05-18 19:36:27
 
 from typing import Counter
 import numpy as np
@@ -459,18 +459,28 @@ class Reads2Vectors():
 
         # self.logger.debug(f'{len(negtive_reads_lst1), len(negtive_reads_lst2), len(negtive_reads_features)}')
         genuine_fea = self.read2vec(genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features)
+        del genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features
+
         negative_fea = self.read2vec(negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features)
+        del negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features
+        
         ambiguous_fea = self.read2vec(ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features)
-        del genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features, negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features, ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features
+        del ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features
 
         read_features = genuine_fea + negative_fea
-        labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
+        feature_len = len(read_features[0])
         train_data = np.array(read_features, dtype=object)
-        shape1 = (len(labels), len(read_features[0]))
+        gen_len = len(genuine_fea)
+        neg_len = len(negative_fea)
+        del read_features, genuine_fea, negative_fea
+
+        labels = np.array([1] * gen_len + [0] * neg_len)
+        shape1 = (gen_len + neg_len, feature_len)
         train_data.reshape(shape1)   
-        print(train_data.size)
+
         ambiguous_data = np.array(ambiguous_fea, dtype=object)
         shape2 = (len(ambiguous_fea), len(ambiguous_fea[0]))
+        del ambiguous_fea
         ambiguous_data.reshape(shape2) 
         # scaling data
         self.logger.debug(train_data.shape)
@@ -480,7 +490,7 @@ class Reads2Vectors():
         else:
             train, ambiguous = self.scaler2(train_data, ambiguous_data)
         self.logger.debug(train[0])
-        del train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
+        del train_data, ambiguous_data
         return train, labels, ambiguous
 
     def scaler2(self, lab_fea, ambiguous_ulab_fea):
@@ -620,14 +630,15 @@ class Reads2Vectors():
             # Write the vectors to the pickle file
             with open(file_name, "wb") as file:
                 pickle.dump(vectors, file)
-
             chunk_names.append(file_name)
-
+            del vectors
+            
         combined_data = []
         for file_name in chunk_names:
             with open(file_name, "rb") as file:
                 vectors = pickle.load(file)
                 combined_data.extend(vectors)
+                del vectors
             os.remove(file_name)
 
         del combined_features, chunks      
