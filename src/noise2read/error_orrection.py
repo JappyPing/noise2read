@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-07 16:44:23
+# @Last Modified time: 2023-05-18 13:59:25
 
 import os
 from Bio import SeqIO
@@ -143,6 +143,7 @@ class ErrorCorrection():
         # merge genuine and ambiguous errors
         grouped_ambiguous_df = ambiguous_df.groupby("idx")
         new_negative_df = pd.DataFrame()
+        new_genuine_df = pd.DataFrame()
         for name, group_df in grouped_ambiguous_df:
             self.logger.debug(group_df['predictand'])
             # if "N-X" or "X-N" in group_df['ErrorTye'].tolist():
@@ -152,22 +153,24 @@ class ErrorCorrection():
                 entry = copy.deepcopy(new_df.loc[[pred_index]])
                 bad_df = group_df.index.isin([pred_index])
                 cur_negative = group_df[~bad_df]
-                genuine_df = pd.concat([genuine_df, entry], ignore_index=True)
+                # genuine_df = pd.concat([genuine_df, entry], ignore_index=True)
+                new_genuine_df = pd.concat([new_genuine_df, entry], ignore_index=True)
                 new_negative_df = pd.concat([new_negative_df, cur_negative], ignore_index=True)
                 
         if edit_dis == 1 and self.config.verbose:
             ambiguous_df.to_csv(self.config.result_dir + 'ambiguous_1nt_prediction.csv', index=False)
         elif edit_dis == 2 and self.config.verbose:
             ambiguous_df.to_csv(self.config.result_dir + 'ambiguous_2nt_prediction.csv', index=False)
-        del TM, train_data, train_labels, ambiguous_data, ambiguous_df, grouped_ambiguous_df
+        del TM, ambiguous_data, ambiguous_df, grouped_ambiguous_df
         #######################################################################################################
         if isinstance(high_ambiguous_df, pd.DataFrame):
-            train_data, train_labels, high_ambiguous_data = RV.high_all_in_one_embedding(genuine_df, negative_df, new_negative_df, high_ambiguous_df)
+            # high_train_data, high_train_labels, high_ambiguous_data = RV.high_all_in_one_embedding(genuine_df, negative_df, new_negative_df, high_ambiguous_df)
+            high_train_data, high_train_labels, high_ambiguous_data = RV.high_all_in_one_embedding(train_data, train_labels, new_genuine_df, new_negative_df, high_ambiguous_df)
             study_name = 'high_ambiguous_1nt'
-            TM = MLClassifier(self.logger, self.config, study_name, train_data, train_labels, high_ambiguous_data)
+            TM = MLClassifier(self.logger, self.config, study_name, high_train_data, high_train_labels, high_ambiguous_data)
             high_predictions = TM.tunning(self.config.n_trials)
             high_ambiguous_df.insert(high_ambiguous_df.shape[1], 'predictand', high_predictions)
-            del RV, TM, train_data, train_labels, high_ambiguous_data, negative_df
+            del RV, TM, high_train_data, high_train_labels, high_ambiguous_data, negative_df
             return genuine_df, new_negative_df, high_ambiguous_df           
         else:
             del negative_df

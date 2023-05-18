@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-18 12:23:57
+# @Last Modified time: 2023-05-18 14:11:17
 
 from typing import Counter
 import numpy as np
@@ -66,7 +66,7 @@ class Reads2Vectors():
         # self.logger.debug(f'FourierTransform: {len(ft_fea)}, ChaosGame: {len(cg_fea)}, Entropy: {len(entropy_fea)}, FickettScore: {len(fs_fea)}')
         return features 
     '''
-    def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
+    def high_all_in_one_embedding(self, train_data, train_labels, new_genuine_df, new_negative_df, ambiguous_df):
         self.logger.info("Embedding genuine and high ambiguous data.")
         genuine_reads_lst1 = []
         negtive_reads_lst1 = []
@@ -79,15 +79,7 @@ class Reads2Vectors():
         genuine_reads_features = []
         negtive_reads_features = []
         ambiguous_reads_features = [] 
-        # if self.config.read_type == "DNA":
-        #     error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-N", "N-T", "C-N", "N-C", "A-N", "N-A", "G-N", "N-G"]
-        #     base_lst = ['A', 'C', 'G', 'T', 'N']
-        #     kmers = [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]
-        #     # kmers3 = ['ANA', 'CNA', 'TNA', 'GNA', 'ANC', 'CNC', 'TNC', 'GNC', 'ANG', 'CNG', 'TNG', 'GNG', 'ANT', 'CNT', 'TNT', 'GNT'] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]
-        #     # kmers = kmers2 + kmers3
-        # elif self.config.read_type == "RNA":
-        #     base_lst = ['A', 'C', 'G', 'U', 'N']
-        #     kmers = [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]    
+  
         base_lst = ['A', 'C', 'G', 'T', 'N']
         if self.config.read_type == "DNA":
             error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-X", "X-T", "C-X", "X-C", "A-X", "X-A", "G-X", "X-G", "X-N", "N-X", 'A-N', 'T-N','G-N','C-N','N-A','N-T', 'N-C', 'N-G']
@@ -108,7 +100,7 @@ class Reads2Vectors():
         self.logger.debug(len(kmers))
         total_err_tyes = []
         total_err_kmers = []
-        for idx, row in genuine_df.iterrows():
+        for idx, row in new_genuine_df.iterrows():
             total_err_tyes.append(row['ErrorTye'])
             total_err_kmers.append(row['StartErrKmer'])
             total_err_kmers.append(row['EndErrKmer'])
@@ -145,7 +137,7 @@ class Reads2Vectors():
         self.logger.debug(err_kmers2count)
         self.logger.debug(err_tyes2count)
 
-        for idx, row in genuine_df.iterrows():
+        for idx, row in new_genuine_df.iterrows():
             genuine_reads_lst1.append(row['StartRead'])
             genuine_reads_lst2.append(row['EndRead'])
 
@@ -171,21 +163,6 @@ class Reads2Vectors():
             cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
             negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
 
-        # isolates negative
-        for idx, row in negative_df.iterrows():
-            read = row['StartRead']
-            pos_reads = enumerate_ed1_seqs(read)
-            for read2 in pos_reads:
-                negtive_reads_lst1.append(read) 
-                negtive_reads_lst2.append(read2)  
-                cur_err_tye_kmers = error_type_classification(read, read2)
-                cur_err_tye = cur_err_tye_kmers[0]
-                cur_kmer1 = cur_err_tye_kmers[1]
-                cur_kmer2 = cur_err_tye_kmers[2]
-                cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
-                cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
-                cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-                negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
 
         for idx, row in ambiguous_df.iterrows():
             ambiguous_reads_lst1.append(row['StartRead'])
@@ -204,21 +181,29 @@ class Reads2Vectors():
         del genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features, negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features, ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features
 
         read_features = genuine_fea + negative_fea
-        labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
-        train_data = np.array(read_features)
+        new_labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
+        new_train_data = np.array(read_features)
         shape1 = (len(labels), len(read_features[0]))
-        train_data.reshape(shape1)   
+        new_train_data.reshape(shape1)   
+
+        # merge the genuine and negative training data of ambiguous prediction to traininig data for high ambiguous prediction
+        merged_train_data = np.concatenate((train_data, new_train_data), axis=0)
+        merged_train_labels = np.concatenate((train_labels, new_labels), axis=0)
 
         ambiguous_data = np.array(ambiguous_fea)
         shape2 = (len(ambiguous_fea), len(ambiguous_fea[0]))
         ambiguous_data.reshape(shape2) 
+
         # scaling data
-        self.logger.debug(train_data.shape)
+        self.logger.debug(merged_train_data.shape)
         self.logger.debug(ambiguous_data.shape)
-        train, ambiguous = self.scaler(train_data, ambiguous_data, high_flag=True)
+
+        train, ambiguous = self.scaler(merged_train_data, ambiguous_data, high_flag=True)
+        
         self.logger.debug(train[0])
-        del train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
-        return train, labels, ambiguous
+        
+        del merged_train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
+        return train, merged_train_labels, ambiguous
 
     def all_in_one_embedding(self, total_reads, genuine_df, negative_df, ambiguous_df, high_flag):
         self.logger.info("Embedding genuine and ambiguous data.")
@@ -665,4 +650,160 @@ class Reads2Vectors():
         
         self.logger.debug(f'{len(read_features)}, {len(read_features[0])}')
         return read_features
+'''
+
+'''
+    def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
+        self.logger.info("Embedding genuine and high ambiguous data.")
+        genuine_reads_lst1 = []
+        negtive_reads_lst1 = []
+        ambiguous_reads_lst1 = []
+
+        genuine_reads_lst2 = []
+        negtive_reads_lst2 = []
+        ambiguous_reads_lst2 = []
+
+        genuine_reads_features = []
+        negtive_reads_features = []
+        ambiguous_reads_features = [] 
+        # if self.config.read_type == "DNA":
+        #     error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-N", "N-T", "C-N", "N-C", "A-N", "N-A", "G-N", "N-G"]
+        #     base_lst = ['A', 'C', 'G', 'T', 'N']
+        #     kmers = [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]
+        #     # kmers3 = ['ANA', 'CNA', 'TNA', 'GNA', 'ANC', 'CNC', 'TNC', 'GNC', 'ANG', 'CNG', 'TNG', 'GNG', 'ANT', 'CNT', 'TNT', 'GNT'] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]
+        #     # kmers = kmers2 + kmers3
+        # elif self.config.read_type == "RNA":
+        #     base_lst = ['A', 'C', 'G', 'U', 'N']
+        #     kmers = [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]    
+        base_lst = ['A', 'C', 'G', 'T', 'N']
+        if self.config.read_type == "DNA":
+            error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-X", "X-T", "C-X", "X-C", "A-X", "X-A", "G-X", "X-G", "X-N", "N-X", 'A-N', 'T-N','G-N','C-N','N-A','N-T', 'N-C', 'N-G']
+            kmers = ['NX', 'XN', 'XA', 'XC', 'XG', 'XT', 'AX', 'CX', 'GX', 'TX'] + [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)] + ['AXA', 'CXA', 'TXA', 'GXA', 'AXC', 'CXC', 'TXC', 'GXC', 'AXG', 'CXG', 'TXG', 'GXG', 'AXT', 'CXT', 'TXT', 'GXT', 'NXA', 'NXC', 'NXG', 'NXT', 'NXN','AXN','CXN','GXN','TXN']
+            # kmers3 = ['ANA', 'CNA', 'TNA', 'GNA', 'ANC', 'CNC', 'TNC', 'GNC', 'ANG', 'CNG', 'TNG', 'GNG', 'ANT', 'CNT', 'TNT', 'GNT'] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]
+            # kmers = kmers2 + kmers3
+        elif self.config.read_type == "RNA":
+            # error_tyes = ["A-G", "G-A", "A-U", "U-A", "A-C", "C-A", "G-U", "U-G", "G-C", "C-G", "U-C", "C-U", "U-N", "N-U", "C-N", "N-C", "A-N", "N-A", "G-N", "N-G"]
+            error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-X", "X-T", "C-X", "X-C", "A-X", "X-A", "G-X", "X-G", "X-N", "N-X", 'A-N', 'T-N','G-N','C-N','N-A','N-T', 'N-C', 'N-G']
+            kmers = ['NX', 'XN', 'XA', 'XC', 'XG', 'XT', 'AX', 'CX', 'GX', 'TX'] + [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)] + ['AXA', 'CXA', 'TXA', 'GXA', 'AXC', 'CXC', 'TXC', 'GXC', 'AXG', 'CXG', 'TXG', 'GXG', 'AXT', 'CXT', 'TXT', 'GXT', 'NXA', 'NXC', 'NXG', 'NXU', 'NXN','AXN','CXN','GXN','UXN']
+
+        error_tye_priors = {}
+        err_tye_base_prior = 0.1
+        for it in error_tyes:
+            error_tye_priors[it] = err_tye_base_prior
+            err_tye_base_prior += 0.01
+
+        self.logger.debug(len(kmers))
+        total_err_tyes = []
+        total_err_kmers = []
+        for idx, row in genuine_df.iterrows():
+            total_err_tyes.append(row['ErrorTye'])
+            total_err_kmers.append(row['StartErrKmer'])
+            total_err_kmers.append(row['EndErrKmer'])
+
+        for idx, row in ambiguous_df.iterrows():
+            total_err_tyes.append(row['ErrorTye'])
+            total_err_kmers.append(row['StartErrKmer'])
+            total_err_kmers.append(row['EndErrKmer'])
+
+        for idx, row in new_negative_df.iterrows():
+            read = row['StartRead']
+            total_err_tyes.append(row['ErrorTye'])
+            total_err_kmers.append(row['StartErrKmer'])
+            total_err_kmers.append(row['EndErrKmer'])
+            
+        total_err_kmers_count = len(total_err_kmers)
+        total_err_tyes_count = len(total_err_tyes)
+        
+        err_kmers2count = Counter(total_err_kmers)
+        err_tyes2count = Counter(total_err_tyes)
+        self.logger.debug(len(err_kmers2count.keys()))
+        kmer_keys = err_kmers2count.keys()
+
+        not_exist_kmer = set(kmers) - set(kmer_keys)
+        if not_exist_kmer:
+            for mer in not_exist_kmer:
+                err_kmers2count[mer] = 0
+
+        kmers_priors = {}
+        base_prior = 0.1
+        for item in kmer_keys:
+            kmers_priors[item] = base_prior
+            base_prior += 0.01        
+        self.logger.debug(err_kmers2count)
+        self.logger.debug(err_tyes2count)
+
+        for idx, row in genuine_df.iterrows():
+            genuine_reads_lst1.append(row['StartRead'])
+            genuine_reads_lst2.append(row['EndRead'])
+
+            cur_err_tye = row['ErrorTye']
+            cur_kmer1 = row['StartErrKmer']
+            cur_kmer2 = row['EndErrKmer']
+            # self.logger.debug(row['StartRead'])
+            # self.logger.debug(row['EndRead'])
+            # self.logger.debug(f'{cur_kmer1}, {cur_kmer2}')
+            cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
+            cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
+            cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
+            genuine_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, error_tyes[row['ErrorTye']] , row["StartDegree"], row['ErrorPosition']
+        
+        for idx, row in new_negative_df.iterrows():
+            negtive_reads_lst1.append(row['StartRead'])
+            negtive_reads_lst2.append(row['EndRead'])
+            cur_err_tye = row['ErrorTye']
+            cur_kmer1 = row['StartErrKmer']
+            cur_kmer2 = row['EndErrKmer']
+            cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
+            cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
+            cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
+            negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
+
+        # isolates negative
+        for idx, row in negative_df.iterrows():
+            read = row['StartRead']
+            pos_reads = enumerate_ed1_seqs(read)
+            for read2 in pos_reads:
+                negtive_reads_lst1.append(read) 
+                negtive_reads_lst2.append(read2)  
+                cur_err_tye_kmers = error_type_classification(read, read2)
+                cur_err_tye = cur_err_tye_kmers[0]
+                cur_kmer1 = cur_err_tye_kmers[1]
+                cur_kmer2 = cur_err_tye_kmers[2]
+                cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
+                cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
+                cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
+                negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
+
+        for idx, row in ambiguous_df.iterrows():
+            ambiguous_reads_lst1.append(row['StartRead'])
+            ambiguous_reads_lst2.append(row['EndRead'])
+            cur_err_tye = row['ErrorTye']
+            cur_kmer1 = row['StartErrKmer']
+            cur_kmer2 = row['EndErrKmer']
+            cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
+            cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
+            cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
+            ambiguous_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
+
+        genuine_fea = self.read2vec(genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features)
+        negative_fea = self.read2vec(negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features)
+        ambiguous_fea = self.read2vec(ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features)
+        del genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features, negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features, ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features
+
+        read_features = genuine_fea + negative_fea
+        labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
+        train_data = np.array(read_features)
+        shape1 = (len(labels), len(read_features[0]))
+        train_data.reshape(shape1)   
+
+        ambiguous_data = np.array(ambiguous_fea)
+        shape2 = (len(ambiguous_fea), len(ambiguous_fea[0]))
+        ambiguous_data.reshape(shape2) 
+        # scaling data
+        self.logger.debug(train_data.shape)
+        self.logger.debug(ambiguous_data.shape)
+        train, ambiguous = self.scaler(train_data, ambiguous_data, high_flag=True)
+        self.logger.debug(train[0])
+        del train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
+        return train, labels, ambiguous
 '''
