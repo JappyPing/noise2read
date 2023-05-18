@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-18 15:19:49
+# @Last Modified time: 2023-05-18 19:11:38
 
 import editdistance
 import networkx as nx
@@ -213,15 +213,8 @@ class DataGneration():
         subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2]
 
         chunk_size = len(subgraphs) // self.config.chunks_num
-        remainder = len(subgraphs) % self.config.chunks_num
-
         if chunk_size > 0:
-            groups = []
-            for i in range(self.config.chunks_num):
-                groups.append(subgraphs[i:i+chunk_size])
-            # Handle the remaining elements
-            if remainder > 0:
-                groups.append(subgraphs[-remainder:])
+            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
         else:
             groups = subgraphs
 
@@ -241,7 +234,7 @@ class DataGneration():
             # Write the group of subgraphs to the file
             nx.write_gexf(group_G, file_name)
             gexf_files.append(file_name)
-        
+
         del groups, subgraphs, graph
 
         genuine_lst = []
@@ -328,22 +321,14 @@ class DataGneration():
         self.logger.info("Extracting genuine and ambiguous errors...")
 
         chunk_size = len(subgraphs) // self.config.chunks_num
-        remainder = len(subgraphs) % self.config.chunks_num
-
         if chunk_size > 0:
-            groups = []
-            for i in range(self.config.chunks_num):
-                groups.append(subgraphs[i:i+chunk_size])
-            # Handle the remaining elements
-            if remainder > 0:
-                groups.append(subgraphs[-remainder:])
+            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
         else:
             groups = subgraphs
 
         # Write each group of subgraphs to separate files
         gexf_files = []
         for i, group in enumerate(groups):
-            # print(i)
             # Create a new graph for the group of subgraphs
             group_G = nx.Graph()
             for subgraph_nodes in group:
@@ -358,8 +343,6 @@ class DataGneration():
             nx.write_gexf(group_G, file_name)
             gexf_files.append(file_name)
         
-        del groups, subgraphs, graph
-
         genuine_lst = []
         ambiguous_lst = []
 
@@ -369,8 +352,8 @@ class DataGneration():
 
         high_idx = 0
         for gexf_file in gexf_files:
-            graph = nx.read_gexf(gexf_file)
-            sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+            cur_graph = nx.read_gexf(gexf_file)
+            sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
             
             # Process the subgraphs in parallel
             pool = Pool(processes=self.config.num_workers)
@@ -389,7 +372,7 @@ class DataGneration():
                 high_ambi_lst.extend(cur_lst)
                 high_idx = cur_idx + 1
             os.remove(gexf_file)
-            del graph, sub_graphs
+            del cur_graph, sub_graphs
         
         # genuine_lst = []
         # ambiguous_lst = []
@@ -821,15 +804,8 @@ class DataGneration():
                     sub_graph.nodes[node]['flag'] = False
 
         chunk_size = len(subgraphs) // self.config.chunks_num
-        remainder = len(subgraphs) % self.config.chunks_num
-
         if chunk_size > 0:
-            groups = []
-            for i in range(self.config.chunks_num):
-                groups.append(subgraphs[i:i+chunk_size])
-            # Handle the remaining elements
-            if remainder > 0:
-                groups.append(subgraphs[-remainder:])
+            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
         else:
             groups = subgraphs
 
