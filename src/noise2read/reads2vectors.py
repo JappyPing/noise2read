@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-17 19:58:46
+# @Last Modified time: 2023-05-18 12:23:57
 
 from typing import Counter
 import numpy as np
@@ -13,13 +13,16 @@ from mpire import WorkerPool
 from tqdm import tqdm
 from noise2read.utils import *
 import itertools
+import pickle
+import multiprocessing as mp
+
 
 class Reads2Vectors():
     def __init__(self, logger, config, edit_dis):
         self.logger = logger
         self.edit_dis = edit_dis
         self.config = config
-
+    '''
     def read2features(self, shared_objects, i):
         ES, reads_lst1, reads_lst2, other_features = shared_objects
         features = []
@@ -62,7 +65,7 @@ class Reads2Vectors():
         features.extend(other_features[i])
         # self.logger.debug(f'FourierTransform: {len(ft_fea)}, ChaosGame: {len(cg_fea)}, Entropy: {len(entropy_fea)}, FickettScore: {len(fs_fea)}')
         return features 
-
+    '''
     def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
         self.logger.info("Embedding genuine and high ambiguous data.")
         genuine_reads_lst1 = []
@@ -169,20 +172,20 @@ class Reads2Vectors():
             negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
 
         # isolates negative
-        # for idx, row in negative_df.iterrows():
-        #     read = row['StartRead']
-        #     pos_reads = enumerate_ed1_seqs(read)
-        #     for read2 in pos_reads:
-        #         negtive_reads_lst1.append(read) 
-        #         negtive_reads_lst2.append(read2)  
-        #         cur_err_tye_kmers = error_type_classification(read, read2)
-        #         cur_err_tye = cur_err_tye_kmers[0]
-        #         cur_kmer1 = cur_err_tye_kmers[1]
-        #         cur_kmer2 = cur_err_tye_kmers[2]
-        #         cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
-        #         cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
-        #         cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-        #         negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
+        for idx, row in negative_df.iterrows():
+            read = row['StartRead']
+            pos_reads = enumerate_ed1_seqs(read)
+            for read2 in pos_reads:
+                negtive_reads_lst1.append(read) 
+                negtive_reads_lst2.append(read2)  
+                cur_err_tye_kmers = error_type_classification(read, read2)
+                cur_err_tye = cur_err_tye_kmers[0]
+                cur_kmer1 = cur_err_tye_kmers[1]
+                cur_kmer2 = cur_err_tye_kmers[2]
+                cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
+                cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
+                cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
+                negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
 
         for idx, row in ambiguous_df.iterrows():
             ambiguous_reads_lst1.append(row['StartRead'])
@@ -477,11 +480,11 @@ class Reads2Vectors():
 
         read_features = genuine_fea + negative_fea
         labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
-        train_data = np.array(read_features)
+        train_data = np.array(read_features, dtype=object)
         shape1 = (len(labels), len(read_features[0]))
         train_data.reshape(shape1)   
-
-        ambiguous_data = np.array(ambiguous_fea)
+        print(train_data.size)
+        ambiguous_data = np.array(ambiguous_fea, dtype=object)
         shape2 = (len(ambiguous_fea), len(ambiguous_fea[0]))
         ambiguous_data.reshape(shape2) 
         # scaling data
@@ -578,6 +581,74 @@ class Reads2Vectors():
         
         return lab_scale_f, ulab_scale_f 
 
+
+    # def read2features(self, shared_objects, i):
+    def read2features(self, ES, ori_feature):
+        # ES, reads_lst1, reads_lst2, other_features = shared_objects
+        features = []
+        
+        ###########################################################################
+        ft_fea1 = ES.descriptors("FourierTransform", ori_feature[0])
+        cg_fea1 = ES.descriptors("ChaosGame", ori_feature[0])
+        entropy_fea1 = ES.descriptors("Entropy", ori_feature[0])
+        fs_fea1 = ES.descriptors("FickettScore", ori_feature[0])
+        features.extend(ft_fea1)
+        features.extend(cg_fea1)
+        features.extend(entropy_fea1)
+        features.extend(fs_fea1)
+        atomic_fea1 = ES.descriptors("atomic_number",ori_feature[0])
+        atomic_fea2 = ES.descriptors("atomic_number", ori_feature[1])
+        features.extend(atomic_fea1)
+        features.extend(atomic_fea2)
+        
+        features.extend(ori_feature[2:])
+        return features 
+
+    def read2vec(self, reads_lst1, reads_lst2, other_features):  
+        ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
+
+        # Combine the features of each sample into one list
+        combined_features = []
+        for seq1, seq2, lst in zip(reads_lst1, reads_lst2, other_features):
+            tmp_lst = []
+            tmp_lst.append(seq1)
+            tmp_lst.append(seq2)
+            tmp_lst.extend(lst)
+            combined_features.append(tmp_lst)
+            del tmp_lst
+
+        chunk_size = len(combined_features) // self.config.chunks_num
+        if chunk_size > 0:
+            chunks = [combined_features[i:i+chunk_size] for i in range(0, len(combined_features), chunk_size)]
+        else:
+            chunks = combined_features
+        
+        # Use multiprocessing to write each chunk to a separate pickle file
+        chunk_names = []
+        for i, chunk in enumerate(chunks):
+            pool = mp.Pool(processes=self.config.num_workers)
+            vectors = pool.starmap(self.read2features, [(ES, sequence) for sequence in chunk])
+            pool.close()
+            pool.join()
+            # Generate the pickle file name
+            file_name = self.config.result_dir + f"chunk_{i}.pickle"
+            # Write the vectors to the pickle file
+            with open(file_name, "wb") as file:
+                pickle.dump(vectors, file)
+
+            chunk_names.append(file_name)
+
+        combined_data = []
+        for file_name in chunk_names:
+            with open(file_name, "rb") as file:
+                vectors = pickle.load(file)
+                combined_data.extend(vectors)
+            os.remove(file_name)
+
+        del combined_features, chunks      
+        return combined_data
+    
+'''
     def read2vec(self, reads_lst1, reads_lst2, other_features):
         read_features = []    
         ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
@@ -594,3 +665,4 @@ class Reads2Vectors():
         
         self.logger.debug(f'{len(read_features)}, {len(read_features[0])}')
         return read_features
+'''

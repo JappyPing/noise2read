@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-17 16:03:22
+# @Last Modified time: 2023-05-18 10:22:44
 
 import configparser
 import os
@@ -35,7 +35,11 @@ class Config(object):
             if conf.has_option("General", "num_workers"):
                 self.num_workers = conf.getint("General", "num_workers")
             else:
-                self.num_workers = -1   
+                self.num_workers = -1
+            if conf.has_option("General", "chunks_num"):
+                self.chunks_num = conf.getint("General", "chunks_num")
+            else:   
+                self.chunks_num = 100
             if conf.has_option("General", "verbose"):
                 self.verbose = conf.getboolean("General", "verbose")
             else:
@@ -299,8 +303,9 @@ class Config(object):
             self.ground_truth_data = None  
             # general
             self.num_workers = -1 
+            self.chunks_num = 100
             self.min_iters = 1000
-            self.verbose = False 
+            self.verbose = True 
             self.iso_change_detail = False     
             self.top_n = 100      
             # self.over_sampling = True 
