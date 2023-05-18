@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-18 14:11:17
+# @Last Modified time: 2023-05-18 15:21:13
 
 from typing import Counter
 import numpy as np
@@ -603,11 +603,18 @@ class Reads2Vectors():
             del tmp_lst
 
         chunk_size = len(combined_features) // self.config.chunks_num
+        remainder = len(combined_features) % self.config.chunks_num
+
         if chunk_size > 0:
-            chunks = [combined_features[i:i+chunk_size] for i in range(0, len(combined_features), chunk_size)]
+            chunks = []
+            for i in range(self.config.chunks_num):
+                chunks.append(combined_features[i:i+chunk_size])
+            # Handle the remaining elements
+            if remainder > 0:
+                chunks.append(combined_features[-remainder:])
         else:
             chunks = combined_features
-        
+
         # Use multiprocessing to write each chunk to a separate pickle file
         chunk_names = []
         for i, chunk in enumerate(chunks):
