@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-18 13:05:07
+# @Last Modified time: 2023-05-18 13:23:55
 
 import editdistance
 import networkx as nx
@@ -294,8 +294,6 @@ class DataGneration():
                 continue   
         return gen_lst
         
-
-
     def extract_genuine_ambi_errs(self, graph, edit_dis):
         """
         extract genuine and ambiguous errors from read graph
@@ -390,8 +388,6 @@ class DataGneration():
         #         if genu_ambi_lst[0]:
         #             genuine_lst.extend(genu_ambi_lst[0])
         #             ambiguous_lst.extend(genu_ambi_lst[1])
-
-        self.logger.info("Done!")                    
 
         genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
 
@@ -542,8 +538,8 @@ class DataGneration():
             MultiVariables: MultiVariables for next step error correction
         """
         # 1nt-edit-distance-based graph
-        self.logger.info("-------------------------------------------------------------")
-        self.logger.info("1nt-edit-distance read graph error correction")
+        # self.logger.info("-------------------------------------------------------------")
+        # self.logger.info("1nt-edit-distance read graph error correction")
         graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(self.config.input_file, edit_dis)
         seq_max_len = max(seqs_lens_lst)
         seq_min_len = min(seqs_lens_lst)
@@ -676,12 +672,13 @@ class DataGneration():
             seqs2id_dict.setdefault(seq, []).append(str(item.id))
         unique_seqs = set(total_seqs)
 
+        self.logger.info("Constructing " + str(edit_dis) + "nt-edit-distance read graph...")
         graph = nx.Graph()
         read_count = Counter(total_seqs)
         high_freq = []
         low_freq = []
 
-        for read, frequency in tqdm(read_count.items(), desc=self.logger.info("Adding nodes to " + str(edit_dis) + "nt-edit-distance read graph..."), miniters=int(len(read_count)/self.config.min_iters)):
+        for read, frequency in tqdm(read_count.items(), miniters=int(len(read_count)/self.config.min_iters)):
             if not graph.has_node(read):
                 graph.add_node(read, count = frequency, flag=False)  
             # if frequency >= self.config.high_freq_thre:
@@ -701,7 +698,7 @@ class DataGneration():
         elif edit_dis == 2:
             shared_unique_seqs = low_freq
         
-        self.logger.info("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
+        self.logger.debug("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
         with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
             if edit_dis == 1:
                 for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, progress_bar=self.config.verbose):
@@ -714,7 +711,8 @@ class DataGneration():
             self.logger.debug(len(edges_lst))
             self.logger.debug(edges_lst[0])
             graph.add_edges_from(edges_lst)
-        self.logger.info(str(edit_dis) + "nt-edit-distance read graph construction finished.")
+        # self.logger.info(str(edit_dis) + "nt-edit-distance read graph construction done.")
+        self.logger.info("Done!")
         ########################################################
         # save graphs
         if self.config.graph_visualization or self.config.save_graph:
