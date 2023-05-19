@@ -2,6 +2,6 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-24 15:47:23
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-19 10:53:35
+# @Last Modified time: 2023-05-19 18:16:34
 
-__version__ = "0.0.95"
+__version__ = "0.0.96"

@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-19 10:51:27
+# @Last Modified time: 2023-05-19 18:14:24
 
 from typing import Counter
 import numpy as np
@@ -21,66 +21,31 @@ class Reads2Vectors():
         self.edit_dis = edit_dis
         self.config = config
     
-    def read2features(self, shared_objects, i):
-        ES, original_feature = shared_objects
-        
-        cur_feture = original_feature[i]
-
+    def read2features(self, shared_objs, idx):
+        ES, ori_features = shared_objs
+        cur_feature = ori_features[idx]
         features = []
-        # pd_fe = ES.descriptors("PairDistance", reads_lst[i])
-        # features.extend(pd_fe)    
-        ###########################################################################
-        # features.append(read_count_lst[i]) 
-        # features.append(err_pos_lst[i]) 
-        # freq_pos.append([ori_seq_freq, err_pos])              
-        ###########################################################################
-        ft_fea1 = ES.descriptors("FourierTransform", cur_feture[0])
-        cg_fea1 = ES.descriptors("ChaosGame", cur_feture[0])
-        entropy_fea1 = ES.descriptors("Entropy", cur_feture[0])
-        fs_fea1 = ES.descriptors("FickettScore", cur_feture[0])
+        ft_fea1 = ES.descriptors("FourierTransform", cur_feature[0])
+        cg_fea1 = ES.descriptors("ChaosGame", cur_feature[0])
+        entropy_fea1 = ES.descriptors("Entropy", cur_feature[0])
+        fs_fea1 = ES.descriptors("FickettScore", cur_feature[0])
 
         features.extend(ft_fea1)
         features.extend(cg_fea1)
         features.extend(entropy_fea1)
         features.extend(fs_fea1)
-        # print(len(features))
-        # ft_fea2 = ES.descriptors("FourierTransform", reads_lst2[i])
-        # cg_fea2 = ES.descriptors("ChaosGame", reads_lst2[i])
-        # # entropy_fea2 = ES.descriptors("Entropy", reads_lst2[i])
-        # fs_fea2 = ES.descriptors("FickettScore", reads_lst2[i])
 
-        # features.extend(ft_fea2)
-        # features.extend(cg_fea2)
-        # # features.extend(entropy_fea2)
-        # features.extend(fs_fea2)
-        # self.logger.debug(len(features))
-        atomic_fea1 = ES.descriptors("atomic_number", cur_feture[0])
-        atomic_fea2 = ES.descriptors("atomic_number", cur_feture[1])
-        # atomic_fea1 = ES.descriptors("binary", reads_lst1[i])
-        # atomic_fea2 = ES.descriptors("binary", reads_lst2[i])
-        # print(int(other_features[i][0]))
+        atomic_fea1 = ES.descriptors("atomic_number", cur_feature[0])
+        atomic_fea2 = ES.descriptors("atomic_number", cur_feature[1])
         features.extend(atomic_fea1)
         features.extend(atomic_fea2)
-        # onehot_fea = ES.descriptors("OneHot", reads_lst1[i])
-        # features.extend(onehot_fea)
-        features.extend(cur_feture[2:])
+
+        features.extend(cur_feature[2:])
         # self.logger.debug(f'FourierTransform: {len(ft_fea)}, ChaosGame: {len(cg_fea)}, Entropy: {len(entropy_fea)}, FickettScore: {len(fs_fea)}')
         return features 
 
     def all_in_one_embedding(self, total_reads, genuine_df, negative_df, ambiguous_df, high_flag):
         self.logger.info("Embedding genuine and ambiguous data.")
-        genuine_reads_lst1 = []
-        negtive_reads_lst1 = []
-        ambiguous_reads_lst1 = []
-
-        genuine_reads_lst2 = []
-        negtive_reads_lst2 = []
-        ambiguous_reads_lst2 = []
-
-        genuine_reads_features = []
-        negtive_reads_features = []
-        ambiguous_reads_features = [] 
-
         if self.edit_dis == 1:
             base_lst = ['A', 'C', 'G', 'T', 'N']
             if self.config.read_type == "DNA":
@@ -142,9 +107,10 @@ class Reads2Vectors():
             juge_indels = err_tyes2count.keys() & set(['N-X', 'X-N', 'X-A', 'X-C', 'X-G', 'X-T', 'A-X', 'C-X', 'G-X', 'T-X'])
             indel_num = len(juge_indels)
 
+        genuine_feature_lst = []
         for idx, row in genuine_df.iterrows():
-            genuine_reads_lst1.append(row['StartRead'])
-            genuine_reads_lst2.append(row['EndRead'])
+            # genuine_feature_lst.append(row['StartRead'])
+            # genuine_feature_lst.append(row['EndRead'])
             if self.edit_dis == 1:
                 cur_err_tye = row['ErrorTye']
                 cur_kmer1 = row['StartErrKmer']
@@ -157,13 +123,19 @@ class Reads2Vectors():
                 cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
                 # 
                 if high_flag:
-                    genuine_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, error_tyes[row['ErrorTye']] , row["StartDegree"], row['ErrorPosition']
+                    # genuine_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, error_tyes[row['ErrorTye']] , row["StartDegree"], row['ErrorPosition']
+                    genuine_feature_lst.append((row['StartRead'], row['EndRead'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
                 else:
-                    genuine_reads_features.append([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, error_tyes[row['ErrorTye']] , row["StartDegree"], row['ErrorPosition']
+                    # genuine_feature_lst.extend([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, error_tyes[row['ErrorTye']] , row["StartDegree"], row['ErrorPosition']
+                    genuine_feature_lst.append((row['StartRead'], row['EndRead'], row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
             else:
-                genuine_reads_features.append([row['StartReadCount']])
+                # genuine_feature_lst.append(row['StartReadCount'])
+                genuine_feature_lst.append((row['StartRead'], row['EndRead'], row['StartReadCount']))
             # genuine_reads_count.append(row['StartReadCount'])
-        
+
+        genuine_fea = self.read2vec(genuine_feature_lst)
+        del genuine_feature_lst
+        #################################################################################
         negative_count = 0
         neg_read2seqs = {}
         if self.edit_dis == 1:
@@ -188,14 +160,15 @@ class Reads2Vectors():
         if negative_count >= self.config.negative_sample_num:
             self.logger.warning("Negative samples larger than {}, noise2read will use random sampling to generate negative samples.".format(self.config.negative_sample_num))
 
+        negative_feature_lst = []
         for idx, row in negative_df.iterrows():
             read = row['StartRead']
             if self.edit_dis == 1:
                 if negative_count < self.config.negative_sample_num:
                     pos_reads = neg_read2seqs[read]
                     for read2 in pos_reads:
-                        negtive_reads_lst1.append(read) 
-                        negtive_reads_lst2.append(read2)  
+                        # negative_feature_lst.append(read) 
+                        # negative_feature_lst.append(read2)  
                         cur_err_tye_kmers = error_type_classification(read, read2)
                         cur_err_tye = cur_err_tye_kmers[0]
                         cur_kmer1 = cur_err_tye_kmers[1]
@@ -204,20 +177,22 @@ class Reads2Vectors():
                         cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
                         cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
                         if high_flag:
-                            negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
+                            # negative_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
+                            negative_feature_lst.append((read, read2, cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
                         else:
-                            negtive_reads_features.append([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) 
+                            # negative_feature_lst.extend([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) 
+                            negative_feature_lst.append((read, read2, row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
                 else:
                     pos_reads = neg_read2seqs[read]
                     candidates = list(pos_reads - total_reads)
                     if len(candidates) > 0:
                         for i in range(each_negative_num):
                             if len(candidates) > 0:
-                                negtive_reads_lst1.append(read) 
+                                # negative_feature_lst.append(read) 
                                 
                                 select_read = random.choice(candidates) 
                                 candidates.remove(select_read)
-                                negtive_reads_lst2.append(select_read)  
+                                # negative_feature_lst.append(select_read)  
 
                                 cur_err_tye_kmers = error_type_classification(read, select_read)
                                 cur_err_tye = cur_err_tye_kmers[0]
@@ -228,17 +203,23 @@ class Reads2Vectors():
                                 cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
                                 # 
                                 if high_flag:
-                                    negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
+                                    # negative_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
+                                    negative_feature_lst.append((read, select_read, cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
                                 else:
-                                    negtive_reads_features.append([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) 
+                                    # negative_feature_lst.extend([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) 
+                                    negative_feature_lst.append((read, select_read, row['StartReadCount']))
             elif self.edit_dis == 2:
                 # pos_reads = enumerate_ed2_seqs(read) 
                 random_seqs = random_ed2_seq(read, total_reads, each_negative_num)
                 for i in range(len(random_seqs)):
-                    negtive_reads_lst1.append(read) 
-                    negtive_reads_lst2.append(random_seqs[i])  
-                    negtive_reads_features.append([row['StartReadCount']]) #, row["StartDegree"]
+                    # negative_feature_lst.append(read) 
+                    # negative_feature_lst.append(random_seqs[i])  
+                    # negative_feature_lst.append(row['StartReadCount']) #, row["StartDegree"]
+                    negative_feature_lst.append((read, random_seqs[i], row['StartReadCount']))
 
+        negative_fea = self.read2vec(negative_feature_lst)
+        del negative_feature_lst
+        ###############################################################
         '''
         for idx, row in negative_df.iterrows():
             read = row['StartRead']
@@ -301,9 +282,10 @@ class Reads2Vectors():
                     negtive_reads_features.append([row['StartReadCount']]) #, row["StartDegree"]
                     # negtive_reads_count.append(row['StartReadCount']) 
         '''
+        ambiguous_feature_lst = []
         for idx, row in ambiguous_df.iterrows():
-            ambiguous_reads_lst1.append(row['StartRead'])
-            ambiguous_reads_lst2.append(row['EndRead'])
+            ambiguous_feature_lst.append(row['StartRead'])
+            ambiguous_feature_lst.append(row['EndRead'])
             if self.edit_dis == 1:
                 cur_err_tye = row['ErrorTye']
                 cur_kmer1 = row['StartErrKmer']
@@ -313,22 +295,15 @@ class Reads2Vectors():
                 cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
                 # 
                 if high_flag:
-                    ambiguous_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
+                    ambiguous_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
                 else:
-                    ambiguous_reads_features.append([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
+                    ambiguous_feature_lst.extend([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
             else:
-                ambiguous_reads_features.append([row['StartReadCount']])
+                ambiguous_feature_lst.append(row['StartReadCount'])
 
-        # self.logger.debug(f'{len(negtive_reads_lst1), len(negtive_reads_lst2), len(negtive_reads_features)}')
-        genuine_fea = self.read2vec(genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features)
-        del genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features
-
-        negative_fea = self.read2vec(negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features)
-        del negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features
-        
-        ambiguous_fea = self.read2vec(ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features)
-        del ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features
-
+        ambiguous_fea = self.read2vec(ambiguous_feature_lst)
+        del ambiguous_feature_lst
+        ##################################################################
         read_features = genuine_fea + negative_fea
         feature_len = len(read_features[0])
         train_data = np.array(read_features, dtype=object)
@@ -438,7 +413,6 @@ class Reads2Vectors():
         
         return lab_scale_f, ulab_scale_f 
 
-    # def read2features(self, shared_objects, i):
     '''
     def read2features(self, ES, ori_feature):
         # ES, reads_lst1, reads_lst2, other_features = shared_objects
@@ -461,34 +435,27 @@ class Reads2Vectors():
         features.extend(ori_feature[2:])
         return features 
     '''
-    def read2vec(self, reads_lst1, reads_lst2, other_features):  
+    def read2vec(self, original_features_lst):  
         ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
 
-        # Combine the features of each sample into one list
-        combined_features = []
-        for seq1, seq2, lst in zip(reads_lst1, reads_lst2, other_features):
-            tmp_lst = []
-            tmp_lst.append(seq1)
-            tmp_lst.append(seq2)
-            tmp_lst.extend(lst)
-            combined_features.append(tmp_lst)
-            del tmp_lst
-
-        chunk_size = len(combined_features) // self.config.chunks_num
+        chunk_size = len(original_features_lst) // self.config.chunks_num
         if chunk_size > 0:
-            chunks = [combined_features[i:i+chunk_size] for i in range(0, len(combined_features), chunk_size)]
+            chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
         else:
-            chunks = combined_features
+            chunks = original_features_lst
 
         # Use multiprocessing to write each chunk to a separate pickle file
         chunk_names = []
         for i, chunk in enumerate(chunks):
-
-            shared_objects = ES, chunk
+            # print(type(chunk))
+            # print(chunk[0])
             vectors = []
+            shared_objects = ES, chunk
             with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-                for fea_lst in pool.imap(self.read2features, range(len(chunk))):
-                    vectors.append(fea_lst)
+                results = pool.imap(self.read2features, range(len(chunk)))
+
+            for fea_lst in results:
+                vectors.append(fea_lst)
 
             # Generate the pickle file name
             file_name = self.config.result_dir + f"chunk_{i}.pickle"
@@ -506,31 +473,11 @@ class Reads2Vectors():
                 del vectors
             os.remove(file_name)
 
-        del combined_features, chunks      
+        del chunks      
         return combined_data
     
     def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
         self.logger.info("Embedding genuine and high ambiguous data.")
-        genuine_reads_lst1 = []
-        negtive_reads_lst1 = []
-        ambiguous_reads_lst1 = []
-
-        genuine_reads_lst2 = []
-        negtive_reads_lst2 = []
-        ambiguous_reads_lst2 = []
-
-        genuine_reads_features = []
-        negtive_reads_features = []
-        ambiguous_reads_features = [] 
-        # if self.config.read_type == "DNA":
-        #     error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-N", "N-T", "C-N", "N-C", "A-N", "N-A", "G-N", "N-G"]
-        #     base_lst = ['A', 'C', 'G', 'T', 'N']
-        #     kmers = [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]
-        #     # kmers3 = ['ANA', 'CNA', 'TNA', 'GNA', 'ANC', 'CNC', 'TNC', 'GNC', 'ANG', 'CNG', 'TNG', 'GNG', 'ANT', 'CNT', 'TNT', 'GNT'] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]
-        #     # kmers = kmers2 + kmers3
-        # elif self.config.read_type == "RNA":
-        #     base_lst = ['A', 'C', 'G', 'U', 'N']
-        #     kmers = [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]    
         base_lst = ['A', 'C', 'G', 'T', 'N']
         if self.config.read_type == "DNA":
             error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-X", "X-T", "C-X", "X-C", "A-X", "X-A", "G-X", "X-G", "X-N", "N-X", 'A-N', 'T-N','G-N','C-N','N-A','N-T', 'N-C', 'N-G']
@@ -587,11 +534,9 @@ class Reads2Vectors():
             base_prior += 0.01        
         self.logger.debug(err_kmers2count)
         self.logger.debug(err_tyes2count)
-
+        ##################################################################################
+        genuine_feature_lst = []
         for idx, row in genuine_df.iterrows():
-            genuine_reads_lst1.append(row['StartRead'])
-            genuine_reads_lst2.append(row['EndRead'])
-
             cur_err_tye = row['ErrorTye']
             cur_kmer1 = row['StartErrKmer']
             cur_kmer2 = row['EndErrKmer']
@@ -601,26 +546,30 @@ class Reads2Vectors():
             cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
             cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
             cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-            genuine_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, error_tyes[row['ErrorTye']] , row["StartDegree"], row['ErrorPosition']
-        
+            # genuine_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, error_tyes[row['ErrorTye']] , row["StartDegree"], row['ErrorPosition']
+            genuine_feature_lst.append((row['StartRead'], row['EndRead'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
+        genuine_fea = self.read2vec(genuine_feature_lst)
+        del genuine_feature_lst
+        #################################################################################
+        negative_feature_lst = []
         for idx, row in new_negative_df.iterrows():
-            negtive_reads_lst1.append(row['StartRead'])
-            negtive_reads_lst2.append(row['EndRead'])
+            # negative_feature_lst.append()
+            # negative_feature_lst.append()
             cur_err_tye = row['ErrorTye']
             cur_kmer1 = row['StartErrKmer']
             cur_kmer2 = row['EndErrKmer']
             cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
             cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
             cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-            negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
-
+            # negative_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
+            negative_feature_lst.append((row['StartRead'], row['EndRead'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
         # isolates negative
         for idx, row in negative_df.iterrows():
             read = row['StartRead']
             pos_reads = enumerate_ed1_seqs(read)
             for read2 in pos_reads:
-                negtive_reads_lst1.append(read) 
-                negtive_reads_lst2.append(read2)  
+                # negative_feature_lst.append(read) 
+                # negative_feature_lst.append(read2)  
                 cur_err_tye_kmers = error_type_classification(read, read2)
                 cur_err_tye = cur_err_tye_kmers[0]
                 cur_kmer1 = cur_err_tye_kmers[1]
@@ -628,24 +577,26 @@ class Reads2Vectors():
                 cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
                 cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
                 cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-                negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
-
+                # negative_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
+                negative_feature_lst.append((read, read2, cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
+        negative_fea = self.read2vec(negative_feature_lst)
+        del negative_feature_lst
+        ###############################################################
+        ambiguous_feature_lst = []
         for idx, row in ambiguous_df.iterrows():
-            ambiguous_reads_lst1.append(row['StartRead'])
-            ambiguous_reads_lst2.append(row['EndRead'])
+            # ambiguous_feature_lst.append(row['StartRead'])
+            # ambiguous_feature_lst.append(row['EndRead'])
             cur_err_tye = row['ErrorTye']
             cur_kmer1 = row['StartErrKmer']
             cur_kmer2 = row['EndErrKmer']
             cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
             cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
             cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-            ambiguous_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
-
-        genuine_fea = self.read2vec(genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features)
-        negative_fea = self.read2vec(negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features)
-        ambiguous_fea = self.read2vec(ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features)
-        del genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features, negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features, ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features
-
+            # ambiguous_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
+            ambiguous_feature_lst.append((row['StartRead'], row['EndRead'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
+        ambiguous_fea = self.read2vec(ambiguous_feature_lst)
+        del ambiguous_feature_lst
+        ##################################################################
         read_features = genuine_fea + negative_fea
         labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
         train_data = np.array(read_features)
