@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-19 18:14:24
+# @Last Modified time: 2023-05-20 01:26:15
 
 from typing import Counter
 import numpy as np
@@ -135,7 +135,9 @@ class Reads2Vectors():
 
         genuine_fea = self.read2vec(genuine_feature_lst)
         del genuine_feature_lst
+
         #################################################################################
+        print("encoding negative samples...")
         negative_count = 0
         neg_read2seqs = {}
         if self.edit_dis == 1:
@@ -207,7 +209,7 @@ class Reads2Vectors():
                                     negative_feature_lst.append((read, select_read, cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
                                 else:
                                     # negative_feature_lst.extend([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) 
-                                    negative_feature_lst.append((read, select_read, row['StartReadCount']))
+                                    negative_feature_lst.append((read, select_read, row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
             elif self.edit_dis == 2:
                 # pos_reads = enumerate_ed2_seqs(read) 
                 random_seqs = random_ed2_seq(read, total_reads, each_negative_num)
@@ -284,8 +286,6 @@ class Reads2Vectors():
         '''
         ambiguous_feature_lst = []
         for idx, row in ambiguous_df.iterrows():
-            ambiguous_feature_lst.append(row['StartRead'])
-            ambiguous_feature_lst.append(row['EndRead'])
             if self.edit_dis == 1:
                 cur_err_tye = row['ErrorTye']
                 cur_kmer1 = row['StartErrKmer']
@@ -295,11 +295,11 @@ class Reads2Vectors():
                 cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
                 # 
                 if high_flag:
-                    ambiguous_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
+                    ambiguous_feature_lst.append((row['StartRead'], row['EndRead'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
                 else:
-                    ambiguous_feature_lst.extend([row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
+                    ambiguous_feature_lst.append((row['StartRead'], row['EndRead'], row['StartReadCount'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
             else:
-                ambiguous_feature_lst.append(row['StartReadCount'])
+                ambiguous_feature_lst.append((row['StartRead'], row['EndRead'], row['StartReadCount']))
 
         ambiguous_fea = self.read2vec(ambiguous_feature_lst)
         del ambiguous_feature_lst
@@ -438,43 +438,55 @@ class Reads2Vectors():
     def read2vec(self, original_features_lst):  
         ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
 
-        chunk_size = len(original_features_lst) // self.config.chunks_num
-        if chunk_size > 0:
-            chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
-        else:
-            chunks = original_features_lst
-
-        # Use multiprocessing to write each chunk to a separate pickle file
-        chunk_names = []
-        for i, chunk in enumerate(chunks):
-            # print(type(chunk))
-            # print(chunk[0])
-            vectors = []
-            shared_objects = ES, chunk
-            with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-                results = pool.imap(self.read2features, range(len(chunk)))
-
-            for fea_lst in results:
-                vectors.append(fea_lst)
-
-            # Generate the pickle file name
-            file_name = self.config.result_dir + f"chunk_{i}.pickle"
-            # Write the vectors to the pickle file
-            with open(file_name, "wb") as file:
-                pickle.dump(vectors, file)
-            chunk_names.append(file_name)
-            del vectors
-            
-        combined_data = []
-        for file_name in chunk_names:
-            with open(file_name, "rb") as file:
-                vectors = pickle.load(file)
-                combined_data.extend(vectors)
+        if len(original_features_lst) > (self.config.chunks_num * 10):
+            chunk_size = len(original_features_lst) // self.config.chunks_num
+            remainder = len(original_features_lst) % self.config.chunks_num
+            # chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
+            chunks = []
+            for i in range(self.config.chunks_num):
+                # print(i)
+                cur_idx = chunk_size * i
+                chunks.append(original_features_lst[cur_idx:cur_idx+chunk_size])
+            # Handle the remaining elements
+            if remainder > 0:
+                chunks[-1].extend(original_features_lst[-remainder:])   
+                # print(chunks[-1])         
+            chunk_names = []
+            for i in range(len(chunks)):
+                chunk = chunks[i]
+                print(i)
+                print(len(chunk), type(chunk))
+                # print(chunk)
+                shared_objects = ES, chunk
+                vectors = []
+                with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
+                    for item in pool.imap(self.read2features, range(len(chunk))):
+                        vectors.append(item)
+                # Generate the pickle file name
+                file_name = self.config.result_dir + f"chunk_{i}.pickle"
+                # Write the vectors to the pickle file
+                with open(file_name, "wb") as file:
+                    pickle.dump(vectors, file)
+                chunk_names.append(file_name)
                 del vectors
-            os.remove(file_name)
+            del chunks
+            
+            combined_data = []
+            for file_name in chunk_names:
+                with open(file_name, "rb") as file:
+                    vectors = pickle.load(file)
+                    combined_data.extend(vectors)
+                    del vectors
+                os.remove(file_name)
+            return combined_data
+        else:
+            vectors = []
+            shared_objects = ES, original_features_lst
+            with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
+                for item in pool.imap(self.read2features, range(len(original_features_lst))):
+                    vectors.append(item)
+            return vectors
 
-        del chunks      
-        return combined_data
     
     def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
         self.logger.info("Embedding genuine and high ambiguous data.")
@@ -579,6 +591,7 @@ class Reads2Vectors():
                 cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
                 # negative_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
                 negative_feature_lst.append((read, read2, cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
+        
         negative_fea = self.read2vec(negative_feature_lst)
         del negative_feature_lst
         ###############################################################
