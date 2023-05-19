@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-19 10:54:10
+# @Last Modified time: 2023-05-19 10:55:32
 
 import configparser
 import os
@@ -64,7 +64,7 @@ class Config(object):
             if conf.has_option("General", "negative_sample_num"):
                 self.negative_sample_num = conf.getint("General", "negative_sample_num")
             else:
-                self.negative_sample_num = 500000 # when 
+                self.negative_sample_num = 300000 # when 
             # if conf.has_option("General", "over_sampling"):
             #     self.over_sampling = conf.getboolean("General", "over_sampling")
             # else:
@@ -309,7 +309,7 @@ class Config(object):
             self.iso_change_detail = False     
             self.top_n = 100      
             # self.over_sampling = True 
-            self.negative_sample_num = 500000
+            self.negative_sample_num = 300000
             self.min_read_len = 30
 
             # GraphSetup
