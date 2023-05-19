@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-18 19:11:38
+# @Last Modified time: 2023-05-19 10:52:07
 
 import editdistance
 import networkx as nx
@@ -16,7 +16,6 @@ from networkx.drawing.nx_agraph import graphviz_layout
 from collections import Counter
 import sys
 import pandas as pd
-from multiprocessing import Pool
 
 class DataGneration():
     """
@@ -210,7 +209,7 @@ class DataGneration():
             DataFrame: one pandas dataframe saving genuine errors
         """
         graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(self.config.input_file, edit_dis=1)
-        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2]
+        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) ]#if len(c) >= 2
 
         chunk_size = len(subgraphs) // self.config.chunks_num
         if chunk_size > 0:
@@ -242,14 +241,10 @@ class DataGneration():
             graph = nx.read_gexf(gexf_file)
             sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
             
-            # Process the subgraphs in parallel
-            pool = Pool(processes=self.config.num_workers)
-            genuine_lsts = pool.starmap(self.extract_umi_genuine_errs_subgraph, [(sub_graph) for sub_graph in sub_graphs])
-            # Close the multiprocessing pool
-            pool.close()
-            pool.join()
-
-            for item1 in genuine_lsts:
+            subgraph_num = len(sub_graphs)
+            with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
+                cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
+            for item in cur_genuine_lsts:
                 genuine_lst.extend(item)
 
             os.remove(gexf_file)
@@ -262,8 +257,9 @@ class DataGneration():
             genuine_df.to_csv(genuine_csv, index=False) 
         return genuine_df
 
-    def extract_umi_genuine_errs_subgraph(self, sub_graph): 
+    def extract_umi_genuine_errs_subgraph(self, sub_graphs, i): 
         gen_lst = []
+        sub_graph = sub_graphs[i]
         nodes_lst = list(sub_graph.nodes)
         for node in nodes_lst:
             node_count = sub_graph.nodes[node]['count']
@@ -316,7 +312,8 @@ class DataGneration():
             genuine_csv = self.config.result_dir + "genuine2.csv"
             ambiguous_csv = self.config.result_dir + "ambiguous2.csv"  
 
-        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2]
+        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
+        # subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
 
         self.logger.info("Extracting genuine and ambiguous errors...")
 
@@ -342,30 +339,25 @@ class DataGneration():
             # Write the group of subgraphs to the file
             nx.write_gexf(group_G, file_name)
             gexf_files.append(file_name)
-        
-        genuine_lst = []
-        ambiguous_lst = []
 
         if self.config.high_ambiguous:
             high_ambiguous_df = pd.DataFrame(columns=["idx", "StartRead", "StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])    
             high_ambi_lst = []        
 
         high_idx = 0
+        genuine_lst = []
+        ambiguous_lst = []
         for gexf_file in gexf_files:
             cur_graph = nx.read_gexf(gexf_file)
-            sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+            sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
             
-            # Process the subgraphs in parallel
-            pool = Pool(processes=self.config.num_workers)
-            results = pool.starmap(self.extract_genuine_ambi_errs_subgraph, [(sub_graph, edit_dis) for sub_graph in sub_graphs])
-            # Close the multiprocessing pool
-            pool.close()
-            pool.join()
-            
-            genuine_lsts, ambiguous_lsts = zip(*results)
-            for item1, item2 in zip(genuine_lsts, ambiguous_lsts):
-                genuine_lst.extend(item1)
-                ambiguous_lst.extend(item2)
+            subgraph_num = len(sub_graphs)
+            shared_obs = sub_graphs, edit_dis
+            with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
+                    if genu_ambi_lst[0]:
+                        genuine_lst.extend(genu_ambi_lst[0])
+                        ambiguous_lst.extend(genu_ambi_lst[1])
 
             if self.config.high_ambiguous:
                 cur_lst, cur_idx = self.extract_high_ambiguous_errs(sub_graphs, high_idx)
@@ -446,6 +438,7 @@ class DataGneration():
             idx += 1
         return tmp_df
 
+    '''
     def extract_genuine_ambi_errs_subgraph(self, sub_graph, edit_dis):
         gen_lst = []
         ambi_lst = []
@@ -521,7 +514,8 @@ class DataGneration():
             else:
                 continue
         return gen_lst, ambi_lst
-
+    '''
+    
     def data_files(self, edit_dis):
         """
         function to return the results produced by DataGneration class
@@ -829,8 +823,8 @@ class DataGneration():
         amplicon_lst = []
         idx = 0
         for gexf_file in gexf_files:
-            graph = nx.read_gexf(gexf_file)
-            sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+            cur_graph = nx.read_gexf(gexf_file)
+            sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
             
             cur_lst, cur_idx = self.extract_amplicon_errs(sub_graphs, idx)
             amplicon_lst.extend(cur_lst)
@@ -947,7 +941,7 @@ class DataGneration():
         return high_ambi_lst, idx
 
 
-'''
+    '''
     def extract_genuine_ambi_errs(self, subgraphs, edit_dis):
         """
         extract genuine and ambiguous errors from read graph
@@ -1035,9 +1029,8 @@ class DataGneration():
             genuine_df.to_csv(genuine_csv, index=False)  
             ambiguous_df.to_csv(ambiguous_csv, index=False)    
         return genuine_df, ambiguous_df
-'''
+    '''
 
-'''
     def extract_genuine_ambi_errs_subgraph(self, shared_obs, ii):
         gen_lst = []
         ambi_lst = []
@@ -1117,9 +1110,9 @@ class DataGneration():
                 else:
                     continue
         return [gen_lst, ambi_lst]
-'''
 
-'''
+
+    '''
     def extract_high_ambiguous_errs(self, subgraphs):
         """
         extract high ambiguous errors from read graph
@@ -1157,4 +1150,4 @@ class DataGneration():
             high_ambiguous_df.to_csv(high_ambiguous_csv, index=False)  
         self.logger.info("Done!")
         return high_ambiguous_df
-'''
+    '''

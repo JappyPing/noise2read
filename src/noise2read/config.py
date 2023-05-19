@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-18 13:36:23
+# @Last Modified time: 2023-05-19 10:00:18
 
 import configparser
 import os
@@ -332,7 +332,7 @@ class Config(object):
             # self.ambiguous_error_node_degree = 4   # for base editing and lncRNA quant datasets 3 others 4 
 
             # ModelTuningSetup
-            self.n_trials = 30
+            self.n_trials = 5
             self.n_estimators = 400
             self.test_size = 0.1 # default 
             # random state for SMOTE and train_test_split       

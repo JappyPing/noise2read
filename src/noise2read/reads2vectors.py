@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-18 19:36:27
+# @Last Modified time: 2023-05-19 10:51:27
 
 from typing import Counter
 import numpy as np
@@ -10,21 +10,22 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from noise2read.encoding import EncodeScheme
 from mpire import WorkerPool
-from tqdm import tqdm
+# from tqdm import tqdm
 from noise2read.utils import *
 import itertools
 import pickle
-import multiprocessing as mp
-
 
 class Reads2Vectors():
     def __init__(self, logger, config, edit_dis):
         self.logger = logger
         self.edit_dis = edit_dis
         self.config = config
-    '''
+    
     def read2features(self, shared_objects, i):
-        ES, reads_lst1, reads_lst2, other_features = shared_objects
+        ES, original_feature = shared_objects
+        
+        cur_feture = original_feature[i]
+
         features = []
         # pd_fe = ES.descriptors("PairDistance", reads_lst[i])
         # features.extend(pd_fe)    
@@ -33,10 +34,10 @@ class Reads2Vectors():
         # features.append(err_pos_lst[i]) 
         # freq_pos.append([ori_seq_freq, err_pos])              
         ###########################################################################
-        ft_fea1 = ES.descriptors("FourierTransform", reads_lst1[i])
-        cg_fea1 = ES.descriptors("ChaosGame", reads_lst1[i])
-        entropy_fea1 = ES.descriptors("Entropy", reads_lst1[i])
-        fs_fea1 = ES.descriptors("FickettScore", reads_lst1[i])
+        ft_fea1 = ES.descriptors("FourierTransform", cur_feture[0])
+        cg_fea1 = ES.descriptors("ChaosGame", cur_feture[0])
+        entropy_fea1 = ES.descriptors("Entropy", cur_feture[0])
+        fs_fea1 = ES.descriptors("FickettScore", cur_feture[0])
 
         features.extend(ft_fea1)
         features.extend(cg_fea1)
@@ -53,8 +54,8 @@ class Reads2Vectors():
         # # features.extend(entropy_fea2)
         # features.extend(fs_fea2)
         # self.logger.debug(len(features))
-        atomic_fea1 = ES.descriptors("atomic_number", reads_lst1[i])
-        atomic_fea2 = ES.descriptors("atomic_number", reads_lst2[i])
+        atomic_fea1 = ES.descriptors("atomic_number", cur_feture[0])
+        atomic_fea2 = ES.descriptors("atomic_number", cur_feture[1])
         # atomic_fea1 = ES.descriptors("binary", reads_lst1[i])
         # atomic_fea2 = ES.descriptors("binary", reads_lst2[i])
         # print(int(other_features[i][0]))
@@ -62,148 +63,9 @@ class Reads2Vectors():
         features.extend(atomic_fea2)
         # onehot_fea = ES.descriptors("OneHot", reads_lst1[i])
         # features.extend(onehot_fea)
-        features.extend(other_features[i])
+        features.extend(cur_feture[2:])
         # self.logger.debug(f'FourierTransform: {len(ft_fea)}, ChaosGame: {len(cg_fea)}, Entropy: {len(entropy_fea)}, FickettScore: {len(fs_fea)}')
         return features 
-    '''
-    def high_all_in_one_embedding(self, train_data, train_labels, new_genuine_df, new_negative_df, ambiguous_df):
-        self.logger.info("Embedding genuine and high ambiguous data.")
-        genuine_reads_lst1 = []
-        negtive_reads_lst1 = []
-        ambiguous_reads_lst1 = []
-
-        genuine_reads_lst2 = []
-        negtive_reads_lst2 = []
-        ambiguous_reads_lst2 = []
-
-        genuine_reads_features = []
-        negtive_reads_features = []
-        ambiguous_reads_features = [] 
-  
-        base_lst = ['A', 'C', 'G', 'T', 'N']
-        if self.config.read_type == "DNA":
-            error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-X", "X-T", "C-X", "X-C", "A-X", "X-A", "G-X", "X-G", "X-N", "N-X", 'A-N', 'T-N','G-N','C-N','N-A','N-T', 'N-C', 'N-G']
-            kmers = ['NX', 'XN', 'XA', 'XC', 'XG', 'XT', 'AX', 'CX', 'GX', 'TX'] + [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)] + ['AXA', 'CXA', 'TXA', 'GXA', 'AXC', 'CXC', 'TXC', 'GXC', 'AXG', 'CXG', 'TXG', 'GXG', 'AXT', 'CXT', 'TXT', 'GXT', 'NXA', 'NXC', 'NXG', 'NXT', 'NXN','AXN','CXN','GXN','TXN']
-            # kmers3 = ['ANA', 'CNA', 'TNA', 'GNA', 'ANC', 'CNC', 'TNC', 'GNC', 'ANG', 'CNG', 'TNG', 'GNG', 'ANT', 'CNT', 'TNT', 'GNT'] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)]
-            # kmers = kmers2 + kmers3
-        elif self.config.read_type == "RNA":
-            # error_tyes = ["A-G", "G-A", "A-U", "U-A", "A-C", "C-A", "G-U", "U-G", "G-C", "C-G", "U-C", "C-U", "U-N", "N-U", "C-N", "N-C", "A-N", "N-A", "G-N", "N-G"]
-            error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-X", "X-T", "C-X", "X-C", "A-X", "X-A", "G-X", "X-G", "X-N", "N-X", 'A-N', 'T-N','G-N','C-N','N-A','N-T', 'N-C', 'N-G']
-            kmers = ['NX', 'XN', 'XA', 'XC', 'XG', 'XT', 'AX', 'CX', 'GX', 'TX'] + [''.join(i) for i in itertools.product(base_lst, repeat = 2)] + [''.join(i) for i in itertools.product(base_lst, repeat = 3)] + ['AXA', 'CXA', 'TXA', 'GXA', 'AXC', 'CXC', 'TXC', 'GXC', 'AXG', 'CXG', 'TXG', 'GXG', 'AXT', 'CXT', 'TXT', 'GXT', 'NXA', 'NXC', 'NXG', 'NXU', 'NXN','AXN','CXN','GXN','UXN']
-
-        error_tye_priors = {}
-        err_tye_base_prior = 0.1
-        for it in error_tyes:
-            error_tye_priors[it] = err_tye_base_prior
-            err_tye_base_prior += 0.01
-
-        self.logger.debug(len(kmers))
-        total_err_tyes = []
-        total_err_kmers = []
-        for idx, row in new_genuine_df.iterrows():
-            total_err_tyes.append(row['ErrorTye'])
-            total_err_kmers.append(row['StartErrKmer'])
-            total_err_kmers.append(row['EndErrKmer'])
-
-        for idx, row in ambiguous_df.iterrows():
-            total_err_tyes.append(row['ErrorTye'])
-            total_err_kmers.append(row['StartErrKmer'])
-            total_err_kmers.append(row['EndErrKmer'])
-
-        for idx, row in new_negative_df.iterrows():
-            read = row['StartRead']
-            total_err_tyes.append(row['ErrorTye'])
-            total_err_kmers.append(row['StartErrKmer'])
-            total_err_kmers.append(row['EndErrKmer'])
-            
-        total_err_kmers_count = len(total_err_kmers)
-        total_err_tyes_count = len(total_err_tyes)
-        
-        err_kmers2count = Counter(total_err_kmers)
-        err_tyes2count = Counter(total_err_tyes)
-        self.logger.debug(len(err_kmers2count.keys()))
-        kmer_keys = err_kmers2count.keys()
-
-        not_exist_kmer = set(kmers) - set(kmer_keys)
-        if not_exist_kmer:
-            for mer in not_exist_kmer:
-                err_kmers2count[mer] = 0
-
-        kmers_priors = {}
-        base_prior = 0.1
-        for item in kmer_keys:
-            kmers_priors[item] = base_prior
-            base_prior += 0.01        
-        self.logger.debug(err_kmers2count)
-        self.logger.debug(err_tyes2count)
-
-        for idx, row in new_genuine_df.iterrows():
-            genuine_reads_lst1.append(row['StartRead'])
-            genuine_reads_lst2.append(row['EndRead'])
-
-            cur_err_tye = row['ErrorTye']
-            cur_kmer1 = row['StartErrKmer']
-            cur_kmer2 = row['EndErrKmer']
-            # self.logger.debug(row['StartRead'])
-            # self.logger.debug(row['EndRead'])
-            # self.logger.debug(f'{cur_kmer1}, {cur_kmer2}')
-            cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
-            cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
-            cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-            genuine_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, error_tyes[row['ErrorTye']] , row["StartDegree"], row['ErrorPosition']
-        
-        for idx, row in new_negative_df.iterrows():
-            negtive_reads_lst1.append(row['StartRead'])
-            negtive_reads_lst2.append(row['EndRead'])
-            cur_err_tye = row['ErrorTye']
-            cur_kmer1 = row['StartErrKmer']
-            cur_kmer2 = row['EndErrKmer']
-            cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
-            cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
-            cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-            negtive_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
-
-
-        for idx, row in ambiguous_df.iterrows():
-            ambiguous_reads_lst1.append(row['StartRead'])
-            ambiguous_reads_lst2.append(row['EndRead'])
-            cur_err_tye = row['ErrorTye']
-            cur_kmer1 = row['StartErrKmer']
-            cur_kmer2 = row['EndErrKmer']
-            cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
-            cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
-            cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-            ambiguous_reads_features.append([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])#, row["StartDegree"]
-
-        genuine_fea = self.read2vec(genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features)
-        negative_fea = self.read2vec(negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features)
-        ambiguous_fea = self.read2vec(ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features)
-        del genuine_reads_lst1, genuine_reads_lst2, genuine_reads_features, negtive_reads_lst1, negtive_reads_lst2, negtive_reads_features, ambiguous_reads_lst1, ambiguous_reads_lst2, ambiguous_reads_features
-
-        read_features = genuine_fea + negative_fea
-        new_labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
-        new_train_data = np.array(read_features)
-        shape1 = (len(labels), len(read_features[0]))
-        new_train_data.reshape(shape1)   
-
-        # merge the genuine and negative training data of ambiguous prediction to traininig data for high ambiguous prediction
-        merged_train_data = np.concatenate((train_data, new_train_data), axis=0)
-        merged_train_labels = np.concatenate((train_labels, new_labels), axis=0)
-
-        ambiguous_data = np.array(ambiguous_fea)
-        shape2 = (len(ambiguous_fea), len(ambiguous_fea[0]))
-        ambiguous_data.reshape(shape2) 
-
-        # scaling data
-        self.logger.debug(merged_train_data.shape)
-        self.logger.debug(ambiguous_data.shape)
-
-        train, ambiguous = self.scaler(merged_train_data, ambiguous_data, high_flag=True)
-        
-        self.logger.debug(train[0])
-        
-        del merged_train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
-        return train, merged_train_labels, ambiguous
 
     def all_in_one_embedding(self, total_reads, genuine_df, negative_df, ambiguous_df, high_flag):
         self.logger.info("Embedding genuine and ambiguous data.")
@@ -475,7 +337,7 @@ class Reads2Vectors():
         del read_features, genuine_fea, negative_fea
 
         labels = np.array([1] * gen_len + [0] * neg_len)
-        shape1 = (gen_len + neg_len, feature_len)
+        shape1 = ((gen_len + neg_len), feature_len)
         train_data.reshape(shape1)   
 
         ambiguous_data = np.array(ambiguous_fea, dtype=object)
@@ -576,8 +438,8 @@ class Reads2Vectors():
         
         return lab_scale_f, ulab_scale_f 
 
-
     # def read2features(self, shared_objects, i):
+    '''
     def read2features(self, ES, ori_feature):
         # ES, reads_lst1, reads_lst2, other_features = shared_objects
         features = []
@@ -598,7 +460,7 @@ class Reads2Vectors():
         
         features.extend(ori_feature[2:])
         return features 
-
+    '''
     def read2vec(self, reads_lst1, reads_lst2, other_features):  
         ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
 
@@ -621,10 +483,13 @@ class Reads2Vectors():
         # Use multiprocessing to write each chunk to a separate pickle file
         chunk_names = []
         for i, chunk in enumerate(chunks):
-            pool = mp.Pool(processes=self.config.num_workers)
-            vectors = pool.starmap(self.read2features, [(ES, sequence) for sequence in chunk])
-            pool.close()
-            pool.join()
+
+            shared_objects = ES, chunk
+            vectors = []
+            with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
+                for fea_lst in pool.imap(self.read2features, range(len(chunk))):
+                    vectors.append(fea_lst)
+
             # Generate the pickle file name
             file_name = self.config.result_dir + f"chunk_{i}.pickle"
             # Write the vectors to the pickle file
@@ -644,26 +509,6 @@ class Reads2Vectors():
         del combined_features, chunks      
         return combined_data
     
-'''
-    def read2vec(self, reads_lst1, reads_lst2, other_features):
-        read_features = []    
-        ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
-
-        shared_objects = ES, reads_lst1, reads_lst2, other_features
-        # with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-        #     with tqdm(total=len(reads_lst1), desc=self.logger.info("Encoding reads")) as pbar:   
-        #         for fea_lst in pool.imap(self.read2features, range(len(reads_lst1))):
-        #             read_features.append(fea_lst)
-        #             pbar.update()  
-        with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-            for fea_lst in pool.imap(self.read2features, range(len(reads_lst1)), progress_bar=self.config.verbose):
-                read_features.append(fea_lst)
-        
-        self.logger.debug(f'{len(read_features)}, {len(read_features[0])}')
-        return read_features
-'''
-
-'''
     def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
         self.logger.info("Embedding genuine and high ambiguous data.")
         genuine_reads_lst1 = []
@@ -817,4 +662,69 @@ class Reads2Vectors():
         self.logger.debug(train[0])
         del train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
         return train, labels, ambiguous
-'''
+
+    '''
+    def read2vec(self, reads_lst1, reads_lst2, other_features):
+        read_features = []    
+        ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
+
+        shared_objects = ES, reads_lst1, reads_lst2, other_features
+        # with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
+        #     with tqdm(total=len(reads_lst1), desc=self.logger.info("Encoding reads")) as pbar:   
+        #         for fea_lst in pool.imap(self.read2features, range(len(reads_lst1))):
+        #             read_features.append(fea_lst)
+        #             pbar.update()  
+        with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
+            for fea_lst in pool.imap(self.read2features, range(len(reads_lst1)), progress_bar=self.config.verbose):
+                read_features.append(fea_lst)
+        
+        self.logger.debug(f'{len(read_features)}, {len(read_features[0])}')
+        return read_features
+    '''
+
+    '''
+    def read2features(self, shared_objects, i):
+        ES, reads_lst1, reads_lst2, other_features = shared_objects
+        features = []
+        # pd_fe = ES.descriptors("PairDistance", reads_lst[i])
+        # features.extend(pd_fe)    
+        ###########################################################################
+        # features.append(read_count_lst[i]) 
+        # features.append(err_pos_lst[i]) 
+        # freq_pos.append([ori_seq_freq, err_pos])              
+        ###########################################################################
+        ft_fea1 = ES.descriptors("FourierTransform", reads_lst1[i])
+        cg_fea1 = ES.descriptors("ChaosGame", reads_lst1[i])
+        entropy_fea1 = ES.descriptors("Entropy", reads_lst1[i])
+        fs_fea1 = ES.descriptors("FickettScore", reads_lst1[i])
+
+        features.extend(ft_fea1)
+        features.extend(cg_fea1)
+        features.extend(entropy_fea1)
+        features.extend(fs_fea1)
+        # print(len(features))
+        # ft_fea2 = ES.descriptors("FourierTransform", reads_lst2[i])
+        # cg_fea2 = ES.descriptors("ChaosGame", reads_lst2[i])
+        # # entropy_fea2 = ES.descriptors("Entropy", reads_lst2[i])
+        # fs_fea2 = ES.descriptors("FickettScore", reads_lst2[i])
+
+        # features.extend(ft_fea2)
+        # features.extend(cg_fea2)
+        # # features.extend(entropy_fea2)
+        # features.extend(fs_fea2)
+        # self.logger.debug(len(features))
+        atomic_fea1 = ES.descriptors("atomic_number", reads_lst1[i])
+        atomic_fea2 = ES.descriptors("atomic_number", reads_lst2[i])
+        # atomic_fea1 = ES.descriptors("binary", reads_lst1[i])
+        # atomic_fea2 = ES.descriptors("binary", reads_lst2[i])
+        # print(int(other_features[i][0]))
+        features.extend(atomic_fea1)
+        features.extend(atomic_fea2)
+        # onehot_fea = ES.descriptors("OneHot", reads_lst1[i])
+        # features.extend(onehot_fea)
+        features.extend(other_features[i])
+        # self.logger.debug(f'FourierTransform: {len(ft_fea)}, ChaosGame: {len(cg_fea)}, Entropy: {len(entropy_fea)}, FickettScore: {len(fs_fea)}')
+        return features 
+    '''
+
+   
