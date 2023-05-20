@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-19 10:52:07
+# @Last Modified time: 2023-05-20 21:17:32
 
 import editdistance
 import networkx as nx
@@ -197,7 +197,7 @@ class DataGneration():
             # high_ambiguous_df = self.extract_high_ambiguous_errs(subgraphs)
             genuine_df, ambiguous_df, high_ambiguous_df = self.extract_genuine_ambi_errs(graph, edit_dis)
             return genuine_df, negative_df, ambiguous_df, high_ambiguous_df
-        else:
+        elif edit_dis == 1 or edit_dis == 2:
             genuine_df, ambiguous_df = self.extract_genuine_ambi_errs(graph, edit_dis)
             return genuine_df, negative_df, ambiguous_df
 
@@ -396,9 +396,9 @@ class DataGneration():
                 high_ambiguous_csv = self.config.result_dir + "high_ambiguous_1nt.csv"
                 high_ambiguous_df.to_csv(high_ambiguous_csv, index=False)  
         self.logger.info("Done!")
-        if self.config.high_ambiguous:
+        if edit_dis == 1 and self.config.high_ambiguous:
             return genuine_df, ambiguous_df, high_ambiguous_df
-        else:
+        elif edit_dis == 1 or edit_dis == 2:
             return genuine_df, ambiguous_df
 
     def add_genu_sample(self, shared_obs, i):

@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-20 01:26:15
+# @Last Modified time: 2023-05-20 11:49:53
 
 from typing import Counter
 import numpy as np
@@ -137,7 +137,7 @@ class Reads2Vectors():
         del genuine_feature_lst
 
         #################################################################################
-        print("encoding negative samples...")
+        # print("encoding negative samples...")
         negative_count = 0
         neg_read2seqs = {}
         if self.edit_dis == 1:
@@ -454,8 +454,8 @@ class Reads2Vectors():
             chunk_names = []
             for i in range(len(chunks)):
                 chunk = chunks[i]
-                print(i)
-                print(len(chunk), type(chunk))
+                # print(i)
+                # print(len(chunk), type(chunk))
                 # print(chunk)
                 shared_objects = ES, chunk
                 vectors = []
