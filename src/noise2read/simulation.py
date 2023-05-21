@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:04:45
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-21 12:07:59
+# @Last Modified time: 2023-05-21 12:41:13
 
 import collections
 from Bio import SeqIO
@@ -122,8 +122,8 @@ class Simulation():
     def read2err_read(self, read):
         possible_seqs = self.enumerate_ed1_seqs(read)
         num = len(possible_seqs)
-        # random.seed(self.config.indels)
-        random.shuffle(possible_seqs)
+        random.seed(self.config.sim_seed)
+        # random.shuffle(possible_seqs)
         idx = random.randint(0, num-1)
         return possible_seqs[idx]
 
@@ -267,11 +267,44 @@ class Simulation():
         os.system("cat %s %s > %s" % (err_free_subdataset_2, err_free_subdataset, true_data))     
         return raw_data, true_data
 
+    def find_first_diff_char(self, string1, string2):
+        min_len = min(len(string1), len(string2))
+
+        for i in range(min_len):
+            if string1[i] != string2[i]:
+                return i
+
+        # If all characters in the shorter string match the corresponding characters in the longer string
+        # and the shorter string is a prefix of the longer string, return the length of the shorter string
+        if len(string1) != len(string2):
+            return min_len
+
+        # If both strings are identical
+        return -1
+
     def mutate_seq(self, shared_objects, idx):
         records_dict, file_type = shared_objects
         ori_seq = str(records_dict[idx].seq)
         mutation_seq = self.read2err_read(ori_seq)
         if file_type == "fastq":
+            dis = editdistance.eval(ori_seq, mutation_seq)
+            if dis == 0:
+                let_ano = records_dict[idx].letter_annotations
+            elif dis == 1:
+                insert_idx = find_first_diff_char(self, ori_seq, mutation_seq)
+                # Get the quality scores list from letter_annotations
+                quality_scores = records_dict[idx].letter_annotations["phred_quality"]
+
+                # Calculate the average score
+                min_score = min(quality_scores)
+
+                # Insert the average score at the specified index
+                quality_scores.insert(insert_idx, min_score)
+
+                records_dict[idx].letter_annotations["phred_quality"] = quality_scores
+            else:
+                self.logger.error("Generate non 1-base error read.")
+                sys.exit(1)
             return SeqRecord(Seq(mutation_seq), id=records_dict[idx].id, description=records_dict[idx].description, letter_annotations=records_dict[idx].letter_annotations)
         elif file_type == "fasta":
             return SeqRecord(Seq(mutation_seq).seq, id=records_dict[idx].id, description=records_dict[idx].description)     
@@ -288,8 +321,8 @@ class Simulation():
     def read2_2baseerr_read(self, read):
         possible_seqs = self.enumerate_ed2_seqs(read)
         num = len(possible_seqs)
-        # random.seed(self.config.indels)
-        random.shuffle(possible_seqs)
+        random.seed(self.config.sim_seed)
+        # random.shuffle(possible_seqs)
         idx = random.randint(0, num-1)
         return possible_seqs[idx]
 
