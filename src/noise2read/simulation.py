@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:04:45
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-17 10:19:59
+# @Last Modified time: 2023-05-21 12:07:59
 
 import collections
 from Bio import SeqIO
@@ -151,7 +151,8 @@ class Simulation():
 
     def simulation(self):
         # step 1 correct errors using noise2read
-        corrected_data = self.error_correction(self.config)
+        # corrected_data = self.error_correction(self.config)
+        corrected_data = "/home/pping/Data/Repo/noise2read_results_0518/test/SRR9077111_1_corrected_corrected.fastq"
         # inject errors
         raw_data, true_data = self.error_injection(corrected_data)
         # raw_data, true_data = self.error_injection(self.config.input_file)
@@ -177,50 +178,59 @@ class Simulation():
 
         read2counts = collections.Counter(total_seqs_lst)
         select_id_lst = []
-        total_bases = 0
+        # total_bases = 0
         total_reads = 0
         new_read2counts = {}
         for read, count in read2counts.items():
             # if count >= 5:
-            if count > self.min_freq:
+            if count > self.config.min_freq:
                 select_id_lst.extend(seq2id_dict[read])
             if count > self.config.min_read_count:
                 new_read2counts[read] = count
                 total_reads += count
-                total_bases += len(read) * count
+                # total_bases += len(read) * count
                 
         # one base error
-        err_1_base_num = round(total_bases * self.config.error_rate1)
+        err_1_base_num = round(total_reads * self.config.error_rate1)
         if total_reads > err_1_base_num:
             per_num =  err_1_base_num / total_reads
-        err_1_id_lst = []
-        for read, count in new_read2counts.items():
-            random_num = round(count * per_num)
-            name_lst = seq2id_dict[read]
-            # random.shuffle(name_lst)
-            np.random.seed(self.config.sim_random_state)
-            indices = np.random.permutation(len(name_lst), size=random_num, replace=False)
-            err_1_id_lst.extend(name_lst[indices])
+            err_1_id_lst = []
+            for read, count in new_read2counts.items():
+                random_num = round(count * per_num)
+                name_lst = seq2id_dict[read]
+
+                rng = np.random.default_rng(seed=self.config.sim_seed)
+                indices = rng.permutation(len(name_lst))[:random_num]
+                # print(indices)
+                err_1_id_lst.extend(name_lst[i] for i in indices)
+                # print(err_1_id_lst)
+        else:
+            self.logger.error("1 base error reads number is larger than the total reads number!")
+            sys.exit(1)
 
         # two base errors
         if self.config.error_rate2 > 0:
             err_2_id_lst = []
-            err_2_base_num = round((total_bases-err_1_base_num) * self.config.error_rate2)
-
             cur_total_reads = total_reads - len(err_1_id_lst)
+            err_2_base_num = round(cur_total_reads * self.config.error_rate2)
+
             if cur_total_reads > err_2_base_num:
                 per_num_2base =  err_2_base_num / (cur_total_reads * 2)
-            for read, count in new_read2counts.items():
-                random_num_2base = round(count * per_num_2base)
-                cur_name_lst = list(set(seq2id_dict[read]) - set(err_1_id_lst))
-                # random.shuffle(name_lst)
-                np.random.seed(self.config.sim_random_state)
-                indices = np.random.permutation(len(cur_name_lst), size=random_num_2base, replace=False)
-                err_2_id_lst.extend(cur_name_lst[indices])
-            self.logger.info(f"total bases: {total_bases}, total reads: {total_reads}, 1 base error rate: {self.config.error_rate1}, 1 base error contained reads number: {len(err_1_id_lst)}, 2 bases error rate: {self.config.error_rate2}, 2 bases error contained reads number: {len(err_2_id_lst)}")
+                for read, count in new_read2counts.items():
+                    random_num_2base = round(count * per_num_2base)
+                    cur_name_lst = list(set(seq2id_dict[read]) - set(err_1_id_lst))
+
+                    rng = np.random.default_rng(seed=self.config.sim_seed)
+                    indices = rng.permutation(len(cur_name_lst))[:random_num_2base]
+                    err_2_id_lst.extend(cur_name_lst[i] for i in indices)
+                    
+                self.logger.info(f"Total reads: {total_reads}, 1 base error per read error rate: {self.config.error_rate1}, 1 base error reads number: {len(err_1_id_lst)}, 2 bases per read error rate: {self.config.error_rate2}, 2 bases error reads number: {len(err_2_id_lst)}")
+            else:
+                self.logger.error("2 bases error reads number is larger than the total reads number!")
+                sys.exit(1)
         else:
             # err_reads_num = round(total_bases * self.config.error_rate / total_reads)
-            self.logger.info(f"total bases: {total_bases}, total reads: {total_reads}, 1 base error rate: {self.config.error_rate1}, 1 base error contained reads number: {len(err_1_id_lst)}")
+            self.logger.info(f"Total reads: {total_reads}, 1 base error per read error rate: {self.config.error_rate1}, 1 base error reads number: {len(err_1_id_lst)}")
 
         err_1base_records = []
         shared_objects = records_dict, file_type

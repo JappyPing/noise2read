@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-19 10:55:32
+# @Last Modified time: 2023-05-21 12:01:03
 
 import configparser
 import os
@@ -285,10 +285,10 @@ class Config(object):
             else:
                 self.error_rate2 = 0.005 # default
 
-            if conf.has_option("Simulation", "sim_random_state"):
-                self.sim_random_state = conf.getint("Simulation", "sim_random_state")
+            if conf.has_option("Simulation", "sim_seed"):
+                self.sim_seed = conf.getint("Simulation", "sim_seed")
             else:
-                self.sim_random_state = 42 # default
+                self.sim_seed = 42 # default
                 
             # # Evaluation
             # if conf.has_option("Evaluation", "delta"):
@@ -375,7 +375,7 @@ class Config(object):
             self.indels = True
             self.error_rate1 = 0.03
             self.error_rate2 = 0.005
-            self.sim_random_state = 42
+            self.sim_seed = 42
 
             # # Evaluation
             # self.delta = 1
