@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-20 21:17:32
+# @Last Modified time: 2023-05-21 16:40:27
 
 import editdistance
 import networkx as nx
@@ -44,10 +44,10 @@ class DataGneration():
         self.logger = logger
         self.config = config
         if os.path.exists(self.config.result_dir):
-            self.logger.warning("Directory '% s' already exists, noise2read will use it." % self.config.result_dir)
+            self.logger.warning("Directory '%s' already exists, noise2read will use it." % self.config.result_dir)
         else:
             os.makedirs(self.config.result_dir)
-            self.logger.info("Directory '% s' created" % self.config.result_dir)
+            self.logger.info("Directory '%s' created" % self.config.result_dir)
         
         self.file_type = parse_file_type(self.config.input_file)
         if ".gz" in self.file_type:
@@ -209,7 +209,7 @@ class DataGneration():
             DataFrame: one pandas dataframe saving genuine errors
         """
         graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(self.config.input_file, edit_dis=1)
-        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) ]#if len(c) >= 2
+        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
 
         chunk_size = len(subgraphs) // self.config.chunks_num
         if chunk_size > 0:
@@ -238,8 +238,8 @@ class DataGneration():
 
         genuine_lst = []
         for gexf_file in gexf_files:
-            graph = nx.read_gexf(gexf_file)
-            sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+            cur_graph = nx.read_gexf(gexf_file)
+            sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
             
             subgraph_num = len(sub_graphs)
             with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
@@ -248,7 +248,7 @@ class DataGneration():
                 genuine_lst.extend(item)
 
             os.remove(gexf_file)
-            del graph, sub_graphs
+            del cur_graph, sub_graphs
 
         genuine_df = pd.DataFrame(genuine_lst, columns=["StartRead","StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])
 
@@ -710,10 +710,10 @@ class DataGneration():
             elif edit_dis == 2:
                 subdir = self.config.result_dir + "graph2/"
             if os.path.exists(subdir):
-                self.logger.info("Directory '% s' already exists" % subdir)
+                self.logger.info("Directory '%s' already exists" % subdir)
             else:
                 os.makedirs(subdir)
-                self.logger.info("Directory '% s' created" % subdir)
+                self.logger.info("Directory '%s' created" % subdir)
         if self.config.save_graph:
             graph_filename = subdir + 'graph.gexf'
             nx.write_gexf(graph, graph_filename)

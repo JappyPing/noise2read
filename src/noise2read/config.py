@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-21 12:01:03
+# @Last Modified time: 2023-05-21 14:58:20
 
 import configparser
 import os
@@ -273,7 +273,7 @@ class Config(object):
             if conf.has_option("Simulation", "indels"):
                 self.indels = conf.getboolean("Simulation", "indels")
             else:
-                self.indels = True
+                self.indels = False
 
             if conf.has_option("Simulation", "error_rate1"):
                 self.error_rate1 = conf.getfloat("Simulation", "error_rate1")
@@ -372,7 +372,7 @@ class Config(object):
             self.min_freq = 4
             self.min_read_count = 30
             self.substations = True
-            self.indels = True
+            self.indels = False
             self.error_rate1 = 0.03
             self.error_rate2 = 0.005
             self.sim_seed = 42

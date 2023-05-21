@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:04:45
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-21 12:41:13
+# @Last Modified time: 2023-05-21 17:14:27
 
 import collections
 from Bio import SeqIO
@@ -151,15 +151,13 @@ class Simulation():
 
     def simulation(self):
         # step 1 correct errors using noise2read
-        # corrected_data = self.error_correction(self.config)
-        corrected_data = "/home/pping/Data/Repo/noise2read_results_0518/test/SRR9077111_1_corrected_corrected.fastq"
+        corrected_data = self.error_correction(self.config)
         # inject errors
         raw_data, true_data = self.error_injection(corrected_data)
         # raw_data, true_data = self.error_injection(self.config.input_file)
         DP = DataProcessing( 
             self.logger,
-            self.config.num_workers,
-            self.config.result_dir)
+            self.config)
         umi_raw_dataset, umi_true_dataset = DP.write_mimic_umis(raw_data, true_data)
         return umi_raw_dataset, umi_true_dataset
 
@@ -289,19 +287,20 @@ class Simulation():
         if file_type == "fastq":
             dis = editdistance.eval(ori_seq, mutation_seq)
             if dis == 0:
-                let_ano = records_dict[idx].letter_annotations
+                pass
             elif dis == 1:
-                insert_idx = find_first_diff_char(self, ori_seq, mutation_seq)
+                indel_idx = self.find_first_diff_char(ori_seq, mutation_seq)
                 # Get the quality scores list from letter_annotations
                 quality_scores = records_dict[idx].letter_annotations["phred_quality"]
-
-                # Calculate the average score
-                min_score = min(quality_scores)
-
-                # Insert the average score at the specified index
-                quality_scores.insert(insert_idx, min_score)
-
-                records_dict[idx].letter_annotations["phred_quality"] = quality_scores
+                if len(ori_seq) < len(mutation_seq):
+                    # Calculate the average score
+                    min_score = min(quality_scores)
+                    # Insert the average score at the specified index
+                    quality_scores.insert(indel_idx, min_score)
+                    records_dict[idx].letter_annotations["phred_quality"] = quality_scores
+                elif len(ori_seq) > len(mutation_seq):
+                    quality_scores.pop(indel_idx)
+                    records_dict[idx].letter_annotations["phred_quality"] = quality_scores
             else:
                 self.logger.error("Generate non 1-base error read.")
                 sys.exit(1)
@@ -326,13 +325,12 @@ class Simulation():
         idx = random.randint(0, num-1)
         return possible_seqs[idx]
 
-    def enumerate_ed2_seqs(read):
-        # possible_ed1 = self.enumerate_ed1_seqs(read)
+    def enumerate_ed2_seqs(self, read):
         possible_ed1 = seq2substitution(read)
         possible_ed2 = []
         for seq in possible_ed1:
             possible_ed2.extend(list(set(seq2substitution(seq)) - possible_ed1))
-        return set(possible_ed2)
+        return list(set(possible_ed2))
 
     '''
     def extract_seq(self, shared_objects, name):

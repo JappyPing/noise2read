@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-17 10:24:07
+# @Last Modified time: 2023-05-21 17:12:51
 
 import collections
 from Bio import SeqIO
@@ -23,15 +23,15 @@ class DataProcessing():
         self.config = config
         
         if os.path.exists(self.config.result_dir):
-            self.logger.info("Directory '% s' already exists" % self.config.result_dir)
+            self.logger.info("Directory '%s' already exists" % self.config.result_dir)
         else:
             os.makedirs(self.config.result_dir)
         if os.path.exists(self.config.result_dir + 'raw/'):
-            self.logger.info("Directory '% s' already exists" % self.config.result_dir + 'raw/')
+            self.logger.info(f"Directory {self.config.result_dir}raw/ already exists")
         else:
             os.makedirs(self.config.result_dir + 'raw/')       
         if os.path.exists(self.config.result_dir + 'true/'):
-            self.logger.info("Directory '% s' already exists" % self.config.result_dir + 'true/')
+            self.logger.info(f"Directory {self.config.result_dir}true/ already exists")
         else:
             os.makedirs(self.config.result_dir + 'true/') 
                
@@ -62,8 +62,8 @@ class DataProcessing():
                 non_umi_records.append(non_umi_rec)        
         self.logger.info("Rewrite umi and non-umi Data")
         raw_base_name = original_data.split('/')[-1]
-        umi_raw_dataset = self.output_dir + "umi_" + raw_base_name
-        non_umi_raw_dataset = self.output_dir + "non_umi_" + raw_base_name
+        umi_raw_dataset = self.config.result_dir + "umi_" + raw_base_name
+        non_umi_raw_dataset = self.config.result_dir + "umi_in_name_" + raw_base_name
         with open(umi_raw_dataset, "w") as handle:
             SeqIO.write(umi_records, handle, ff_type)        
         with open(non_umi_raw_dataset, "w") as handle:
@@ -97,7 +97,7 @@ class DataProcessing():
         #     self.logger,
         #     self.num_workers,
         #     umi_raw_dataset,
-        #     self.output_dir,
+        #     self.config.result_dir,
         #     read_max_len = self.umi_end - self.umi_start,
         #     entropy_kmer=3, 
         #     entropy_q=2, 
@@ -166,8 +166,8 @@ class DataProcessing():
                     raw_records.extend(tmp_raw_rec)
                     true_records.extend(tmp_true_rec)                    
         self.logger.info("Write raw and true data to file")
-        raw_file = self.output_dir + "raw/" + non_umi_f.split('/')[-1]
-        true_file = self.output_dir + "true/" + non_umi_f.split('/')[-1]
+        raw_file = self.config.result_dir + "raw/" + non_umi_f.split('/')[-1]
+        true_file = self.config.result_dir + "true/" + non_umi_f.split('/')[-1]
         with open(raw_file, "w") as handle:
             SeqIO.write(raw_records, handle, ori_file_type)        
         with open(true_file, "w") as handle:
@@ -212,8 +212,8 @@ class DataProcessing():
             true_records.append(true_rec)
         raw_base_name = raw_dataset.split('/')[-1]
         true_base_name = true_dataset.split('/')[-1]
-        umi_raw_dataset = self.output_dir + "raw/" + "umi_" + raw_base_name
-        umi_true_dataset = self.output_dir + "true/" + "umi_"  + true_base_name
+        umi_raw_dataset = self.config.result_dir + "raw/" + "umi_" + raw_base_name
+        umi_true_dataset = self.config.result_dir + "true/" + "umi_"  + true_base_name
         self.logger.info("Rewrite Data")
         with open(umi_raw_dataset, "w") as handle:
             SeqIO.write(raw_records, handle, raw_file_type)        

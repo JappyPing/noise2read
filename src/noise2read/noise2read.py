@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-16 23:42:25
+# @Last Modified time: 2023-05-21 17:18:05
 
 from noise2read.config import Config
 import sys, getopt
@@ -320,13 +320,7 @@ def main():
                         logger.error(f"Only {available_cpu_cores} available to use.") 
                         config.num_workers = available_cpu_cores
                 #############################################################
-                    DP = DataProcessing( 
-                        logger,
-                        config.num_workers,
-                        config.result_dir,
-                        config.umi_start,
-                        config.umi_end,
-                        config.non_umi_start)
+                    DP = DataProcessing(logger, config)
                     DP.write_mimic_umis(config.input_file, config.ground_truth_data)
 ############################################################################################################################
                 elif module_arg == "real_umi":   
