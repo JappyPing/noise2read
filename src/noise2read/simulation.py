@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:04:45
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-22 23:03:52
+# @Last Modified time: 2023-05-23 21:26:58
 
 import collections
 from Bio import SeqIO
@@ -151,7 +151,11 @@ class Simulation():
 
     def simulation(self):
         # step 1 correct errors using noise2read
-        corrected_data = self.error_correction(self.config)
+        # 
+        if os.path.exists(self.config.correct_data):
+            corrected_data = self.config.correct_data
+        else:
+            corrected_data = self.error_correction(self.config)
         # inject errors
         raw_data, true_data = self.error_injection(corrected_data)
         # raw_data, true_data = self.error_injection(self.config.input_file)

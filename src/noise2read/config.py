@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-23 18:56:07
+# @Last Modified time: 2023-05-23 21:26:07
 
 import configparser
 import os
@@ -306,6 +306,7 @@ class Config(object):
             self.result_dir = os.path.join(base_path, 'result/')
             # input
             self.ground_truth_data = None  
+
             # general
             self.num_workers = -1 
             self.chunks_num = 100
