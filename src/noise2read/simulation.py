@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:04:45
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-22 14:05:48
+# @Last Modified time: 2023-05-22 23:03:52
 
 import collections
 from Bio import SeqIO

@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-21 14:58:20
+# @Last Modified time: 2023-05-23 18:56:07
 
 import configparser
 import os
@@ -125,6 +125,11 @@ class Config(object):
                 self.proba_deviation = conf.getfloat("AmbiguousSetup", "proba_deviation")
             else:
                 self.proba_deviation = 0.95 # default 
+
+            if conf.has_option("AmbiguousSetup", "iso_neg_high"):
+                self.iso_neg_high = conf.getboolean("AmbiguousSetup", "iso_neg_high")
+            else:
+                self.iso_neg_high = True    
 
             # ModelTuningSetup
             if conf.has_option("ModelTuningSetup", "n_trials"):
@@ -278,12 +283,12 @@ class Config(object):
             if conf.has_option("Simulation", "error_rate1"):
                 self.error_rate1 = conf.getfloat("Simulation", "error_rate1")
             else:
-                self.error_rate1 = 0.03 # default
+                self.error_rate1 = 0.1 # default
 
             if conf.has_option("Simulation", "error_rate2"):
                 self.error_rate2 = conf.getfloat("Simulation", "error_rate2")
             else:
-                self.error_rate2 = 0.005 # default
+                self.error_rate2 = 0.05 # default
 
             if conf.has_option("Simulation", "sim_seed"):
                 self.sim_seed = conf.getint("Simulation", "sim_seed")
@@ -330,6 +335,7 @@ class Config(object):
             # high ambiguous predict probability difference
             self.proba_deviation = 0.95      # for base editing and lncRNA quant datasets 0.75 others 0.6 
             # self.ambiguous_error_node_degree = 4   # for base editing and lncRNA quant datasets 3 others 4 
+            self.iso_neg_high = True # if True, the high frequency isolated nodes aslso included as negative samples for high ambiguous prediction. This will use quite a lot computational resources (memory) for embeeding and model training
 
             # ModelTuningSetup
             self.n_trials = 30
@@ -373,8 +379,8 @@ class Config(object):
             self.min_read_count = 30
             self.substations = True
             self.indels = False
-            self.error_rate1 = 0.03
-            self.error_rate2 = 0.005
+            self.error_rate1 = 0.1
+            self.error_rate2 = 0.05
             self.sim_seed = 42
 
             # # Evaluation

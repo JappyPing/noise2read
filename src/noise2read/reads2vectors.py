@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-20 11:49:53
+# @Last Modified time: 2023-05-23 18:52:23
 
 from typing import Counter
 import numpy as np
@@ -576,21 +576,22 @@ class Reads2Vectors():
             # negative_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2]) #, row["StartDegree"]
             negative_feature_lst.append((row['StartRead'], row['EndRead'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
         # isolates negative
-        for idx, row in negative_df.iterrows():
-            read = row['StartRead']
-            pos_reads = enumerate_ed1_seqs(read)
-            for read2 in pos_reads:
-                # negative_feature_lst.append(read) 
-                # negative_feature_lst.append(read2)  
-                cur_err_tye_kmers = error_type_classification(read, read2)
-                cur_err_tye = cur_err_tye_kmers[0]
-                cur_kmer1 = cur_err_tye_kmers[1]
-                cur_kmer2 = cur_err_tye_kmers[2]
-                cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
-                cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
-                cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
-                # negative_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
-                negative_feature_lst.append((read, read2, cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
+        if self.config.iso_neg_high:
+            for idx, row in negative_df.iterrows():
+                read = row['StartRead']
+                pos_reads = enumerate_ed1_seqs(read)
+                for read2 in pos_reads:
+                    # negative_feature_lst.append(read) 
+                    # negative_feature_lst.append(read2)  
+                    cur_err_tye_kmers = error_type_classification(read, read2)
+                    cur_err_tye = cur_err_tye_kmers[0]
+                    cur_kmer1 = cur_err_tye_kmers[1]
+                    cur_kmer2 = cur_err_tye_kmers[2]
+                    cur_err_tye_val = (err_tyes2count[cur_err_tye] + error_tye_priors[cur_err_tye]) / (total_err_tyes_count + 1)
+                    cur_err_kmer_val1 = (err_kmers2count[cur_kmer1] + kmers_priors[cur_kmer1]) / (total_err_kmers_count + 1)
+                    cur_err_kmer_val2 = (err_kmers2count[cur_kmer2] + kmers_priors[cur_kmer2]) / (total_err_kmers_count + 1)
+                    # negative_feature_lst.extend([cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2])  
+                    negative_feature_lst.append((read, read2, cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
         
         negative_fea = self.read2vec(negative_feature_lst)
         del negative_feature_lst
