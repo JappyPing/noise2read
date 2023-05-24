@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-21 16:40:27
+# @Last Modified time: 2023-05-24 10:02:27
 
 import editdistance
 import networkx as nx
@@ -786,7 +786,7 @@ class DataGneration():
         graph, seq_lens_set, seqs2id_dict, unique_seqs = self.generate_graph(data_set, edit_dis=1)
         self.graph_summary(graph)
         
-        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2]
         
         amplicon_df = pd.DataFrame(columns=["idx", "StartRead","StartReadCount", "StartDegree", "ErrorTye", "ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])
         for sub_graph in subgraphs:
