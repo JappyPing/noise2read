@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-24 10:02:27
+# @Last Modified time: 2023-05-24 14:48:03
 
 import editdistance
 import networkx as nx
@@ -768,14 +768,12 @@ class DataGneration():
         del graph
         return genuine_df, negative_df, ambiguous_df, unique_seqs
 
-    def extract_amplicon_err_samples(self, data_set, amplicon_low_freq=50, amplicon_high_freq=1500):
+    def extract_amplicon_err_samples(self, data_set):
         """
         extract amplicon sequencing errors from read graph
 
         Args:
             data_set (str): The filename including path for further errors correction for amplicon sequencing data.
-            amplicon_low_freq (int, optional): The threshold of low frquency determining a read for further rectification for amplicon sequencing ddata. Defaults to 50.
-            amplicon_high_freq (int, optional): The threshold of high frquency for amplicon sequencing error correction. Defaults to 1500.
 
         Returns:
             DataFrame: amplicon_df, a dataframe saving the amplicon sequencing errors
@@ -824,13 +822,13 @@ class DataGneration():
         idx = 0
         for gexf_file in gexf_files:
             cur_graph = nx.read_gexf(gexf_file)
-            sub_graphs = [graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+            sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
             
             cur_lst, cur_idx = self.extract_amplicon_errs(sub_graphs, idx)
             amplicon_lst.extend(cur_lst)
             idx = cur_idx + 1
             os.remove(gexf_file)
-            del graph, sub_graphs
+            del cur_graph, sub_graphs
 
         for item in amplicon_lst:
             amplicon_df.loc[len(amplicon_df)] = item
@@ -848,14 +846,14 @@ class DataGneration():
                     node_count = sub_graph.nodes[node]['count']
                     node_degree = sub_graph.degree[node]
                     line = []
-                    if node_count < amplicon_low_freq and not sub_graph.nodes[node]['flag']:# and node_degree <= self.config.amplicon_error_node_degree:
+                    if node_count < self.config.amplicon_low_freq and not sub_graph.nodes[node]['flag']:# and node_degree <= self.config.amplicon_error_node_degree:
                         node_neis = [n for n in sub_graph.neighbors(node)]
                         # nei2count = []
                         nei_degree_count = []
                         for nei in node_neis:
                             nei_count = sub_graph.nodes[nei]['count']
                             nei_degree = sub_graph.degree[nei]
-                            if nei_count > amplicon_high_freq:
+                            if nei_count > self.config.amplicon_high_freq:
                                 line = [nei, nei_count, nei_degree, node, node_count, node_degree]
                                 new_line = self.err_type_classification(line) 
                                 new_line.insert(0, idx) 
@@ -866,7 +864,7 @@ class DataGneration():
                         sub_graph.nodes[node]['flag'] = True
                     else:
                         continue     
-        return amplicon_errs_lst
+        return amplicon_errs_lst, idx
   
     def draw_graph(self, graph, sub_dir, drawing_graph_num = 50):
         """

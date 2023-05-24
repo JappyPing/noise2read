@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-21 17:18:05
+# @Last Modified time: 2023-05-24 15:01:15
 
 from noise2read.config import Config
 import sys, getopt
@@ -237,8 +237,8 @@ def main():
                         mid_result = EC.all_in_one_ed2_correction(corrected_file, unique_seqs2, genuine_df2, negative_df2, ambiguous_df2)
                     else:
                         mid_result = corrected_file
-
-                    amplicon_df = DG.extract_amplicon_err_samples(mid_result, config.amplicon_low_freq, config.amplicon_high_freq)
+                    # mid_result = config.input_file
+                    amplicon_df = DG.extract_amplicon_err_samples(mid_result)
                     config.correct_data = EC.correct_amplicon_err(mid_result, genuine_df, negative_df, new_negative_df, amplicon_df, config.amplicon_threshold_proba)
                 
                     DataAnalysis(logger, config).evaluation()
