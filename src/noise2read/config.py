@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-23 21:26:07
+# @Last Modified time: 2023-05-25 14:28:54
 
 import configparser
 import os
@@ -265,11 +265,11 @@ class Config(object):
             if conf.has_option("Simulation", "min_freq"):
                 self.min_freq = conf.getint("Simulation", "min_freq")
             else:
-                self.min_freq = 4 # default
-            if conf.has_option("Simulation", "min_read_count"):
-                self.min_read_count = conf.getint("Simulation", "min_read_count")
-            else:
-                self.min_read_count = 30 # default
+                self.min_freq = 7 # default
+            # if conf.has_option("Simulation", "min_read_count"):
+            #     self.min_read_count = conf.getint("Simulation", "min_read_count")
+            # else:
+            #     self.min_read_count = 30 # default
                 
             if conf.has_option("Simulation", "substations"):
                 self.substations = conf.getboolean("Simulation", "substations")
@@ -376,8 +376,8 @@ class Config(object):
             # self.amplicon_error_node_degree = 4
 
             # simulation
-            self.min_freq = 4
-            self.min_read_count = 30
+            self.min_freq = 7
+            # self.min_read_count = 30
             self.substations = True
             self.indels = False
             self.error_rate1 = 0.1
