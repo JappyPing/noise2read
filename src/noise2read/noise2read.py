@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-24 15:01:15
+# @Last Modified time: 2023-05-25 11:37:16
 
 from noise2read.config import Config
 import sys, getopt
@@ -140,6 +140,7 @@ def main():
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
                     ## one model to predict
+
                     if config.high_ambiguous:
                         # corrected_file, no_high_correct, new_negative_df = EC.all_in_one_correction(isolates_file, non_isolates_file, unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df)
                         corrected_file, new_negative_df = EC.all_in_one_correction(isolates_file, non_isolates_file, unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df)

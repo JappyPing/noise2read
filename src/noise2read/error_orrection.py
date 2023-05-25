@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-19 09:59:43
+# @Last Modified time: 2023-05-25 13:14:46
 
 import os
 from Bio import SeqIO
@@ -58,7 +58,9 @@ class ErrorCorrection():
                 new_negative_df: pandas dataframe containing negative samples from the prediction result of ambiguous errors
         """
         corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + self.out_file_tye  
-        if isinstance(high_ambiguous_df, pd.DataFrame):
+        if isinstance(high_ambiguous_df, pd.DataFrame) and high_ambiguous_df.empty:
+            self.logger.info("No ambiguous between high-frequency reads identified!")
+        if isinstance(high_ambiguous_df, pd.DataFrame) and not high_ambiguous_df.empty:
             genuine_ambi_errs_df, new_negative_df, high_ambi_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df, edit_dis=1)
             # correct errors
             genuine_corrected_file = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
