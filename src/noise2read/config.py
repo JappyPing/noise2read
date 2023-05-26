@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-25 14:28:54
+# @Last Modified time: 2023-05-26 13:51:43
 
 import configparser
 import os
@@ -265,36 +265,32 @@ class Config(object):
             if conf.has_option("Simulation", "min_freq"):
                 self.min_freq = conf.getint("Simulation", "min_freq")
             else:
-                self.min_freq = 7 # default
-            # if conf.has_option("Simulation", "min_read_count"):
-            #     self.min_read_count = conf.getint("Simulation", "min_read_count")
-            # else:
-            #     self.min_read_count = 30 # default
+                self.min_freq = 4 # default
+            if conf.has_option("Simulation", "min_read_count"):
+                self.min_read_count = conf.getint("Simulation", "min_read_count")
+            else:
+                self.min_read_count = 30 # default
                 
-            if conf.has_option("Simulation", "substations"):
-                self.substations = conf.getboolean("Simulation", "substations")
-            else:
-                self.substations = True
-            if conf.has_option("Simulation", "indels"):
-                self.indels = conf.getboolean("Simulation", "indels")
-            else:
-                self.indels = False
+            # if conf.has_option("Simulation", "substations"):
+            #     self.substations = conf.getboolean("Simulation", "substations")
+            # else:
+            #     self.substations = True
+            # if conf.has_option("Simulation", "indels"):
+            #     self.indels = conf.getboolean("Simulation", "indels")
+            # else:
+            #     self.indels = False
 
             if conf.has_option("Simulation", "error_rate1"):
                 self.error_rate1 = conf.getfloat("Simulation", "error_rate1")
             else:
-                self.error_rate1 = 0.1 # default
+                self.error_rate1 = 0.09 # default
 
             if conf.has_option("Simulation", "error_rate2"):
                 self.error_rate2 = conf.getfloat("Simulation", "error_rate2")
             else:
-                self.error_rate2 = 0.05 # default
+                self.error_rate2 = 0.02 # default
 
-            if conf.has_option("Simulation", "sim_seed"):
-                self.sim_seed = conf.getint("Simulation", "sim_seed")
-            else:
-                self.sim_seed = 42 # default
-                
+
             # # Evaluation
             # if conf.has_option("Evaluation", "delta"):
             #     self.delta = conf.getint("Evaluation", "delta")
@@ -376,14 +372,13 @@ class Config(object):
             # self.amplicon_error_node_degree = 4
 
             # simulation
-            self.min_freq = 7
-            # self.min_read_count = 30
-            self.substations = True
-            self.indels = False
-            self.error_rate1 = 0.1
-            self.error_rate2 = 0.05
-            self.sim_seed = 42
-
+            self.min_freq = 4
+            self.min_read_count = 30
+            # self.substations = True
+            # self.indels = False
+            self.error_rate1 = 0.09
+            self.error_rate2 = 0.02
+  
             # # Evaluation
             # self.delta = 1
 

@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-24 14:48:03
+# @Last Modified time: 2023-05-26 14:01:57
 
 import editdistance
 import networkx as nx
@@ -242,8 +242,18 @@ class DataGneration():
             sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
             
             subgraph_num = len(sub_graphs)
-            with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
-                cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
+            try:
+                with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
+                    cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
+            
             for item in cur_genuine_lsts:
                 genuine_lst.extend(item)
 
@@ -350,15 +360,23 @@ class DataGneration():
         for gexf_file in gexf_files:
             cur_graph = nx.read_gexf(gexf_file)
             sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
-            
-            subgraph_num = len(sub_graphs)
-            shared_obs = sub_graphs, edit_dis
-            with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
-                for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
-                    if genu_ambi_lst[0]:
-                        genuine_lst.extend(genu_ambi_lst[0])
-                        ambiguous_lst.extend(genu_ambi_lst[1])
+            try:
+                subgraph_num = len(sub_graphs)
+                shared_obs = sub_graphs, edit_dis
+                with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                    for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
+                        if genu_ambi_lst[0]:
+                            genuine_lst.extend(genu_ambi_lst[0])
+                            ambiguous_lst.extend(genu_ambi_lst[1])
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
 
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
+            
             if self.config.high_ambiguous:
                 cur_lst, cur_idx = self.extract_high_ambiguous_errs(sub_graphs, high_idx)
                 high_ambi_lst.extend(cur_lst)
@@ -688,14 +706,23 @@ class DataGneration():
             shared_unique_seqs = low_freq
         
         self.logger.debug("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
-        with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
-            if edit_dis == 1:
-                for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, progress_bar=self.config.verbose):
-                    edges_lst.extend(edge_lst)
-            elif edit_dis == 2:
-                for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, progress_bar=self.config.verbose):
-                    edges_lst.extend(edge_lst)
+        try:
+            with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
+                if edit_dis == 1:
+                    for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, progress_bar=self.config.verbose):
+                        edges_lst.extend(edge_lst)
+                elif edit_dis == 2:
+                    for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, progress_bar=self.config.verbose):
+                        edges_lst.extend(edge_lst)
+        except KeyboardInterrupt:
+            # Handle termination signal (Ctrl+C)
+            pool.terminate()  # Terminate the WorkerPool before exiting
 
+        except Exception:
+            # Handle other exceptions
+            pool.terminate()  # Terminate the WorkerPool before exiting
+            raise
+        
         if len(edges_lst) > 0:
             self.logger.debug(len(edges_lst))
             self.logger.debug(edges_lst[0])

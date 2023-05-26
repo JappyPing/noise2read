@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-23 18:52:23
+# @Last Modified time: 2023-05-26 14:03:18
 
 from typing import Counter
 import numpy as np
@@ -459,9 +459,19 @@ class Reads2Vectors():
                 # print(chunk)
                 shared_objects = ES, chunk
                 vectors = []
-                with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-                    for item in pool.imap(self.read2features, range(len(chunk))):
-                        vectors.append(item)
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
+                        for item in pool.imap(self.read2features, range(len(chunk))):
+                            vectors.append(item)
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+
                 # Generate the pickle file name
                 file_name = self.config.result_dir + f"chunk_{i}.pickle"
                 # Write the vectors to the pickle file
@@ -480,11 +490,21 @@ class Reads2Vectors():
                 os.remove(file_name)
             return combined_data
         else:
-            vectors = []
-            shared_objects = ES, original_features_lst
-            with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-                for item in pool.imap(self.read2features, range(len(original_features_lst))):
-                    vectors.append(item)
+            try:
+                vectors = []
+                shared_objects = ES, original_features_lst
+                with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
+                    for item in pool.imap(self.read2features, range(len(original_features_lst))):
+                        vectors.append(item)
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
+
             return vectors
 
     

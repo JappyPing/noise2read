@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-25 14:15:46
+# @Last Modified time: 2023-05-25 22:08:29
 
 from noise2read.config import Config
 import sys, getopt
@@ -239,8 +239,12 @@ def main():
                     else:
                         mid_result = corrected_file
                     # mid_result = config.input_file
-                    amplicon_df = DG.extract_amplicon_err_samples(mid_result)
-                    config.correct_data = EC.correct_amplicon_err(mid_result, genuine_df, negative_df, new_negative_df, amplicon_df, config.amplicon_threshold_proba)
+                    if (not new_negative_df.empty or not negative_df.empty) and not genuine_df.empty:
+                        amplicon_df = DG.extract_amplicon_err_samples(mid_result)
+                        config.correct_data = EC.correct_amplicon_err(mid_result, genuine_df, negative_df, new_negative_df, amplicon_df, config.amplicon_threshold_proba)
+                    else:
+                        self.logger.warning("No genuine or negative samples for amplicon errors prediction!")
+                        config.correct_data = mid_result
                 
                     DataAnalysis(logger, config).evaluation()
                     # delete bcool result

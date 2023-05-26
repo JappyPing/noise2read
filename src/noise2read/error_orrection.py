@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-25 13:14:46
+# @Last Modified time: 2023-05-25 23:51:45
 
 import os
 from Bio import SeqIO
@@ -60,43 +60,51 @@ class ErrorCorrection():
         corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + self.out_file_tye  
         if isinstance(high_ambiguous_df, pd.DataFrame) and high_ambiguous_df.empty:
             self.logger.info("No ambiguous between high-frequency reads identified!")
-        if isinstance(high_ambiguous_df, pd.DataFrame) and not high_ambiguous_df.empty:
-            genuine_ambi_errs_df, new_negative_df, high_ambi_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df, edit_dis=1)
-            # correct errors
-            genuine_corrected_file = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
-            self.logger.info("Genuine and ambiguous errors corrected.")
-            
-            del genuine_ambi_errs_df, genuine_df, negative_df, ambiguous_df, unique_seqs
-            ###############################################################################################
-            # IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, genuine_corrected_file, self.config.result_dir, self.config.iso_change_detail, self.config.min_iters)
-            # tmp_corrected_isolates = IEC.bcool_correct_isolates() 
-            # tmp_correct = self.config.result_dir + self.base[0] + '_correct_no_high.' + self.out_file_tye  
-            # if tmp_corrected_isolates and genuine_corrected_file:
-            #     os.system("cat %s %s > %s" % (tmp_corrected_isolates, genuine_corrected_file, tmp_correct))
-            # # if os.path.exists(tmp_corrected_isolates):     
-            # #     os.system("rm %s" % tmp_corrected_isolates)
-            # del IEC
-            #####################################################################
-            non_isolates_correct = self.all_in_one_high_ambiguous_err_correction(genuine_corrected_file, high_ambi_df)
-            del high_ambiguous_df
-            self.logger.info("High ambiguous errors corrected.")
-            self.logger.info('1nt-edit-distance based Errors Correction finished.')
-            self.logger.info("#############################################")
-        else:
-            genuine_ambi_errs_df, new_negative_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df=None, edit_dis=1)
-            # correct errors
-            self.logger.info("Correcting 1nt-edit-distance based Errors")
+        if not genuine_df.empty and not ambiguous_df.empty and not negative_df.empty:
+            if isinstance(high_ambiguous_df, pd.DataFrame) and not high_ambiguous_df.empty:
+                genuine_ambi_errs_df, new_negative_df, high_ambi_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df, edit_dis=1)
+                # correct errors
+                genuine_corrected_file = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
+                self.logger.info("Genuine and ambiguous errors corrected.")
+                
+                del genuine_ambi_errs_df, genuine_df, negative_df, ambiguous_df, unique_seqs
+                ###############################################################################################
+                # IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, genuine_corrected_file, self.config.result_dir, self.config.iso_change_detail, self.config.min_iters)
+                # tmp_corrected_isolates = IEC.bcool_correct_isolates() 
+                # tmp_correct = self.config.result_dir + self.base[0] + '_correct_no_high.' + self.out_file_tye  
+                # if tmp_corrected_isolates and genuine_corrected_file:
+                #     os.system("cat %s %s > %s" % (tmp_corrected_isolates, genuine_corrected_file, tmp_correct))
+                # # if os.path.exists(tmp_corrected_isolates):     
+                # #     os.system("rm %s" % tmp_corrected_isolates)
+                # del IEC
+                #####################################################################
+                non_isolates_correct = self.all_in_one_high_ambiguous_err_correction(genuine_corrected_file, high_ambi_df)
+                del high_ambiguous_df
+                self.logger.info("High ambiguous errors corrected.")
+                self.logger.info('1nt-edit-distance based Errors Correction finished.')
+                self.logger.info("#############################################")
+            else:
+                genuine_ambi_errs_df, new_negative_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df=None, edit_dis=1)
+                # correct errors
+                self.logger.info("Correcting 1nt-edit-distance based Errors")
 
-            non_isolates_correct = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
-            self.logger.info('1nt-edit-distance based Errors Correction Finished')
-            del genuine_ambi_errs_df, negative_df, ambiguous_df, unique_seqs
+                non_isolates_correct = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
+                self.logger.info('1nt-edit-distance based Errors Correction Finished')
+                del genuine_ambi_errs_df, negative_df, ambiguous_df, unique_seqs
+        elif not genuine_df.empty:
+            non_isolates_correct = self.correct_errors(non_isolates_file, genuine_df)
+            new_negative_df = pd.DataFrame()
+        else:
+            self.logger.error("No genuine and ambiguous errors identified, failed to do error correction!")
+            non_isolates_correct = non_isolates_file
+            sys.exit(1)
         # # bcool correction
         IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, non_isolates_correct, self.config.result_dir, self.config.iso_change_detail, self.config.min_iters)
         corrected_isolates = IEC.bcool_correct_isolates() 
         if corrected_isolates and non_isolates_correct:
             os.system("cat %s %s > %s" % (corrected_isolates, non_isolates_correct, corrected_file))
         else:
-            self.logger.error("No corrected_isolates and/or non_isolates_correct")
+            self.logger.error("No corrected_isolates and/or non_isolates_correct, failed to do error correction")
         del IEC
         if os.path.exists(isolates_file):
             os.system("rm %s" % isolates_file)
@@ -129,6 +137,7 @@ class ErrorCorrection():
         Returns:
             MultiVariables: genuine_df, new_negative_df, high_ambiguous_df
         """
+        
         RV = Reads2Vectors(self.logger, self.config, edit_dis)
         # RV = Reads2Vectors(self.logger, self.config.num_workers, self.config.result_dir, self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type, edit_dis)
         if edit_dis == 1:

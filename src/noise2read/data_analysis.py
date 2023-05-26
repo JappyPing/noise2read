@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-30 09:35:18
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-11 17:09:30
+# @Last Modified time: 2023-05-26 14:00:17
 
 from collections import Counter
 import collections
@@ -643,9 +643,18 @@ class DataAnalysis():
 
         raw_nonFre_reads_total_num = sum(raw_entropy_items)
         # raw entropy
-        with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
-            raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
-        raw_entropy = sum(raw_entropy_lst) 
+        try:
+            with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
+                raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
+            raw_entropy = sum(raw_entropy_lst) 
+        except KeyboardInterrupt:
+            # Handle termination signal (Ctrl+C)
+            pool.terminate()  # Terminate the WorkerPool before exiting
+
+        except Exception:
+            # Handle other exceptions
+            pool.terminate()  # Terminate the WorkerPool before exiting
+            raise
 
         # correct dateset
         non_frequent_correct_reads = correct_unique_reads - frequent_reads
@@ -655,10 +664,18 @@ class DataAnalysis():
 
         # correct entropy
         correct_nonFre_reads_total_num = sum(correct_entropy_items)
+        try:
+            with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
+                correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
+            correct_entropy = sum(correct_entropy_lst)
+        except KeyboardInterrupt:
+            # Handle termination signal (Ctrl+C)
+            pool.terminate()  # Terminate the WorkerPool before exiting
 
-        with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
-            correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
-        correct_entropy = sum(correct_entropy_lst)
+        except Exception:
+            # Handle other exceptions
+            pool.terminate()  # Terminate the WorkerPool before exiting
+            raise
         ##################################################################################
         #information gain (\delta I) heatmap
         new_reads = correct_unique_reads - raw_unique_reads
@@ -672,19 +689,47 @@ class DataAnalysis():
             correct_kept_counts.append(correct_read2count[read])
             raw_kept_counts.append(raw_read2count[read])
 
-        with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-            raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
+        try:
+            with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
+        except KeyboardInterrupt:
+            # Handle termination signal (Ctrl+C)
+            pool.terminate()  # Terminate the WorkerPool before exiting
 
-        with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-            correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
+        except Exception:
+            # Handle other exceptions
+            pool.terminate()  # Terminate the WorkerPool before exiting
+            raise
+
+        try:
+            with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
+        except KeyboardInterrupt:
+            # Handle termination signal (Ctrl+C)
+            pool.terminate()  # Terminate the WorkerPool before exiting
+
+        except Exception:
+            # Handle other exceptions
+            pool.terminate()  # Terminate the WorkerPool before exiting
+            raise
 
         raw_removed_reads = raw_unique_reads - correct_unique_reads
         raw_removed_items = []
         for read in raw_removed_reads:
             raw_removed_items.append(raw_read2count[read])
 
-        with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-            raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
+        try:
+            with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
+        except KeyboardInterrupt:
+            # Handle termination signal (Ctrl+C)
+            pool.terminate()  # Terminate the WorkerPool before exiting
+
+        except Exception:
+            # Handle other exceptions
+            pool.terminate()  # Terminate the WorkerPool before exiting
+            raise
+        
         for i in raw_removed_entropy_items_lst:
             if i <=0:
                 print('Warning')
