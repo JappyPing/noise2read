@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-04-27 23:12:24
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-04-27 23:40:56
+# @Last Modified time: 2023-05-28 00:13:16
 
 import matplotlib.pyplot as plt
 import statistics
@@ -101,11 +101,13 @@ def draw(virus_name, raw_coverage_data, correct_coverage_data):
 
     ##########################################################################################################################
     ll = []
+    neg_pos = []
     for i in range(len(yaxis1)):
         difference = yaxis1[i] - yaxis2[i]
         ll.append(difference)
         if difference < 0:
-            print(i)
+            print(f"Difference: {difference}, Negative position: {i}")
+            neg_pos.append(i)
             
     df_fig = pd.DataFrame()
     df_fig['nt'] = xaxis1

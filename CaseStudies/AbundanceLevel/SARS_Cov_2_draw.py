@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-05-03 16:46:29
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-03 16:51:13
+# @Last Modified time: 2023-05-28 12:38:31
 
 import matplotlib.pyplot as plt
 import statistics
@@ -86,11 +86,13 @@ def draw(virus_name, raw_coverage_data, correct_coverage_data):
 
     ##########################################################################################################################
     ll = []
+    neg_pos = []
     for i in range(len(yaxis1)):
         difference = yaxis1[i] - yaxis2[i]
         ll.append(difference)
         if difference < 0:
-            print(i)
+            print(f"Difference: {difference}, Negative position: {i}")
+            neg_pos.append(i)
             
     df_fig = pd.DataFrame()
     df_fig['nt'] = xaxis1
@@ -121,39 +123,55 @@ def draw(virus_name, raw_coverage_data, correct_coverage_data):
     plt.close()
 
     ########################################################################################################
+    
+    # # df_fig_neg = df_fig.iloc[18845:18895]
+    # # df_fig_pos_color = df_fig.iloc[18889:18895]
+    # # df_fig_neg_color = df_fig.iloc[18855:18888]
+    # # 
+    # df_fig_neg = df_fig.iloc[13536:13545]
+    # df_fig_pos_color = df_fig.iloc[13536:13539]
+    # df_fig_neg_color = df_fig.iloc[13540:13542] 
+    # #   
+    # # neg_pos = neg_pos[0]
+    # # print(neg_pos)
+    # # df_fig_neg = df_fig.iloc[neg_pos - 5 : neg_pos + 5]
+    # # df_fig_pos_color = df_fig.iloc[neg_pos - 5 : neg_pos]
+    # # # df_fig_pos_color2 = df_fig.iloc[neg_pos+1 : neg_pos + 5]
+    # # df_fig_neg_color = df_fig.iloc[neg_pos:neg_pos+1]
 
-    df_fig_neg = df_fig.iloc[18845:18895]
-    df_fig_pos_color = df_fig.iloc[18889:18895]
-    df_fig_neg_color = df_fig.iloc[18855:18888]
+    # fig, ax = plt.subplots(figsize=(10, 8))
+    # # customize the plot margins
+    # plt.subplots_adjust(top=0.5)
 
-    fig, ax = plt.subplots(figsize=(10, 8))
-    # customize the plot margins
-    plt.subplots_adjust(top=0.5)
+    # fig = sns.lineplot(data=df_fig_neg, x='nt', y='count', color='#ffffff', lw=2, zorder=1)
+    # plt.fill_between(df_fig_neg['nt'], df_fig_neg['count'], color='#ffffff')
+    # fig = sns.lineplot(data=df_fig_neg_color, x='nt', y='count', color='#377eb8', lw=2, zorder=1)
+    # plt.fill_between(df_fig_neg_color['nt'], df_fig_neg_color['count'], color='#377eb8')
+    # fig = sns.lineplot(data=df_fig_pos_color, x='nt', y='count', color='#e41a1c', lw=2, zorder=1)
+    # plt.fill_between(df_fig_pos_color['nt'], df_fig_pos_color['count'], color='#e41a1c')
 
-    fig = sns.lineplot(data=df_fig_neg, x='nt', y='count', color='#ffffff', lw=2, zorder=1)
-    plt.fill_between(df_fig_neg['nt'], df_fig_neg['count'], color='#ffffff')
-    fig = sns.lineplot(data=df_fig_neg_color, x='nt', y='count', color='#377eb8', lw=2, zorder=1)
-    plt.fill_between(df_fig_neg_color['nt'], df_fig_neg_color['count'], color='#377eb8')
-    fig = sns.lineplot(data=df_fig_pos_color, x='nt', y='count', color='#e41a1c', lw=2, zorder=1)
-    plt.fill_between(df_fig_pos_color['nt'], df_fig_pos_color['count'], color='#e41a1c')
+    # # fig = sns.lineplot(data=df_fig_pos_color2, x='nt', y='count', color='#e41a1c', lw=2, zorder=1)
+    # # plt.fill_between(df_fig_pos_color2['nt'], df_fig_pos_color2['count'], color='#e41a1c')
 
-    ax.spines['left'].set_position(('outward', 8))  # set the position of the left axis
-    ax.spines['bottom'].set_position(('outward', 8))  # set the position of the bottom axis
-    ax.spines['right'].set_visible(False)  # hide the right axis
-    ax.spines['top'].set_visible(False)  # hide the top axis
+    # ax.spines['left'].set_position(('outward', 8))  # set the position of the left axis
+    # ax.spines['bottom'].set_position(('outward', 8))  # set the position of the bottom axis
+    # ax.spines['right'].set_visible(False)  # hide the right axis
+    # ax.spines['top'].set_visible(False)  # hide the top axis
 
-    plt.xticks(list(range(18845,18896,5)))
-    plt.ylim([-2, 5])
-    # ss.fig_axis_line(y=0, zorder=5, ls='--', lw=3)
-    plt.axhline(y=0, zorder=5, ls='--', lw=3)
+    # # plt.xticks(list(range(18845,18896,5)))
+    # # plt.xticks(list(range(neg_pos - 5, neg_pos + 5,1)))
+    # # plt.xticks(list(range(13527, 13551, 1)), rotation=90)
+    # plt.ylim([-3, 40])
+    # # ss.fig_axis_line(y=0, zorder=5, ls='--', lw=3)
+    # plt.axhline(y=0, zorder=5, ls='--', lw=3)
 
-    # customize the tick label font size
-    plt.xticks(fontsize=14)  # set the font size of the x axis tick labels to 14
-    plt.yticks(fontsize=14)  # set the font size of the y axis tick labels to 14
-    plt.xlabel('Location (nt)', fontsize=24, fontname="serif")  # set the x axis label to "Time (s)" with font size 16
-    plt.ylabel('Coverage\nDifference', fontsize=24, fontname="serif")  # set the y axis label to "Voltage (V)" with font size 16
+    # # customize the tick label font size
+    # plt.xticks(fontsize=14)  # set the font size of the x axis tick labels to 14
+    # plt.yticks(fontsize=14)  # set the font size of the y axis tick labels to 14
+    # plt.xlabel('Location (nt)', fontsize=24, fontname="serif")  # set the x axis label to "Time (s)" with font size 16
+    # plt.ylabel('Coverage\nDifference', fontsize=24, fontname="serif")  # set the y axis label to "Voltage (V)" with font size 16
 
-    plt.savefig('highlight_negative_SARS-Cov-2.png')
+    # plt.savefig('highlight_negative_SARS-Cov-2.png')
 
     ### code_Coverage Histograms ###
 
