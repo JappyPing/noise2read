@@ -22,63 +22,64 @@ Take the dataset `SRR12060401 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_b
 
   * Create a file and copy below
     
-  .. code-block:: console
+.. code-block:: console
 
-      [Paths]
-      ResultDir = "./result/"
-      ;set output directory
+    [Paths]
+    result_dir = ./D9/
 
-      [SourceInputData]
-      input_file = ./SRR12060401.fastq
-      ;set your data to be corrected
+    [SourceInputData]
+    input_file = ./SRR12060401.fastq
 
-      [General]
-      num_workers = -1
-      ;if num_workers = -1 or 0, noise2read will use all the available cpus 
-      verbose = True 
-      min_iters = 100
-      iso_change_detail = True
-      top_n = 100
+    [General]
+    num_workers = -1
+    chunks_num = 100
+    negative_sample_num = 300000
+    verbose = True 
+    min_iters = 1000
+    iso_change_detail = False
+    top_n = 100
 
-      [GraphSetup]
-      high_freq_thre = 5
-      max_error_freq = 4
-      save_graph = False
-      graph_visualization = False
-      drawing_graph_num = 50
+    [GraphSetup]
+    high_freq_thre = 4
+    max_error_freq = 4
+    save_graph = False
+    graph_visualization = False
+    drawing_graph_num = 50
 
-      [EmbeddingSetup]
-      entropy_kmer = 3
-      entropy_q = 2
-      kmer_freq = 3
-      read_type = DNA
+    [EmbeddingSetup]
+    entropy_kmer = 3
+    entropy_q = 2
+    kmer_freq = 3
+    read_type = DNA
 
-      [ModelTuningSetup]
-      n_trials = 1
-      n_estimators = 10 
-      test_size = 0.1        
-      random_state = 32  
-      tree_method = auto
-      learning_rate_min = 1e-3     
-      learning_rate_max = 1e-1 
-      max_depth_min = 3     
-      max_depth_max = 15     
-      max_depth_step = 1 
-      num_boost_round_min = 200     
-      num_boost_round_max = 300     
-      num_boost_round_step = 10 
-      subsample_min = 0.8     
-      subsample_max = 1     
-      colsample_bytree_min = 0.8     
-      colsample_bytree_max = 1     
-      verbose_eval = True
-      seed = 32 
-      best_accuracy = 0.75
+    [AmbiguousSetup]
+    high_ambiguous = False 
+    ; high ambiguous predict probability difference
+    proba_deviation = 0.95
+    iso_neg_high = False
 
-      [Simulation]
-      substations = True
-      indels = False
-      error_rate = 0.001
+    [ModelTuningSetup]
+    n_trials = 30
+    n_estimators = 400
+    test_size = 0.1       
+    random_state = 42
+    tree_method = auto
+    learning_rate_min = 1e-3    
+    learning_rate_max = 1e-1
+    max_depth_min = 3    
+    max_depth_max = 15    
+    max_depth_step = 1
+    num_boost_round_min = 200    
+    num_boost_round_max = 300    
+    num_boost_round_step = 10
+    subsample_min = 0.8    
+    subsample_max = 1    
+    colsample_bytree_min = 0.8    
+    colsample_bytree_max = 1    
+    verbose_eval = True
+    xgboost_seed = 42
+    optuna_seed = 42
+    best_accuracy = 0.85
 
 * Run
   

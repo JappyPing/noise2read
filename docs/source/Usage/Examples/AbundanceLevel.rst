@@ -10,17 +10,21 @@ The instructions for the case studies of the abundance changes for the reference
     git clone https://github.com/Jappy0/noise2read
     cd noise2read/CaseStudies/AbundanceLevel
 
-* Download the reference and original and corrected datasets from `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EnhmDePctr1Di9aQvxcHlbMBAo0sfU7p5KCdUh_wzBlxXA?e=YvaieT>`_
-
-and move the datasets to the folder \*/noise2read/CaseStudies/AbundanceLevel
-
 * For the abundance analysis of SARS_Cov_2
   
+* Download the reference and original and corrected datasets from folder of SARS_Cov_2 in `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EkbYfGVPeh1Aq70QblgXnN4BlLCR3ruyZTgWhBPIVrleFA>`_
+
+and move the datasets to the folder \*/noise2read/CaseStudies/
+
 .. code-block:: console 
 
   ./SARS_Cov_2_run.sh
 
 * For the abundance analysis of Monkeypox
+
+* Download the reference and original and corrected datasets from folder of Monkeypox in `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EkbYfGVPeh1Aq70QblgXnN4BlLCR3ruyZTgWhBPIVrleFA>`_
+
+and move the datasets to the folder \*/noise2read/CaseStudies/
 
 .. code-block:: console 
 

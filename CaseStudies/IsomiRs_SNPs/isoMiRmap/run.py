@@ -2,10 +2,10 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-19 18:56:24
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-03 20:37:50
+# @Last Modified time: 2023-06-01 13:53:18
 import os
 
-raw_dir = "../D22_D31/raw_no_adapters/"
+raw_dir = "../data/no_adapters/"
 
 file_names = os.listdir(raw_dir)
 
@@ -21,7 +21,7 @@ os.system('mv {}{} {}'.format("./", '*.txt', raw_result_dir))
 os.system('mv {}{} {}'.format("./", '*.html', raw_result_dir))
 os.system('mv {}{} {}'.format("./", '*.gff3', raw_result_dir))
 
-correct_dir = "../D22_D31/corrected"
+correct_dir = "../corrected"
 
 cor_file_names = os.listdir(correct_dir)
 
