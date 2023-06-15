@@ -11,14 +11,14 @@
 Turn 'noise' to signal: accurately rectify millions of erroneous short reads through graph learning on edit distances
 =====================================================================================================================
 
-.. note:: 
-
-    All the experimental results obtained in this study utilised version 0.1.5 of noise2read.
-
 `noise2read <https://noise2read.readthedocs.io/en/latest/>`_, originated in a computable rule translated from PCR erring mechanism that: a rare read is erroneous if it has a neighboring read of high abundance, turns erroneous reads into their original state without bringing up any non-existing sequences into the short read set(<300bp) including DNA and RNA sequencing (DNA/RNA-seq), small RNA, unique molecular identifiers (UMI) and amplicon sequencing data.
 
 Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to jump to its documentation
 ===============================================================================================
+
+.. note:: 
+
+    All the experimental results obtained in this study utilised version 0.1.5 of noise2read.
 
 Quick-run example
 =================
