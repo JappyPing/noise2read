@@ -40,7 +40,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
   .. code-block:: console
 
-      noise2read -m correction -c ../../config/Quick_test.ini -a True -g gpu_hist
+      noise2read -m correction -c ../../config/quick_test.ini -a True -g gpu_hist
 
 Examples for correcting simulated miRNAs data with mimic UMIs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 =============================================================================================================================
