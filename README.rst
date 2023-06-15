@@ -45,7 +45,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 Examples for correcting simulated miRNAs data with mimic UMIs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 =============================================================================================================================
 
-Take data sets `D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjBTpjExiShHg0kO72fVpzABn_Krd0K61xdLlK5_03JB5A?e=5GXsg8>`_ as examples.
+Take data sets `D14 and D16 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EqlRHFa57i1MmQa57cGoz_UBSmUqXYRrY0kUhYEGrciyZQ>`_ as examples.
 
 * `noise2read <https://noise2read.readthedocs.io/en/latest/>`__ installation
    
@@ -109,7 +109,7 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
     mkdir ABEs_CBEs
     cd ABEs_CBEs
 
-* Download datasets `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EmjKFVI9QklJrR8Xe0YJP1kBEq8F_SPeUa-Xwx98JQZRNw>`_.
+* Download datasets `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EiE5TtQPhshGiPaaTYqx7NQB2Ew-6VfjBVBeFdSjCmcokA>`_.
 
 * Using `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to correct the datasets. The running time of each experiment is about 13 minutes using 26 cores and GPU for training.
 
