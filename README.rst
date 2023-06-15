@@ -16,8 +16,8 @@ Turn 'noise' to signal: accurately rectify millions of erroneous short reads thr
 Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to jump to its documentation
 ===============================================================================================
 
-.. note:: 
-    All the experimental results obtained in this study utilised version 0.1.5 of noise2read.
+ .. note:: 
+     All the experimental results obtained in this study utilised version 0.1.5 of noise2read.
 
 Quick-run example
 =================
@@ -80,7 +80,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       noise2read -m correction -c ../../config/D14.ini -a False
 
-.. note:: 
+  .. note::
     Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
 * correcting D16
@@ -97,8 +97,8 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       noise2read -m correction -c ../../config/D16.ini -a False
 
-.. note:: 
-    Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
+  .. note::
+        Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
 
 Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 =========================================================================================================================
