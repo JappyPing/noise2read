@@ -107,8 +107,7 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 * Please find the expected log files and correction results at the folder `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_ for correcting data sets of D14-D16. The results under noise2read and noise2read-1 represent the corrected results with and without high ambiguous errors' prediction. 
 
-  **Note**: Noise2read may produce slightly different corrected result from these results under Examples/simulated_miRNAs/correct and `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_. This is because the easy-usable and automatic tuning of the
-classifiers' parameters facilitates wide-range explorations, we have discussed this in the Discussion section of our paper. 
+  **Note**: Noise2read may produce slightly different corrected result from these results under Examples/simulated_miRNAs/correct and `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_. This is because the easy-usable and automatic tuning of the classifiers' parameters facilitates wide-range explorations, we have discussed this in the Discussion section of our paper. 
 
 Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 =========================================================================================================================
