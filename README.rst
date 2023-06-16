@@ -137,5 +137,5 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
 More examples for reproducing our experiments in this paper can be found at the `Examples <https://noise2read.readthedocs.io/en/latest/Usage/Examples/Index.html>`_ of the documentation
 ========================================================================================================================================================================================
 
-Feel free to contact me if you have any questions or are interested in noise2read.
-==================================================================================
+Feel free to contact me if you have any questions on running noise2read or are interested in noise2read.
+========================================================================================================
