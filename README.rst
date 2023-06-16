@@ -62,8 +62,8 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 .. code-block:: console
 
-    noise2read -m evaluation -i ./simulated_miRNAs/raw/D14_umi_miRNA_mix.fa -t ./simulated_miRNAs/true/D14_umi_miRNA_mix.fa -r ./simulated_miRNAs/correct/D14_umi_miRNA_mix.fasta -d ./result
-    noise2read -m evaluation -i ./simulated_miRNAs/raw/D16_umi_miRNA_subs.fa -t ./simulated_miRNAs/true/D16_umi_miRNA_subs.fa -r ./simulated_miRNAs/correct/D16_umi_miRNA_subs.fasta -d ./result
+    noise2read -m evaluation -i ./simulated_miRNAs/raw/D14_umi_miRNA_mix.fa -t ./simulated_miRNAs/true/D14_umi_miRNA_mix.fa -r ./simulated_miRNAs/correct/D14_umi_miRNA_mix.fasta -d ./D14
+    noise2read -m evaluation -i ./simulated_miRNAs/raw/D16_umi_miRNA_subs.fa -t ./simulated_miRNAs/true/D16_umi_miRNA_subs.fa -r ./simulated_miRNAs/correct/D16_umi_miRNA_subs.fasta -d ./D16
 
 * correcting D14
 
@@ -136,3 +136,6 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
 
 More examples for reproducing our experiments in this paper can be found at the `Examples <https://noise2read.readthedocs.io/en/latest/Usage/Examples/Index.html>`_ of the documentation
 ========================================================================================================================================================================================
+
+Feel free to contact me if you have any questions or are interested in noise2read.
+==================================================================================
