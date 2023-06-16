@@ -79,8 +79,6 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       noise2read -m correction -c ../../config/D14.ini -a False
 
-  **Note**: Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
-
 * correcting D16
 
   * with high ambiguous errors correction and using GPU for training 
@@ -95,7 +93,9 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
       noise2read -m correction -c ../../config/D16.ini -a False
 
-  **Note**: Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct
+* Please find the expected log files and correction results at the folder `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_ for correcting D14-D16. The results under noise2read and noise2read-1 represent the corrected results with and without high ambiguous errors' prediction. 
+
+  **Note**: Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct and `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_. We have discussed this in the Discussion section of our paper. 
 
 Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 =========================================================================================================================
@@ -117,3 +117,10 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
 
     noise2read -m correction -i ./D32_D33/raw/D32_ABE_outcome_seqs.fasta -a False -d ./ABE/
     noise2read -m correction -i ./D32_D33/raw/D33_CBE_outcome_seqs.fasta -a False -d ./CBE/
+
+* Please find the expected log files and correction results at the folder `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Ej3EXo3Wt8xOjrpMhSPxpxYBvID7pvJjD7rf53ElNd9jAg?e=mwWnvX>`_. The results for correcting D32 and D33 are presented under the folders of ABE and CBE, respectively.
+
+  **Note**: Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct and `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_. We have discussed this in the Discussion section of our paper. 
+
+More examples for reproducing our experiments in this paper can be found at the `Examples <https://noise2read.readthedocs.io/en/latest/Usage/Examples/Index.html>`_ of the documentation
+========================================================================================================================================================================================
