@@ -1,12 +1,12 @@
 # @Author: Pengyao Ping
 # @Date:   1970-01-01 10:00:00
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-09-06 12:51:38
+# @Last Modified time: 2023-09-06 12:56:09
 # Read the Docs configuration file for Sphinx projects
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
 # Required
-version: 1
+version: 2
 
 # Set the OS, Python version and other tools you might need
 # build:
@@ -27,13 +27,13 @@ sphinx:
   # fail_on_warning: true
 
 # Optionally build your docs in additional formats such as PDF and ePub
-# formats:
-#    - pdf
-#    - epub
+formats:
+   - pdf
+   - epub
 
 # Optional but recommended, declare the Python requirements required
 # to build your documentation
 # See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
-# python:
-#    install:
-#    - requirements: docs/requirements.txt
+python:
+   install:
+   - requirements: docs/requirements.txt
