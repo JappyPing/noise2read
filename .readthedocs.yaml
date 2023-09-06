@@ -1,7 +1,7 @@
 # @Author: Pengyao Ping
 # @Date:   1970-01-01 10:00:00
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-09-06 12:01:16
+# @Last Modified time: 2023-09-06 12:10:59
 # Read the Docs configuration file for Sphinx projects
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
@@ -20,7 +20,7 @@ version: 2
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
-  configuration: docs/conf.py
+  configuration: docs/source/conf.py
   # You can configure Sphinx to use a different builder, for instance use the dirhtml builder for simpler URLs
   # builder: "dirhtml"
   # Fail on all warnings to avoid broken references
