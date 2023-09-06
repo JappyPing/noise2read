@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-25 22:08:29
+# @Last Modified time: 2023-09-06 11:01:44
 
 from noise2read.config import Config
 import sys, getopt
@@ -25,7 +25,7 @@ def main():
     try:
         # opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:o:l:h:", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "over_sampling", "libray_layout", "help"]) 
         # opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:l:hv", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "libray_layout", "help", "version"]) 
-        opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:hv", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "help", "version"]) 
+        opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:hv", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "help", "version", "tau="]) 
         script_name = sys.argv[0]
         input_commands = [script_name]
 
@@ -62,6 +62,8 @@ def main():
                 p_lst = list({"-p", "--parallel"}.intersection(tar_set))
                 a_lst = list({"-a", "--high_ambiguous"}.intersection(tar_set))
                 g_lst = list({"-g", "--tree_method"}.intersection(tar_set))
+                tau_lst = list({"--tau"}.intersection(tar_set))
+                # print(tau_lst)
                 # o_lst = list({"-o", "--over_sampling"}.intersection(tar_set))
 
                 # l_lst = list({"-l", "--libray_layout"}.intersection(tar_set))
@@ -165,7 +167,69 @@ def main():
                     #         config.correct_data = EC.all_in_one_ed2_correction(no_high_correct, unique_seqs3, genuine_df3, negative_df3, ambiguous_df3)
                     #     else:
                     #         config.correct_data = no_high_correct
-                    # DataAnalysis(logger, config).evaluation()                    
+                    # DataAnalysis(logger, config).evaluation()   
+############################################################################################################################
+                elif module_arg == "simplify_correction":
+                    # try: 
+                    if c_lst:
+                        config = Config(opts_dict[c_lst[0]], logger) 
+                        if i_lst:
+                            config.input_file = opts_dict[i_lst[0]]
+                        if not os.path.exists(config.input_file):
+                            logger.exception('Must set sequencing dataset in configuration.')
+                            sys.exit()
+                        if t_lst:
+                            config.ground_truth_data = opts_dict[t_lst[0]]
+                            if not os.path.exists(config.ground_truth_data):
+                                logger.error('Ground truth data does not exsit.')
+                    elif i_lst:
+                        config = Config(None, logger)  
+                        config.input_file = opts_dict[i_lst[0]]
+                        if not os.path.exists(config.input_file):
+                            logger.exception('Input file does not exsit.')
+                            sys.exit()
+                    else:
+                        logger.error('Must input configuration file or sequencing dataset.')
+                        sys.exit()
+                    ##############################################################
+                    if t_lst:
+                        config.ground_truth_data = opts_dict[t_lst[0]] 
+                        if not os.path.exists(config.ground_truth_data):
+                            logger.exception('Ground truth data does not exsit.')
+                            raise
+                    if d_lst:
+                        config.result_dir = opts_dict[d_lst[0]] 
+                    if p_lst:
+                        config.num_workers = int(opts_dict[p_lst[0]])      
+                    if a_lst:
+                        config.high_ambiguous = eval(opts_dict[a_lst[0]])
+                        # print(config.high_ambiguous)
+                    if config.num_workers <= 0:
+                        config.num_workers = available_cpu_cores
+                    if config.num_workers > available_cpu_cores:
+                        logger.error(f"Only {available_cpu_cores} available to use.") 
+                        config.num_workers = available_cpu_cores
+                    ##############################################################
+                    DG = DataGneration(logger, config)
+
+                    isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG.simplify_data_files(config.input_file, edit_dis=1)      
+                    config.read_max_len = read_max_len
+                    ###############################################################
+                    EC = ErrorCorrection(logger, config)
+                    ## one model to predict
+                    corrected_file = EC.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
+                        
+                    if read_min_len > config.min_read_len:
+                        genuine_df, ambiguous_df = DG.simplify_data_files(corrected_file, edit_dis=2) 
+                        config.correct_data = EC.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
+                    else:
+                        config.correct_data = corrected_file
+
+                    DataAnalysis(logger, config).evaluation()  
+                    # delete bcool result
+                    bcool_dir = os.path.join(config.result_dir, 'bcool/')
+                    if os.path.exists(bcool_dir):
+                        os.system("rm -rf %s" % bcool_dir)                                     
 ############################################################################################################################
                 elif module_arg == "amplicon_correction": 
                     if c_lst:
@@ -243,7 +307,7 @@ def main():
                         amplicon_df = DG.extract_amplicon_err_samples(mid_result)
                         config.correct_data = EC.correct_amplicon_err(mid_result, genuine_df, negative_df, new_negative_df, amplicon_df, config.amplicon_threshold_proba)
                     else:
-                        self.logger.warning("No genuine or negative samples for amplicon errors prediction!")
+                        logger.warning("No genuine or negative samples for amplicon errors prediction!")
                         config.correct_data = mid_result
                 
                     DataAnalysis(logger, config).evaluation()
@@ -295,7 +359,7 @@ def main():
                     ##############################################################
                     config.high_ambiguous=False
                     DG = DataGneration(logger, config)
-                    genuine_df = DG.extract_umi_genuine_errs()
+                    genuine_df = DG.extract_umi_genuine_errs(config.input_file)
                     # ##############################################################
                     EC = ErrorCorrection(logger, config)
                     config.correct_data = EC.umi_correction(config.input_file, genuine_df)
@@ -329,7 +393,14 @@ def main():
                     DP.write_mimic_umis(config.input_file, config.ground_truth_data)
 ############################################################################################################################
                 elif module_arg == "real_umi":   
-                    if i_lst:
+                    if c_lst:
+                        config = Config(opts_dict[c_lst[0]], logger) 
+                        if i_lst:
+                            config.input_file = opts_dict[i_lst[0]]
+                        if not os.path.exists(config.input_file):
+                            logger.exception('Must set sequencing dataset in configuration.')
+                            sys.exit()
+                    elif i_lst:
                         config = Config(None, logger)  
                         config.input_file = opts_dict[i_lst[0]]
                         if not os.path.exists(config.input_file):
@@ -339,8 +410,6 @@ def main():
                         logger.error("Must input umi-based sequencing dataset or configuration file.")
                         sys.exit()
 
-                    if u_lst:
-                        config.umi_file = opts_dict[u_lst[0]] 
                     if d_lst:
                         config.result_dir = opts_dict[d_lst[0]] 
                     if config.num_workers <= 0:
@@ -348,8 +417,22 @@ def main():
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
                         config.num_workers = available_cpu_cores
+
+                    if u_lst:
+                        config.umi_file = opts_dict[u_lst[0]] 
+                        if not os.path.exists(config.umi_file):
+                            logger.exception('Umi data does not exsit.')
+                            sys.exit()
                     DP = DataProcessing(logger, config)
-                    DP.real_umi_data(config.input_file)                  
+                    if u_lst:
+                        if config.umi_file and config.input_file:
+                            DP.umi2groundtruth()
+                    else:
+                        if not config.umi_in_read:
+                            DP.real_umi_in_name_data()
+                        else:
+                            DP.real_umi_data(config.input_file)  
+                                              
 ############################################################################################################################
                 elif module_arg == "evaluation":   
                     if i_lst and t_lst and r_lst:
@@ -390,6 +473,8 @@ def main():
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
                         config.num_workers = available_cpu_cores
+                    if tau_lst:
+                        config.high_freq_thre = int(opts_dict[tau_lst[0]])
                 #############################################################
                     DataAnalysis(logger, config).evaluation()
 ############################################################################################################################

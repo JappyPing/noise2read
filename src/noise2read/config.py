@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-19 10:56:38
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-26 13:51:43
+# @Last Modified time: 2023-08-14 13:02:11
 
 import configparser
 import os
@@ -22,6 +22,8 @@ class Config(object):
             # input
             if conf.has_option("SourceInputData", "input_file"):
                 self.input_file = conf.get("SourceInputData", "input_file")      
+            if conf.has_option("SourceInputData", "umi_file"):
+                self.umi_file = conf.get("SourceInputData", "umi_file")  
 
             if conf.has_option("SourceInputData", "ground_truth_data"):
                 self.ground_truth_data = conf.get("SourceInputData", "ground_truth_data")
@@ -231,6 +233,10 @@ class Config(object):
                 self.best_accuracy = 0.85 # default     
 
             # real umi
+            if conf.has_option("RealUMI", "umi_in_read"):
+                self.umi_in_read = conf.getboolean("RealUMI", "umi_in_read")
+            else:
+                self.umi_in_read = False
             if conf.has_option("RealUMI", "umi_start"):
                 self.umi_start = conf.getint("RealUMI", "umi_start")
             else:
@@ -243,6 +249,35 @@ class Config(object):
                 self.non_umi_start = conf.getint("RealUMI", "non_umi_start")
             else:
                 self.non_umi_start = 24 # default
+
+            if conf.has_option("RealUMI", "group_read_number"):
+                self.group_read_number = conf.getint("RealUMI", "group_read_number")
+            else:
+                self.group_read_number = 10 # default
+            if conf.has_option("RealUMI", "read_edit_dif"):
+                self.read_edit_dif = conf.getint("RealUMI", "read_edit_dif")
+            else:
+                self.read_edit_dif = 2 # default
+
+            ###
+            if conf.has_option("RealUMI", "separator1"):
+                self.separator1 = conf.get("RealUMI", "separator1")
+            else:
+                self.separator1 = '_'  
+            if conf.has_option("RealUMI", "separator1_idx"):
+                self.separator1_idx = conf.getint("RealUMI", "separator1_idx")
+            else:
+                self.separator1_idx = 2 # default
+
+            if conf.has_option("RealUMI", "separator2"):
+                self.separator1 = conf.get("RealUMI", "separator2")
+            else:
+                self.separator1 = ' '  
+            if conf.has_option("RealUMI", "separator2_idx"):
+                self.separator2_idx = conf.getint("RealUMI", "separator2_idx")
+            else:
+                self.separator2_idx = 0 # default
+
             # amplicon
             if conf.has_option("Amplicon", "amplicon_low_freq"):
                 self.amplicon_low_freq = conf.getint("Amplicon", "amplicon_low_freq")
@@ -361,9 +396,18 @@ class Config(object):
             self.best_accuracy = 0.85
 
             # real umi
+            self.umi_in_read = False
+            # umi in read
             self.umi_start = 0
             self.umi_end = 12
             self.non_umi_start = 24
+            self.group_read_number = 10
+            self.read_edit_dif = 2
+            # umi in name
+            self.separator1 = '_'
+            self.separator1_idx = 2
+            self.separator2 = ' '
+            self.separator2_idx = 0
 
             #amplicon
             self.amplicon_low_freq = 50

@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-16 15:52:44
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-26 14:01:57
+# @Last Modified time: 2023-09-05 23:40:46
 
 import editdistance
 import networkx as nx
@@ -201,49 +201,71 @@ class DataGneration():
             genuine_df, ambiguous_df = self.extract_genuine_ambi_errs(graph, edit_dis)
             return genuine_df, negative_df, ambiguous_df
 
-    def extract_umi_genuine_errs(self):  
+    def extract_umi_genuine_errs(self, input_file):  
         """
         extract genuine errors from umi graph
 
         Returns:
             DataFrame: one pandas dataframe saving genuine errors
         """
-        graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(self.config.input_file, edit_dis=1)
+        graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(input_file, edit_dis=1)
         subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
-
+        # print(len(subgraphs))
         chunk_size = len(subgraphs) // self.config.chunks_num
         if chunk_size > 0:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
+
+            # Write each group of subgraphs to separate files
+            gexf_files = []
+            # print(len(groups))
+            for i, group in enumerate(groups):
+                # Create a new graph for the group of subgraphs
+                group_G = nx.Graph()
+                # print(group)
+                for subgraph_nodes in group:
+                    # print(subgraph_nodes)
+                    group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
+                    # Add node attributes to the new graph
+                    for node in subgraph_nodes:
+                        # print(node)
+                        group_G.nodes[node].update(graph.nodes[node])
+                # Generate the file name for the group
+                file_name = self.config.result_dir + f"group_{i}.gexf"
+
+                # Write the group of subgraphs to the file
+                nx.write_gexf(group_G, file_name)
+                gexf_files.append(file_name)
+
+            del groups, subgraphs, graph
+
+            genuine_lst = []
+            for gexf_file in gexf_files:
+                cur_graph = nx.read_gexf(gexf_file)
+                sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+                
+                subgraph_num = len(sub_graphs)
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
+                        cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+                
+                for item in cur_genuine_lsts:
+                    genuine_lst.extend(item)
+
+                os.remove(gexf_file)
+                del cur_graph, sub_graphs
         else:
-            groups = subgraphs
-
-        # Write each group of subgraphs to separate files
-        gexf_files = []
-        for i, group in enumerate(groups):
-            # Create a new graph for the group of subgraphs
-            group_G = nx.Graph()
-            for subgraph_nodes in group:
-                group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
-                # Add node attributes to the new graph
-                for node in subgraph_nodes:
-                    group_G.nodes[node].update(graph.nodes[node])
-            # Generate the file name for the group
-            file_name = self.config.result_dir + f"group_{i}.gexf"
-
-            # Write the group of subgraphs to the file
-            nx.write_gexf(group_G, file_name)
-            gexf_files.append(file_name)
-
-        del groups, subgraphs, graph
-
-        genuine_lst = []
-        for gexf_file in gexf_files:
-            cur_graph = nx.read_gexf(gexf_file)
-            sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
-            
-            subgraph_num = len(sub_graphs)
+            genuine_lst = []
+            subgraph_num = len(subgraphs)
             try:
-                with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
+                with WorkerPool(self.config.num_workers, shared_objects=subgraphs, start_method='fork') as pool:
                     cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
@@ -257,9 +279,7 @@ class DataGneration():
             for item in cur_genuine_lsts:
                 genuine_lst.extend(item)
 
-            os.remove(gexf_file)
-            del cur_graph, sub_graphs
-
+            
         genuine_df = pd.DataFrame(genuine_lst, columns=["StartRead","StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])
 
         if self.config.verbose:
@@ -419,6 +439,99 @@ class DataGneration():
         elif edit_dis == 1 or edit_dis == 2:
             return genuine_df, ambiguous_df
 
+    def extract_simplify_genuine_ambi_errs(self, graph, edit_dis):
+        """
+        extract genuine and ambiguous errors from read graph
+
+        Args:
+            subgraphs (class): Subgraphs of graph constructed using NetworkX.
+            edit_dis (int): set edit distance 1 or 2 to search edges for constructing graph
+
+        Returns:
+            DataFrame: two pandas dataframes saving genuine and ambiguous errors
+        """
+        if edit_dis == 1:
+            genu_columns = ["StartRead","StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"]
+            ambiguous_df= pd.DataFrame(columns=["idx", "StartRead","StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])
+            genuine_csv = self.config.result_dir + "genuine1.csv"
+            ambiguous_csv = self.config.result_dir + "ambiguous1.csv"
+        elif edit_dis == 2: #or edit_dis == 3:
+            genu_columns = ["StartRead","StartReadCount", "StartDegree", "EndRead", "EndReadCount", "EndDegree"]
+            ambiguous_df= pd.DataFrame(columns=["idx", "StartRead", "StartReadCount", "StartDegree", "EndRead", "EndReadCount", "EndDegree"])
+            genuine_csv = self.config.result_dir + "genuine2.csv"
+            ambiguous_csv = self.config.result_dir + "ambiguous2.csv"  
+
+        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
+        # subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+        self.logger.info("Extracting genuine and ambiguous errors...")
+
+        chunk_size = len(subgraphs) // self.config.chunks_num
+        if chunk_size > 0:
+            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
+        else:
+            groups = subgraphs
+
+        # Write each group of subgraphs to separate files
+        gexf_files = []
+        for i, group in enumerate(groups):
+            # Create a new graph for the group of subgraphs
+            group_G = nx.Graph()
+            for subgraph_nodes in group:
+                group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
+                # Add node attributes to the new graph
+                for node in subgraph_nodes:
+                    group_G.nodes[node].update(graph.nodes[node])
+            # Generate the file name for the group
+            file_name = self.config.result_dir + f"group_{i}.gexf"
+
+            # Write the group of subgraphs to the file
+            nx.write_gexf(group_G, file_name)
+            gexf_files.append(file_name)
+    
+
+        high_idx = 0
+        genuine_lst = []
+        ambiguous_lst = []
+        for gexf_file in gexf_files:
+            cur_graph = nx.read_gexf(gexf_file)
+            sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+            try:
+                subgraph_num = len(sub_graphs)
+                shared_obs = sub_graphs, edit_dis
+                with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                    for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
+                        if genu_ambi_lst[0]:
+                            genuine_lst.extend(genu_ambi_lst[0])
+                            ambiguous_lst.extend(genu_ambi_lst[1])
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
+            
+            os.remove(gexf_file)
+            del cur_graph, sub_graphs
+        
+        genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
+
+        idx = 0
+        for a_item in ambiguous_lst:
+            for sub_item in a_item:
+                sub_item.insert(0, idx)
+                ambiguous_df.loc[len(ambiguous_df)] = sub_item
+            idx += 1
+
+        if self.config.verbose:
+            genuine_df.to_csv(genuine_csv, index=False)  
+            ambiguous_df.to_csv(ambiguous_csv, index=False) 
+        self.logger.info("Done!")
+        return genuine_df, ambiguous_df
+
+
     def add_genu_sample(self, shared_obs, i):
         """
         add samples to pd DataFrame
@@ -564,6 +677,42 @@ class DataGneration():
             return isolates_file, non_isolates_file, unique_seqs, seq_max_len, seq_min_len, genuine_df, negative_df, ambiguous_df, high_ambiguous_df
         else:
             return isolates_file, non_isolates_file, unique_seqs, seq_max_len, seq_min_len, genuine_df, negative_df, ambiguous_df
+
+    def simplify_data_files(self, input_f, edit_dis):
+        """
+        function to return the results produced by DataGneration class
+
+        Args:
+            edit_dis (int): set edit distance 1 or 2 to search edges for constructing graph
+
+        Returns:
+            MultiVariables: MultiVariables for next step error correction
+        """
+        # 1nt-edit-distance-based graph
+        # self.logger.info("-------------------------------------------------------------")
+        # self.logger.info("1nt-edit-distance read graph error correction")
+        if edit_dis == 1:
+            graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(input_f, edit_dis)
+            seq_max_len = max(seqs_lens_lst)
+            seq_min_len = min(seqs_lens_lst)
+            self.logger.debug(seqs_lens_lst)
+            self.logger.debug("Reads Max length: {}".format(seq_max_len))
+            self.logger.debug("Reads Min length: {}".format(seq_min_len))
+
+            genuine_df, ambiguous_df = self.extract_simplify_genuine_ambi_errs(graph, edit_dis)
+                
+            isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
+            del graph
+
+            return isolates_file, non_isolates_file, seq_max_len, seq_min_len, genuine_df, ambiguous_df
+        elif edit_dis == 2:
+            self.logger.debug(input_f)
+            # if self.seq_min_len > 30:   
+            self.logger.info("Constructing 2nt-edit-distance based graph.")
+            graph, unique_seqs = self.generate_graph(input_f, edit_dis=2)
+            self.graph_summary(graph)  
+            genuine_df, ambiguous_df = self.extract_simplify_genuine_ambi_errs(graph, edit_dis)
+            return genuine_df, ambiguous_df       
 
     def extract_isolated_negatives(self, graph, edit_dis):
         """

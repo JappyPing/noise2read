@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-01-30 09:35:18
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-26 14:00:17
+# @Last Modified time: 2023-08-29 10:14:41
 
 from collections import Counter
 import collections
@@ -538,7 +538,7 @@ class DataAnalysis():
         worksheet3.write('F2', precision)
         worksheet3.write('G1', 'Recall')
         worksheet3.write('G2', recall)
-        worksheet3.write('H1', 'Gain')
+        worksheet3.write('H1', 'Positive Gain')
         worksheet3.write('H2', gain)
         worksheet3.write('I1', 'Fall-out')
         worksheet3.write('I2', fall_out)

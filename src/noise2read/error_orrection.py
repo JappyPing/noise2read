@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-25 23:51:45
+# @Last Modified time: 2023-09-05 21:32:02
 
 import os
 from Bio import SeqIO
@@ -14,6 +14,7 @@ from noise2read.classifier import MLClassifier
 import copy
 from noise2read.utils import *
 from noise2read.reads2vectors import Reads2Vectors
+import sys
 # import shutil
 
 class ErrorCorrection():
@@ -37,6 +38,103 @@ class ErrorCorrection():
             self.out_file_tye = file_type
         bases = config.input_file.split('/')[-1]
         self.base = bases.split('.')
+
+    def simplify_ambiguous_err_prediction(self, genuine_df, ambiguous_df):
+        """
+        ambiguous or high ambiguous errors prediction
+
+        Args:
+            total_reads (set): set contains all the reads
+            genuine_df (DataFrame): pandas dataframe containing positive samples for training
+            ambiguous_df (DataFrame): pandas dataframe containing ambiguous samples for prediction
+            edit_dis (int): edit distance 1 or 2
+
+        Returns:
+            MultiVariables: genuine_df, new_negative_df, high_ambiguous_df
+        """
+        
+        # merge genuine and ambiguous errors
+        grouped_ambiguous_df = ambiguous_df.groupby("idx")
+        # choose the error-free read for the ambiguous errors without using machine learning
+        for name, group_df in grouped_ambiguous_df:
+            if len(group_df) > 0:
+                pred_index = group_df['StartReadCount'].idxmax()
+                new_df = group_df.loc[:, ~group_df.columns.isin(['idx', 'predictand'])]
+                entry = copy.deepcopy(new_df.loc[[pred_index]])
+                genuine_df = pd.concat([genuine_df, entry], ignore_index=True)
+
+        # if edit_dis == 1 and self.config.verbose:
+        #     ambiguous_df.to_csv(self.config.result_dir + 'ambiguous_1nt_prediction.csv', index=False)
+        # elif edit_dis == 2 and self.config.verbose:
+        #     ambiguous_df.to_csv(self.config.result_dir + 'ambiguous_2nt_prediction.csv', index=False)
+        del ambiguous_df, grouped_ambiguous_df
+        return genuine_df   
+
+    def simplify_2nt_correction(self, data_set, genuine_df, ambiguous_df):       
+        """
+        correcting ambiguous errors in 2nt-edit-distance-based read graph
+
+        Args:
+            data_set (str): raw data filename including path
+            genuine_df (DataFrame): pandas dataframe containing positive samples for training
+            ambiguous_df (DataFrame): pandas dataframe containing ambiguous samples for prediction
+
+        Returns:
+            str: corrected data filename including path
+        """
+        if not genuine_df.empty and not ambiguous_df.empty:
+            genuine_ambi_errs_df = self.simplify_ambiguous_err_prediction(genuine_df, ambiguous_df)
+            correct_file = self.all_in_one_2nt_correct_errors(data_set, genuine_ambi_errs_df)
+            os.system("rm %s" % data_set)
+            del genuine_ambi_errs_df
+            self.logger.info("Error Correction finished.")
+            return correct_file
+        else:
+            return data_set
+
+    def simplify_correction(self, isolates_file, non_isolates_file, genuine_df, ambiguous_df):
+        """
+        Args:
+            isolates_file (str):  The isolates' filename with path.
+            non_isolates_file (str):  The non-isolates' filename with path
+            genuine_df (DataFrame): pandas dataframe containing positive samples for training
+            ambiguous_df (DataFrame): pandas dataframe containing ambiguous samples for prediction
+
+        Returns:
+            corrected_file (str): The corrected data filename including path.
+        """
+        corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + self.out_file_tye  
+
+        if not genuine_df.empty and not ambiguous_df.empty:
+            genuine_ambi_errs_df = self.simplify_ambiguous_err_prediction(genuine_df, ambiguous_df)
+            # correct errors
+            self.logger.info("Correcting 1nt-edit-distance based Errors")
+            non_isolates_correct = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
+            self.logger.info('1nt-edit-distance based Errors Correction Finished')
+            del genuine_ambi_errs_df, ambiguous_df
+        elif not genuine_df.empty:
+            non_isolates_correct = self.correct_errors(non_isolates_file, genuine_df)
+        else:
+            self.logger.error("No genuine and ambiguous errors identified, failed to do error correction!")
+            non_isolates_correct = non_isolates_file
+            sys.exit(1)
+        # # bcool correction
+        IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, non_isolates_correct, self.config.result_dir, self.config.iso_change_detail, self.config.min_iters)
+        corrected_isolates = IEC.bcool_correct_isolates() 
+        if corrected_isolates and non_isolates_correct:
+            os.system("cat %s %s > %s" % (corrected_isolates, non_isolates_correct, corrected_file))
+        else:
+            self.logger.error("No corrected_isolates and/or non_isolates_correct, failed to do error correction")
+        del IEC
+        if os.path.exists(isolates_file):
+            os.system("rm %s" % isolates_file)
+        if os.path.exists(non_isolates_file):
+            os.system("rm %s" % non_isolates_file)
+        if os.path.exists(corrected_isolates):   
+            os.system("rm %s" % corrected_isolates)
+        if os.path.exists(non_isolates_correct):     
+            os.system("rm %s" % non_isolates_correct)
+        return corrected_file
 
     def all_in_one_correction(self, isolates_file, non_isolates_file, unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df):
         """
@@ -235,14 +333,14 @@ class ErrorCorrection():
         bases = orginal_file.split('/')[-1]
         prefix = bases.split('.')
         err_free_name_lst = list(set(total_name_lst) - set(err_name_lst))
-        corrected_err_file = self.config.result_dir + prefix[0] + '_err2cor.' + self.out_file_tye
+        corrected_err_file = self.config.result_dir + prefix[0] + '_err2cor.' + ori_file_type
         with open(corrected_err_file, "w") as handle:
-            SeqIO.write(err2cor_records, handle, self.out_file_tye)
+            SeqIO.write(err2cor_records, handle, ori_file_type)
 
-        err_free_reads_file = self.config.result_dir + prefix[0] + '_errfree.' + self.out_file_tye
+        err_free_reads_file = self.config.result_dir + prefix[0] + '_errfree.' + ori_file_type
         extract_records(self.config.result_dir, err_free_name_lst, orginal_file, err_free_reads_file)
         
-        corrected_file = self.config.result_dir + prefix[0] + '_corrected.' + self.out_file_tye
+        corrected_file = self.config.result_dir + prefix[0] + '_corrected.' + ori_file_type
         os.system("cat %s %s > %s" % (corrected_err_file, err_free_reads_file, corrected_file))
         if os.path.exists(corrected_err_file):
             os.system("rm %s" % corrected_err_file)
@@ -332,6 +430,9 @@ class ErrorCorrection():
             return correct_file
         else:
             return data_set
+
+
+
 
     def all_in_one_2nt_correct_errors(self, orginal_file, df_data):
         """
@@ -483,15 +584,15 @@ class ErrorCorrection():
         bases = orginal_file.split('/')[-1]
         prefix = bases.split('.')
         err_free_name_lst = list(set(total_name_lst) - set(err_name_lst))
-        corrected_err_file = self.config.result_dir + prefix[0] + '_err2cor.' + self.out_file_tye
+        corrected_err_file = self.config.result_dir + prefix[0] + '_err2cor.' + ori_file_type
         self.logger.debug(f'Number of high ambiguous errors has been corrected: {len(err2cor_records)}')
         
         with open(corrected_err_file, "w") as handle:
-            SeqIO.write(err2cor_records, handle, self.out_file_tye)
+            SeqIO.write(err2cor_records, handle, ori_file_type)
 
-        err_free_reads_file = self.config.result_dir + prefix[0] + '_errfree.' + self.out_file_tye
+        err_free_reads_file = self.config.result_dir + prefix[0] + '_errfree.' + ori_file_type
         extract_records(self.config.result_dir, err_free_name_lst, orginal_file, err_free_reads_file)
-        corrected_file = self.config.result_dir + prefix[0] + '_correct.' + self.out_file_tye
+        corrected_file = self.config.result_dir + prefix[0] + '_correct.' + ori_file_type
         os.system("cat %s %s > %s" % (corrected_err_file, err_free_reads_file, corrected_file))
         if os.path.exists(corrected_err_file):
             os.system("rm %s" % corrected_err_file)
