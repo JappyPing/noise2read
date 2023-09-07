@@ -11,7 +11,7 @@
 Turn 'noise' to signal: accurately rectify millions of erroneous short reads through graph learning on edit distances
 =====================================================================================================================
 
-`noise2read <https://noise2read.readthedocs.io/en/latest/>`_, originated in a computable rule translated from PCR erring mechanism that: a rare read is erroneous if it has a neighboring read of high abundance, turns erroneous reads into their original state without bringing up any non-existing sequences into the short read set(<300bp) including DNA and RNA sequencing (DNA/RNA-seq), small RNA, unique molecular identifiers (UMI) and amplicon sequencing data.
+`noise2read <https://noise2read.readthedocs.io/en/latest/>`_, originated in a computable rule translated from PCR erring mechanism that: a rare read is erroneous if it has a neighboring read of high abundance, turns erroneous reads into their original state without bringing up any non-existing sequences into the short read set(&lt 300bp) including DNA and RNA sequencing (DNA/RNA-seq), small RNA, unique molecular identifiers (UMI) and amplicon sequencing data.
 
 Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to jump to its documentation
 ===============================================================================================
@@ -111,7 +111,7 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
     mkdir ABEs_CBEs
     cd ABEs_CBEs
 
-* Download datasets under the folder of data of `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EiE5TtQPhshGiPaaTYqx7NQB2Ew-6VfjBVBeFdSjCmcokA>`_.
+* Download datasets under the folder of data of `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Ej3EXo3Wt8xOjrpMhSPxpxYBvID7pvJjD7rf53ElNd9jAg?e=mwWnvX>`_.
 
 * Using `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to correct the datasets. The running time of each experiment is about 13 minutes using 26 cores and GPU for training.
 

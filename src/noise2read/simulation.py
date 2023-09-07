@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:04:45
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-26 14:07:33
+# @Last Modified time: 2023-09-07 16:54:00
 
 import collections
 from Bio import SeqIO
@@ -19,6 +19,7 @@ from noise2read.data_generation import DataGneration
 from noise2read.error_orrection import ErrorCorrection
 from noise2read.data_preprocessing import DataProcessing
 import numpy as np
+import sys
 
 class Simulation():
     # def __init__(self, logger, config, num_workers, f_in, error_rate, output_dir, substations, indels, seed=0):
@@ -149,13 +150,29 @@ class Simulation():
             correct_data = corrected_file
         return correct_data        
 
+    def simplify_error_correction(self, config):
+        DG = DataGneration(self.logger, config)
+        isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG.simplify_data_files(config.input_file, edit_dis=1)      
+        config.read_max_len = read_max_len
+        ###############################################################
+        EC = ErrorCorrection(self.logger, config)
+        corrected_file = EC.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
+            
+        if read_min_len > config.min_read_len:
+            genuine_df, ambiguous_df = DG.simplify_data_files(corrected_file, edit_dis=2) 
+            correct_data = EC.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
+        else:
+            correct_data = corrected_file
+        return correct_data    
+
     def simulation(self):
         # step 1 correct errors using noise2read
         # 
         if os.path.exists(self.config.correct_data):
             corrected_data = self.config.correct_data
         else:
-            corrected_data = self.error_correction(self.config)
+            # corrected_data = self.error_correction(self.config)
+            corrected_data = self.simplify_error_correction(self.config)
         # inject errors
         raw_data, true_data = self.error_injection(corrected_data)
         # raw_data, true_data = self.error_injection(self.config.input_file)

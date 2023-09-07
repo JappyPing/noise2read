@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-05-26 14:03:18
+# @Last Modified time: 2023-09-07 00:15:00
 
 from typing import Counter
 import numpy as np
@@ -26,22 +26,22 @@ class Reads2Vectors():
         cur_feature = ori_features[idx]
         features = []
         ft_fea1 = ES.descriptors("FourierTransform", cur_feature[0])
-        cg_fea1 = ES.descriptors("ChaosGame", cur_feature[0])
+        # cg_fea1 = ES.descriptors("ChaosGame", cur_feature[0])
         entropy_fea1 = ES.descriptors("Entropy", cur_feature[0])
         fs_fea1 = ES.descriptors("FickettScore", cur_feature[0])
 
         features.extend(ft_fea1)
-        features.extend(cg_fea1)
+        # features.extend(cg_fea1)
         features.extend(entropy_fea1)
         features.extend(fs_fea1)
 
-        atomic_fea1 = ES.descriptors("atomic_number", cur_feature[0])
-        atomic_fea2 = ES.descriptors("atomic_number", cur_feature[1])
-        features.extend(atomic_fea1)
-        features.extend(atomic_fea2)
+        # atomic_fea1 = ES.descriptors("atomic_number", cur_feature[0])
+        # atomic_fea2 = ES.descriptors("atomic_number", cur_feature[1])
+        # features.extend(atomic_fea1)
+        # features.extend(atomic_fea2)
 
         features.extend(cur_feature[2:])
-        # self.logger.debug(f'FourierTransform: {len(ft_fea)}, ChaosGame: {len(cg_fea)}, Entropy: {len(entropy_fea)}, FickettScore: {len(fs_fea)}')
+        # self.logger.debug(f'FourierTransform: {len(ft_fea1)}, ChaosGame: {len(cg_fea1)}, Entropy: {len(entropy_fea1)}, FickettScore: {len(fs_fea1)}')
         return features 
 
     def all_in_one_embedding(self, total_reads, genuine_df, negative_df, ambiguous_df, high_flag):
@@ -332,7 +332,8 @@ class Reads2Vectors():
 
     def scaler2(self, lab_fea, ambiguous_ulab_fea):
         # pos0 = 179
-        pos0 = 65
+        # pos0 = 65
+        pos0 = 27
         lab_fea0 = lab_fea[:,0:pos0]
 
         ulab_fea0 = ambiguous_ulab_fea[:,0:pos0]
@@ -340,15 +341,15 @@ class Reads2Vectors():
         lab_scale_f0 = scaler0.fit_transform(lab_fea0)
         ulab_scale_f0 = scaler0.transform(ulab_fea0)
 
-        # read integer encoding
-        pos = (self.config.read_max_len+1) * 2
-        # pos = (self.config.read_max_len+1) * 4  * 2
-        lab_fea1 = lab_fea[:,pos0:pos+pos0]
+        # # read integer encoding
+        # pos = (self.config.read_max_len+1) * 2
+        # # pos = (self.config.read_max_len+1) * 4  * 2
+        # lab_fea1 = lab_fea[:,pos0:pos+pos0]
 
-        ulab_fea1 = ambiguous_ulab_fea[:,pos0:pos+pos0]
-        scaler1 = StandardScaler()
-        lab_scale_f1 = scaler1.fit_transform(lab_fea1)
-        ulab_scale_f1 = scaler1.transform(ulab_fea1)
+        # ulab_fea1 = ambiguous_ulab_fea[:,pos0:pos+pos0]
+        # scaler1 = StandardScaler()
+        # lab_scale_f1 = scaler1.fit_transform(lab_fea1)
+        # ulab_scale_f1 = scaler1.transform(ulab_fea1)
 
         # read count
         lab_fea2 = lab_fea[:,-4].reshape(-1, 1)
@@ -357,14 +358,18 @@ class Reads2Vectors():
         lab_scale_f2 = scaler2.fit_transform(lab_fea2)
         ulab_scale_f2 = scaler2.transform(ulab_fea2)
 
-        lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f2))
-        ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f2))
-        del lab_scale_f0, lab_scale_f1, lab_scale_f2, ulab_scale_f0, ulab_scale_f1, ulab_scale_f2
+        # lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f2))
+        # ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f2))
+        # del lab_scale_f0, lab_scale_f1, lab_scale_f2, ulab_scale_f0, ulab_scale_f1, ulab_scale_f2
+        lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f2))
+        ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f2))
+        del lab_scale_f0, lab_scale_f2, ulab_scale_f0, ulab_scale_f2
         return lab_scale_f, ulab_scale_f 
 
     def scaler(self, lab_fea, ambiguous_ulab_fea, high_flag):
         # pos0 = 179
-        pos0 = 65
+        # pos0 = 65
+        pos0 = 27
         lab_fea0 = lab_fea[:,0:pos0]
 
         ulab_fea0 = ambiguous_ulab_fea[:,0:pos0]
@@ -373,15 +378,15 @@ class Reads2Vectors():
         ulab_scale_f0 = scaler0.transform(ulab_fea0)
 
         # read integer encoding
-        pos = (self.config.read_max_len+1) * 2
-        # pos = self.config.read_max_len+1
-        # pos = (self.config.read_max_len+1) * 4 * 2
-        lab_fea1 = lab_fea[:,pos0:pos+pos0]
+        # pos = (self.config.read_max_len+1) * 2
+        # # pos = self.config.read_max_len+1
+        # # pos = (self.config.read_max_len+1) * 4 * 2
+        # lab_fea1 = lab_fea[:,pos0:pos+pos0]
 
-        ulab_fea1 = ambiguous_ulab_fea[:,pos0:pos+pos0]
-        scaler1 = StandardScaler()
-        lab_scale_f1 = scaler1.fit_transform(lab_fea1)
-        ulab_scale_f1 = scaler1.transform(ulab_fea1)
+        # ulab_fea1 = ambiguous_ulab_fea[:,pos0:pos+pos0]
+        # scaler1 = StandardScaler()
+        # lab_scale_f1 = scaler1.fit_transform(lab_fea1)
+        # ulab_scale_f1 = scaler1.transform(ulab_fea1)
 
         # error type and error kmers
         lab_fea3 = lab_fea[:,-3:]
@@ -398,16 +403,27 @@ class Reads2Vectors():
             lab_scale_f2 = scaler2.fit_transform(lab_fea2)
             ulab_scale_f2 = scaler2.transform(ulab_fea2)
 
-            lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f2, lab_scale_f3))
-            ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f2, ulab_scale_f3))
+            # lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f2, lab_scale_f3))
+            # ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f2, ulab_scale_f3))
+            # # lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f3))
+            # # ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f3))
+            # del lab_scale_f0, lab_scale_f1, lab_scale_f2, lab_scale_f3, ulab_scale_f0, ulab_scale_f1, ulab_scale_f2, ulab_scale_f3
+
+            lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f2, lab_scale_f3))
+            ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f2, ulab_scale_f3))
             # lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f3))
             # ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f3))
-            del lab_scale_f0, lab_scale_f1, lab_scale_f2, lab_scale_f3, ulab_scale_f0, ulab_scale_f1, ulab_scale_f2, ulab_scale_f3
+            del lab_scale_f0, lab_scale_f2, lab_scale_f3, ulab_scale_f0, ulab_scale_f2, ulab_scale_f3
+
         else:
-            lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f3))
-            ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f3))
-            del lab_scale_f0, lab_scale_f1, lab_scale_f3, ulab_scale_f0, ulab_scale_f1, ulab_scale_f3
-                
+            # lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f3))
+            # ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f3))
+            # del lab_scale_f0, lab_scale_f1, lab_scale_f3, ulab_scale_f0, ulab_scale_f1, ulab_scale_f3
+
+            lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f3))
+            ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f3))
+            del lab_scale_f0, lab_scale_f3, ulab_scale_f0, ulab_scale_f3
+
         # lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f2, lab_scale_f3))
         # ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f2, ulab_scale_f3))
         

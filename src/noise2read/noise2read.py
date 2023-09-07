@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2022-12-29 23:04:12
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-09-06 11:01:44
+# @Last Modified time: 2023-09-07 16:52:11
 
 from noise2read.config import Config
 import sys, getopt
@@ -216,7 +216,6 @@ def main():
                     config.read_max_len = read_max_len
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
-                    ## one model to predict
                     corrected_file = EC.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
                         
                     if read_min_len > config.min_read_len:

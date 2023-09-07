@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:01:06
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-08-31 17:45:25
+# @Last Modified time: 2023-09-07 16:59:49
 
 import collections
 from Bio import SeqIO
@@ -90,7 +90,7 @@ class DataProcessing():
         raw_file, true_file = self.raw_true_umi(umi_raw_dataset, non_umi_raw_dataset)
         return raw_file, true_file
 
-    def raw_true_umi_0(self, correct_umi_f, non_umi_f):
+    def raw_true_umi(self, correct_umi_f, non_umi_f):
         umi2id = {}
         umi_record_iterator, umi_f_type = parse_data(correct_umi_f)
         for item in umi_record_iterator:
@@ -281,7 +281,7 @@ class DataProcessing():
 
         return raw_file, true_file
 
-    def raw_true_umi(self, correct_umi_f, non_umi_f):
+    def umi_cluster_analysis(self, correct_umi_f, non_umi_f):
         umi2id = {}
         umi_record_iterator, umi_f_type = parse_data(correct_umi_f)
         umi_n = 0
