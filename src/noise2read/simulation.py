@@ -2,7 +2,7 @@
 # @Author: Pengyao Ping
 # @Date:   2023-02-16 11:04:45
 # @Last Modified by:   Pengyao Ping
-# @Last Modified time: 2023-09-07 16:54:00
+# @Last Modified time: 2023-09-09 09:58:23
 
 import collections
 from Bio import SeqIO
@@ -168,11 +168,11 @@ class Simulation():
     def simulation(self):
         # step 1 correct errors using noise2read
         # 
-        if os.path.exists(self.config.correct_data):
-            corrected_data = self.config.correct_data
-        else:
+        # if os.path.exists(self.config.correct_data):
+        #     corrected_data = self.config.correct_data
+        # else:
             # corrected_data = self.error_correction(self.config)
-            corrected_data = self.simplify_error_correction(self.config)
+        corrected_data = self.simplify_error_correction(self.config)
         # inject errors
         raw_data, true_data = self.error_injection(corrected_data)
         # raw_data, true_data = self.error_injection(self.config.input_file)
@@ -180,6 +180,12 @@ class Simulation():
             self.logger,
             self.config)
         umi_raw_dataset, umi_true_dataset = DP.write_mimic_umis(raw_data, true_data)
+        if os.path.exists(raw_data):
+            os.system("rm %s" % raw_data)
+        if os.path.exists(true_data):
+            os.system("rm %s" % true_data)
+        if os.path.exists(corrected_data):
+            os.system("rm %s" % corrected_data)
         return umi_raw_dataset, umi_true_dataset
     
     def error_injection(self, data_set):
@@ -288,7 +294,13 @@ class Simulation():
         err_free_subdataset_2 = self.config.result_dir + "err_free_subdataset2" + file_type
         extract_records(self.config.result_dir, err_id_lst, data_set, err_free_subdataset_2)
         true_data = self.config.result_dir + "simulated_true_" + file_name + file_type  
-        os.system("cat %s %s > %s" % (err_free_subdataset_2, err_free_subdataset, true_data))     
+        os.system("cat %s %s > %s" % (err_free_subdataset_2, err_free_subdataset, true_data))
+        if os.path.exists(err_free_subdataset_2):
+            os.system("rm %s" % err_free_subdataset_2)   
+        if os.path.exists(err_free_subdataset):
+            os.system("rm %s" % err_free_subdataset)  
+        if os.path.exists(err_subdataset):
+            os.system("rm %s" % err_subdataset)          
         return raw_data, true_data
     
     def find_first_diff_char(self, string1, string2):

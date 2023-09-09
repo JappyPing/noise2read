@@ -432,8 +432,6 @@ class ErrorCorrection():
             return data_set
 
 
-
-
     def all_in_one_2nt_correct_errors(self, orginal_file, df_data):
         """
         correcting ambiguous errors in 2nt-edit-distance-based read graph

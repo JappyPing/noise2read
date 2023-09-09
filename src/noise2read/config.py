@@ -57,7 +57,7 @@ class Config(object):
             if conf.has_option("General", "top_n"):
                 self.top_n = conf.getint("General", "top_n")
             else:
-                self.top_n = 100 
+                self.top_n = 10 
             if conf.has_option("General", "min_read_len"):
                 self.min_read_len = conf.getint("General", "min_read_len")
             else:
@@ -137,7 +137,7 @@ class Config(object):
             if conf.has_option("ModelTuningSetup", "n_trials"):
                 self.n_trials = conf.getint("ModelTuningSetup", "n_trials")
             else:
-                self.n_trials = 30
+                self.n_trials = 20
                 
             if conf.has_option("ModelTuningSetup", "n_estimators"):
                 self.n_estimators = conf.getint("ModelTuningSetup", "n_estimators")
@@ -286,7 +286,7 @@ class Config(object):
             if conf.has_option("Amplicon", "amplicon_high_freq"):
                 self.amplicon_high_freq = conf.getint("Amplicon", "amplicon_high_freq")
             else:
-                self.amplicon_high_freq = 5000 # default   
+                self.amplicon_high_freq = 1500 # default   
             if conf.has_option("Amplicon", "amplicon_threshold_proba"):
                 self.amplicon_threshold_proba = conf.getfloat("Amplicon", "amplicon_threshold_proba")
             else:
@@ -318,12 +318,12 @@ class Config(object):
             if conf.has_option("Simulation", "error_rate1"):
                 self.error_rate1 = conf.getfloat("Simulation", "error_rate1")
             else:
-                self.error_rate1 = 0.09 # default
+                self.error_rate1 = 0.03 # default
 
             if conf.has_option("Simulation", "error_rate2"):
                 self.error_rate2 = conf.getfloat("Simulation", "error_rate2")
             else:
-                self.error_rate2 = 0.02 # default
+                self.error_rate2 = 0.005 # default
 
 
             # # Evaluation
@@ -344,7 +344,7 @@ class Config(object):
             self.min_iters = 1000
             self.verbose = True 
             self.iso_change_detail = False     
-            self.top_n = 100      
+            self.top_n = 10      
             # self.over_sampling = True 
             self.negative_sample_num = 300000
             self.min_read_len = 30
@@ -370,7 +370,7 @@ class Config(object):
             self.iso_neg_high = True # if True, the high frequency isolated nodes aslso included as negative samples for high ambiguous prediction. This will use quite a lot computational resources (memory) for embeeding and model training
 
             # ModelTuningSetup
-            self.n_trials = 30
+            self.n_trials = 20
             self.n_estimators = 400
             self.test_size = 0.1 # default 
             # random state for SMOTE and train_test_split       
@@ -411,7 +411,7 @@ class Config(object):
 
             #amplicon
             self.amplicon_low_freq = 50
-            self.amplicon_high_freq = 5000
+            self.amplicon_high_freq = 1500
             self.amplicon_threshold_proba = 0.85
             # self.amplicon_error_node_degree = 4
 
@@ -420,8 +420,8 @@ class Config(object):
             self.min_read_count = 30
             # self.substations = True
             # self.indels = False
-            self.error_rate1 = 0.09
-            self.error_rate2 = 0.02
+            self.error_rate1 = 0.03
+            self.error_rate2 = 0.005
   
             # # Evaluation
             # self.delta = 1

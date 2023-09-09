@@ -515,6 +515,10 @@ def main():
                         logger.error(f"Only {available_cpu_cores} available to use.") 
                         config.num_workers = available_cpu_cores
                     Simulation(logger, config).simulation()
+                    # delete bcool result
+                    bcool_dir = os.path.join(config.result_dir, 'bcool/')
+                    if os.path.exists(bcool_dir):
+                        os.system("rm -rf %s" % bcool_dir)
 ############################################################################################################################
                 # elif module_arg == "extract_isolates": 
 
