@@ -521,7 +521,7 @@ class DataAnalysis():
         else:
             fall_out = "None"
         # self.logger.info(sheet_name)
-        self.logger.info("{}: accuracy: {}, precision: {}, recall: {}, gain: {}, fall-out: {}".format(sheet_name, accuracy, precision, recall, gain, fall_out))
+        self.logger.info("{}: Accuracy: {}, Precision: {}, Recall: {}, Positive Gain: {}, Fall-out: {}".format(sheet_name, accuracy, precision, recall, gain, fall_out))
         worksheet3 = self.workbook_flie.add_worksheet(sheet_name)
         worksheet3.write('A1', 'TP')
         worksheet3.write('A2', tp)

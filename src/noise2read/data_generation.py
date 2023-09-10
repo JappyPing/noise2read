@@ -212,7 +212,7 @@ class DataGneration():
         subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
         # print(len(subgraphs))
         chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 0:
+        if chunk_size > 1:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
 
             # Write each group of subgraphs to separate files
@@ -348,7 +348,7 @@ class DataGneration():
         self.logger.info("Extracting genuine and ambiguous errors...")
 
         chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 0:
+        if chunk_size > 1:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
         else:
             groups = subgraphs
@@ -467,7 +467,7 @@ class DataGneration():
         self.logger.info("Extracting genuine and ambiguous errors...")
 
         chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 0:
+        if chunk_size > 1:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
         else:
             groups = subgraphs
@@ -972,7 +972,7 @@ class DataGneration():
                     sub_graph.nodes[node]['flag'] = False
 
         chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 0:
+        if chunk_size > 1:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
         else:
             groups = subgraphs
