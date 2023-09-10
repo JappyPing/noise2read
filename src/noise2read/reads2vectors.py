@@ -456,17 +456,21 @@ class Reads2Vectors():
 
         if len(original_features_lst) > (self.config.chunks_num * 10):
             chunk_size = len(original_features_lst) // self.config.chunks_num
-            remainder = len(original_features_lst) % self.config.chunks_num
-            # chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
-            chunks = []
-            for i in range(self.config.chunks_num):
-                # print(i)
-                cur_idx = chunk_size * i
-                chunks.append(original_features_lst[cur_idx:cur_idx+chunk_size])
-            # Handle the remaining elements
-            if remainder > 0:
-                chunks[-1].extend(original_features_lst[-remainder:])   
-                # print(chunks[-1])         
+            # remainder = len(original_features_lst) % self.config.chunks_num
+            chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
+            if chunk_size > 1:
+                chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
+            else:
+                chunks = original_features_lst            
+            # chunks = []
+            # for i in range(self.config.chunks_num):
+            #     # print(i)
+            #     cur_idx = chunk_size * i
+            #     chunks.append(original_features_lst[cur_idx:cur_idx+chunk_size])
+            # # Handle the remaining elements
+            # if remainder > 0:
+            #     chunks[-1].extend(original_features_lst[-remainder:])   
+            #     # print(chunks[-1])         
             chunk_names = []
             for i in range(len(chunks)):
                 chunk = chunks[i]
