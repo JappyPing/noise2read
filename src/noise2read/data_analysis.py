@@ -640,7 +640,7 @@ class DataAnalysis():
         raw_entropy_items = []
         for read in non_frequent_raw_reads:
             raw_entropy_items.append(raw_read2count[read])
-
+        del non_frequent_raw_reads
         raw_nonFre_reads_total_num = sum(raw_entropy_items)
         # raw entropy
         try:
@@ -656,12 +656,14 @@ class DataAnalysis():
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
 
+        del raw_entropy_items, raw_entropy_lst
+
         # correct dateset
         non_frequent_correct_reads = correct_unique_reads - frequent_reads
         correct_entropy_items = []
         for read in non_frequent_correct_reads:
             correct_entropy_items.append(correct_read2count[read])
-
+        del non_frequent_correct_reads
         # correct entropy
         correct_nonFre_reads_total_num = sum(correct_entropy_items)
         try:
@@ -676,19 +678,22 @@ class DataAnalysis():
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
+
+        del correct_entropy_items, correct_entropy_lst
         ##################################################################################
         #information gain (\delta I) heatmap
         new_reads = correct_unique_reads - raw_unique_reads
         new_reads_num = len(new_reads)
         self.logger.info("Wrongly introduced {} new reads".format(new_reads_num))
-
+        del new_reads
+        
         raw_kept_counts = []
         correct_kept_counts = []
         kept_reads = correct_unique_reads & raw_unique_reads
         for read in kept_reads:
             correct_kept_counts.append(correct_read2count[read])
             raw_kept_counts.append(raw_read2count[read])
-
+        del kept_reads
         try:
             with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                 raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
@@ -701,6 +706,8 @@ class DataAnalysis():
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
 
+        del raw_kept_counts
+
         try:
             with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                 correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
@@ -712,11 +719,14 @@ class DataAnalysis():
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
+        del correct_kept_counts
 
         raw_removed_reads = raw_unique_reads - correct_unique_reads
         raw_removed_items = []
         for read in raw_removed_reads:
             raw_removed_items.append(raw_read2count[read])
+
+        del raw_removed_reads, raw_unique_reads, correct_unique_reads
 
         try:
             with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
@@ -729,7 +739,7 @@ class DataAnalysis():
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
-        
+        del raw_removed_items
         for i in raw_removed_entropy_items_lst:
             if i <=0:
                 print('Warning')
