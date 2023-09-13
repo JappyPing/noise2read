@@ -629,10 +629,7 @@ class DataAnalysis():
         return result
 
     def noise2read_entropy(self, raw_read2count, correct_read2count, total_num):
-
         raw_unique_reads = set(raw_read2count.keys())
-        correct_unique_reads = set(correct_read2count.keys())
-
         frequent_reads = set([k for k, v in raw_read2count.items() if v > self.config.high_freq_thre])
 
         # raw dataset
@@ -641,8 +638,39 @@ class DataAnalysis():
         for read in non_frequent_raw_reads:
             raw_entropy_items.append(raw_read2count[read])
         del non_frequent_raw_reads
-        raw_nonFre_reads_total_num = sum(raw_entropy_items)
+        
+        # correct dateset
+        correct_unique_reads = set(correct_read2count.keys())
+        non_frequent_correct_reads = correct_unique_reads - frequent_reads
+        correct_entropy_items = []
+        for read in non_frequent_correct_reads:
+            correct_entropy_items.append(correct_read2count[read])
+        del non_frequent_correct_reads
+
+        # new reads
+        new_reads = correct_unique_reads - raw_unique_reads
+        new_reads_num = len(new_reads)
+        self.logger.info("Wrongly introduced {} new reads".format(new_reads_num))
+        del new_reads
+        
+        # information gain
+        raw_kept_counts = []
+        correct_kept_counts = []
+        kept_reads = correct_unique_reads & raw_unique_reads
+        for read in kept_reads:
+            correct_kept_counts.append(correct_read2count[read])
+            raw_kept_counts.append(raw_read2count[read])
+        del kept_reads, correct_read2count
+
+        raw_removed_reads = raw_unique_reads - correct_unique_reads
+        raw_removed_items = []
+        for read in raw_removed_reads:
+            raw_removed_items.append(raw_read2count[read])
+
+        del raw_removed_reads, raw_unique_reads, correct_unique_reads, raw_read2count 
+        ###################################################################
         # raw entropy
+        raw_nonFre_reads_total_num = sum(raw_entropy_items)
         try:
             with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
                 raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
@@ -650,20 +678,11 @@ class DataAnalysis():
         except KeyboardInterrupt:
             # Handle termination signal (Ctrl+C)
             pool.terminate()  # Terminate the WorkerPool before exiting
-
         except Exception:
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
-
-        del raw_entropy_items, raw_entropy_lst
-
-        # correct dateset
-        non_frequent_correct_reads = correct_unique_reads - frequent_reads
-        correct_entropy_items = []
-        for read in non_frequent_correct_reads:
-            correct_entropy_items.append(correct_read2count[read])
-        del non_frequent_correct_reads
+        del raw_entropy_items, raw_entropy_lst, raw_nonFre_reads_total_num
         # correct entropy
         correct_nonFre_reads_total_num = sum(correct_entropy_items)
         try:
@@ -673,76 +692,52 @@ class DataAnalysis():
         except KeyboardInterrupt:
             # Handle termination signal (Ctrl+C)
             pool.terminate()  # Terminate the WorkerPool before exiting
-
         except Exception:
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
-
-        del correct_entropy_items, correct_entropy_lst
+        del correct_entropy_items, correct_entropy_lst, correct_nonFre_reads_total_num
         ##################################################################################
         #information gain (\delta I) heatmap
-        new_reads = correct_unique_reads - raw_unique_reads
-        new_reads_num = len(new_reads)
-        self.logger.info("Wrongly introduced {} new reads".format(new_reads_num))
-        del new_reads
-        
-        raw_kept_counts = []
-        correct_kept_counts = []
-        kept_reads = correct_unique_reads & raw_unique_reads
-        for read in kept_reads:
-            correct_kept_counts.append(correct_read2count[read])
-            raw_kept_counts.append(raw_read2count[read])
-        del kept_reads
         try:
             with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                 raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
         except KeyboardInterrupt:
             # Handle termination signal (Ctrl+C)
             pool.terminate()  # Terminate the WorkerPool before exiting
-
         except Exception:
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
-
         del raw_kept_counts
-
+        ########
         try:
             with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                 correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
         except KeyboardInterrupt:
             # Handle termination signal (Ctrl+C)
             pool.terminate()  # Terminate the WorkerPool before exiting
-
         except Exception:
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
         del correct_kept_counts
-
-        raw_removed_reads = raw_unique_reads - correct_unique_reads
-        raw_removed_items = []
-        for read in raw_removed_reads:
-            raw_removed_items.append(raw_read2count[read])
-
-        del raw_removed_reads, raw_unique_reads, correct_unique_reads
-
+        ######
         try:
             with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                 raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
         except KeyboardInterrupt:
             # Handle termination signal (Ctrl+C)
             pool.terminate()  # Terminate the WorkerPool before exiting
-
         except Exception:
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
         del raw_removed_items
-        for i in raw_removed_entropy_items_lst:
-            if i <=0:
-                print('Warning')
+        #######
+        # for i in raw_removed_entropy_items_lst:
+        #     if i <=0:
+        #         print('Warning')
         entropy_item_lst = []
         for i, j in zip(raw_kept_entropy_lst, correct_kept_entropy_lst):
             entropy_item_lst.append(i - j)

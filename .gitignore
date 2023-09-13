@@ -1,4 +1,5 @@
 ./vscode/*
+archive/*
 data/*
 archive/*
 benchmark/*

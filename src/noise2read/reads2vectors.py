@@ -73,21 +73,32 @@ class Reads2Vectors():
             self.logger.debug(f'expected kmers: {kmers}, {len(kmers)}')
             total_err_tyes = []
             total_err_kmers = []
-            for idx, row in genuine_df.iterrows():
-                total_err_tyes.append(row['ErrorTye'])
-                total_err_kmers.append(row['StartErrKmer'])
-                total_err_kmers.append(row['EndErrKmer'])
+            # for idx, row in genuine_df.iterrows():
+            #     total_err_tyes.append(row['ErrorTye'])
+            #     total_err_kmers.append(row['StartErrKmer'])
+            #     total_err_kmers.append(row['EndErrKmer'])
 
-            for idx, row in ambiguous_df.iterrows():
-                total_err_tyes.append(row['ErrorTye'])
-                total_err_kmers.append(row['StartErrKmer'])
-                total_err_kmers.append(row['EndErrKmer'])
+            # for idx, row in ambiguous_df.iterrows():
+            #     total_err_tyes.append(row['ErrorTye'])
+            #     total_err_kmers.append(row['StartErrKmer'])
+            #     total_err_kmers.append(row['EndErrKmer'])
+
+            total_err_tyes.extend(genuine_df['ErrorTye'].tolist())
+            total_err_tyes.extend(ambiguous_df['ErrorTye'].tolist())
+
+            total_err_kmers.extend(genuine_df['StartErrKmer'].tolist())
+            total_err_kmers.extend(ambiguous_df['StartErrKmer'].tolist())
+
+            total_err_kmers.extend(genuine_df['EndErrKmer'].tolist())
+            total_err_kmers.extend(ambiguous_df['EndErrKmer'].tolist())
 
             total_err_kmers_count = len(total_err_kmers)
             total_err_tyes_count = len(total_err_tyes)
             
             err_kmers2count = Counter(total_err_kmers)
+            del total_err_kmers
             err_tyes2count = Counter(total_err_tyes)
+            del total_err_tyes
 
             kmer_keys = err_kmers2count.keys()
             self.logger.debug(f'Real kmers: {kmer_keys}, {len(kmer_keys)}')
@@ -462,18 +473,13 @@ class Reads2Vectors():
                 chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
             else:
                 chunks = original_features_lst            
-            # chunks = []
-            # for i in range(self.config.chunks_num):
-            #     # print(i)
-            #     cur_idx = chunk_size * i
-            #     chunks.append(original_features_lst[cur_idx:cur_idx+chunk_size])
-            # # Handle the remaining elements
-            # if remainder > 0:
-            #     chunks[-1].extend(original_features_lst[-remainder:])   
-            #     # print(chunks[-1])         
+
             chunk_names = []
-            for i in range(len(chunks)):
-                chunk = chunks[i]
+            # combined_data = []
+            # for i in range(len(chunks)):
+            i = 0
+            while chunks:
+                chunk = chunks.pop(0)
                 # print(i)
                 # print(len(chunk), type(chunk))
                 # print(chunk)
@@ -494,6 +500,7 @@ class Reads2Vectors():
 
                 # Generate the pickle file name
                 file_name = self.config.result_dir + f"chunk_{i}.pickle"
+                i += 1
                 # Write the vectors to the pickle file
                 with open(file_name, "wb") as file:
                     pickle.dump(vectors, file)
@@ -550,27 +557,41 @@ class Reads2Vectors():
         self.logger.debug(len(kmers))
         total_err_tyes = []
         total_err_kmers = []
-        for idx, row in genuine_df.iterrows():
-            total_err_tyes.append(row['ErrorTye'])
-            total_err_kmers.append(row['StartErrKmer'])
-            total_err_kmers.append(row['EndErrKmer'])
+        total_err_tyes.extend(genuine_df['ErrorTye'].tolist())
+        total_err_tyes.extend(ambiguous_df['ErrorTye'].tolist())
+        total_err_tyes.extend(new_negative_df['ErrorTye'].tolist())
 
-        for idx, row in ambiguous_df.iterrows():
-            total_err_tyes.append(row['ErrorTye'])
-            total_err_kmers.append(row['StartErrKmer'])
-            total_err_kmers.append(row['EndErrKmer'])
+        total_err_kmers.extend(genuine_df['StartErrKmer'].tolist())
+        total_err_kmers.extend(ambiguous_df['StartErrKmer'].tolist())
+        total_err_kmers.extend(new_negative_df['StartErrKmer'].tolist())
 
-        for idx, row in new_negative_df.iterrows():
-            read = row['StartRead']
-            total_err_tyes.append(row['ErrorTye'])
-            total_err_kmers.append(row['StartErrKmer'])
-            total_err_kmers.append(row['EndErrKmer'])
+        total_err_kmers.extend(genuine_df['EndErrKmer'].tolist())
+        total_err_kmers.extend(ambiguous_df['EndErrKmer'].tolist())
+        total_err_kmers.extend(new_negative_df['EndErrKmer'].tolist())
+
+        # for idx, row in genuine_df.iterrows():
+        #     total_err_tyes.append(row['ErrorTye'])
+        #     total_err_kmers.append(row['StartErrKmer'])
+        #     total_err_kmers.append(row['EndErrKmer'])
+
+        # for idx, row in ambiguous_df.iterrows():
+        #     total_err_tyes.append(row['ErrorTye'])
+        #     total_err_kmers.append(row['StartErrKmer'])
+        #     total_err_kmers.append(row['EndErrKmer'])
+
+        # for idx, row in new_negative_df.iterrows():
+        #     # read = row['StartRead']
+        #     total_err_tyes.append(row['ErrorTye'])
+        #     total_err_kmers.append(row['StartErrKmer'])
+        #     total_err_kmers.append(row['EndErrKmer'])
             
         total_err_kmers_count = len(total_err_kmers)
         total_err_tyes_count = len(total_err_tyes)
         
         err_kmers2count = Counter(total_err_kmers)
+        del total_err_kmers
         err_tyes2count = Counter(total_err_tyes)
+        del total_err_tyes
         self.logger.debug(len(err_kmers2count.keys()))
         kmer_keys = err_kmers2count.keys()
 

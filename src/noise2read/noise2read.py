@@ -155,7 +155,7 @@ def main():
                     else:
                         config.correct_data = corrected_file
 
-                    DataAnalysis(logger, config).evaluation()  
+                    # DataAnalysis(logger, config).evaluation()  
                     # delete bcool result
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
@@ -224,7 +224,7 @@ def main():
                     else:
                         config.correct_data = corrected_file
 
-                    DataAnalysis(logger, config).evaluation()  
+                    # DataAnalysis(logger, config).evaluation()  
                     # delete bcool result
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
@@ -309,7 +309,7 @@ def main():
                         logger.warning("No genuine or negative samples for amplicon errors prediction!")
                         config.correct_data = mid_result
                 
-                    DataAnalysis(logger, config).evaluation()
+                    # DataAnalysis(logger, config).evaluation()
                     # delete bcool result
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
@@ -362,7 +362,7 @@ def main():
                     # ##############################################################
                     EC = ErrorCorrection(logger, config)
                     config.correct_data = EC.umi_correction(config.input_file, genuine_df)
-                    DataAnalysis(logger, config).evaluation()
+                    # DataAnalysis(logger, config).evaluation()
 ############################################################################################################################
                 elif module_arg == "mimic_umi":   
                     if i_lst and t_lst:
