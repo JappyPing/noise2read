@@ -154,8 +154,8 @@ def main():
                         config.correct_data = EC.all_in_one_ed2_correction(corrected_file, unique_seqs2, genuine_df2, negative_df2, ambiguous_df2)
                     else:
                         config.correct_data = corrected_file
-
-                    # DataAnalysis(logger, config).evaluation()  
+                    del DG, EC
+                    DataAnalysis(logger, config).evaluation()  
                     # delete bcool result
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
@@ -223,8 +223,8 @@ def main():
                         config.correct_data = EC.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
                     else:
                         config.correct_data = corrected_file
-
-                    # DataAnalysis(logger, config).evaluation()  
+                    del DG, EC
+                    DataAnalysis(logger, config).evaluation()  
                     # delete bcool result
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
@@ -308,8 +308,8 @@ def main():
                     else:
                         logger.warning("No genuine or negative samples for amplicon errors prediction!")
                         config.correct_data = mid_result
-                
-                    # DataAnalysis(logger, config).evaluation()
+                    del DG, EC
+                    DataAnalysis(logger, config).evaluation()
                     # delete bcool result
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
@@ -362,7 +362,8 @@ def main():
                     # ##############################################################
                     EC = ErrorCorrection(logger, config)
                     config.correct_data = EC.umi_correction(config.input_file, genuine_df)
-                    # DataAnalysis(logger, config).evaluation()
+                    del DG, EC
+                    DataAnalysis(logger, config).evaluation()
 ############################################################################################################################
                 elif module_arg == "mimic_umi":   
                     if i_lst and t_lst:
