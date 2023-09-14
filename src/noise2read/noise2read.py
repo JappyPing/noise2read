@@ -217,7 +217,10 @@ def main():
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
                     corrected_file = EC.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
-                        
+
+                    # genuine_df, ambiguous_df = DG.simplify_data_files(config.input_file, edit_dis=2) 
+                    # config.correct_data = EC.simplify_2nt_correction(config.input_file, genuine_df, ambiguous_df)
+
                     if read_min_len > config.min_read_len:
                         genuine_df, ambiguous_df = DG.simplify_data_files(corrected_file, edit_dis=2) 
                         config.correct_data = EC.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
@@ -228,7 +231,8 @@ def main():
                     # delete bcool result
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
-                        os.system("rm -rf %s" % bcool_dir)                                     
+                        os.system("rm -rf %s" % bcool_dir)         
+
 ############################################################################################################################
                 elif module_arg == "amplicon_correction": 
                     if c_lst:

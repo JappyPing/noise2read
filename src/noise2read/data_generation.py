@@ -209,10 +209,12 @@ class DataGneration():
             DataFrame: one pandas dataframe saving genuine errors
         """
         graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(input_file, edit_dis=1)
+        del seqs_lens_lst, seqs2id_dict, unique_seqs
         subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
         # print(len(subgraphs))
+        genuine_lst = []
         chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 1:
+        if chunk_size > 10:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
 
             # Write each group of subgraphs to separate files
@@ -235,10 +237,8 @@ class DataGneration():
                 # Write the group of subgraphs to the file
                 nx.write_gexf(group_G, file_name)
                 gexf_files.append(file_name)
-
             del groups, subgraphs, graph
 
-            genuine_lst = []
             for gexf_file in gexf_files:
                 cur_graph = nx.read_gexf(gexf_file)
                 sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
@@ -262,7 +262,6 @@ class DataGneration():
                 os.remove(gexf_file)
                 del cur_graph, sub_graphs
         else:
-            genuine_lst = []
             subgraph_num = len(subgraphs)
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=subgraphs, start_method='fork') as pool:
@@ -275,7 +274,8 @@ class DataGneration():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-            
+            del subgraphs, graph
+
             for item in cur_genuine_lsts:
                 genuine_lst.extend(item)
 
@@ -346,43 +346,68 @@ class DataGneration():
         # subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
 
         self.logger.info("Extracting genuine and ambiguous errors...")
-
-        chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 1:
-            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
-        else:
-            groups = subgraphs
-
-        # Write each group of subgraphs to separate files
-        gexf_files = []
-        for i, group in enumerate(groups):
-            # Create a new graph for the group of subgraphs
-            group_G = nx.Graph()
-            for subgraph_nodes in group:
-                group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
-                # Add node attributes to the new graph
-                for node in subgraph_nodes:
-                    group_G.nodes[node].update(graph.nodes[node])
-            # Generate the file name for the group
-            file_name = self.config.result_dir + f"group_{i}.gexf"
-
-            # Write the group of subgraphs to the file
-            nx.write_gexf(group_G, file_name)
-            gexf_files.append(file_name)
+        genuine_lst = []
+        ambiguous_lst = []
 
         if self.config.high_ambiguous:
             high_ambiguous_df = pd.DataFrame(columns=["idx", "StartRead", "StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])    
-            high_ambi_lst = []        
+            high_ambi_lst = []  
+            high_idx = 0
 
-        high_idx = 0
-        genuine_lst = []
-        ambiguous_lst = []
-        for gexf_file in gexf_files:
-            cur_graph = nx.read_gexf(gexf_file)
-            sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+        chunk_size = len(subgraphs) // self.config.chunks_num
+        self.logger.debug(chunk_size)
+        if chunk_size > 10:
+            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
+            # self.logger.debug(groups)
+            # Write each group of subgraphs to separate files
+            gexf_files = []
+            for i, group in enumerate(groups):
+                self.logger.debug(group)
+                # Create a new graph for the group of subgraphs
+                group_G = nx.Graph()
+                for subgraph_nodes in group:
+                    group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
+                    # Add node attributes to the new graph
+
+                    for node in subgraph_nodes:
+                        self.logger.debug(node)
+                        group_G.nodes[node].update(graph.nodes[node])
+                # Generate the file name for the group
+                file_name = self.config.result_dir + f"group_{i}.gexf"
+                # Write the group of subgraphs to the file
+                nx.write_gexf(group_G, file_name)
+                gexf_files.append(file_name)
+            del groups, subgraphs, graph
+
+            for gexf_file in gexf_files:
+                cur_graph = nx.read_gexf(gexf_file)
+                sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+                try:
+                    subgraph_num = len(sub_graphs)
+                    shared_obs = sub_graphs, edit_dis
+                    with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                        for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
+                            if genu_ambi_lst[0]:
+                                genuine_lst.extend(genu_ambi_lst[0])
+                                ambiguous_lst.extend(genu_ambi_lst[1])
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+
+                if self.config.high_ambiguous:
+                    cur_lst, cur_idx = self.extract_high_ambiguous_errs(sub_graphs, high_idx)
+                    high_ambi_lst.extend(cur_lst)
+                    high_idx = cur_idx + 1
+                os.remove(gexf_file)
+                del cur_graph, sub_graphs
+        else:    
             try:
-                subgraph_num = len(sub_graphs)
-                shared_obs = sub_graphs, edit_dis
+                subgraph_num = len(subgraphs)
+                shared_obs = subgraphs, edit_dis
                 with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
                     for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
                         if genu_ambi_lst[0]:
@@ -391,28 +416,16 @@ class DataGneration():
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
-
             except Exception:
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-            
             if self.config.high_ambiguous:
-                cur_lst, cur_idx = self.extract_high_ambiguous_errs(sub_graphs, high_idx)
+                cur_lst, cur_idx = self.extract_high_ambiguous_errs(subgraphs, high_idx)
                 high_ambi_lst.extend(cur_lst)
                 high_idx = cur_idx + 1
-            os.remove(gexf_file)
-            del cur_graph, sub_graphs
-        
-        # genuine_lst = []
-        # ambiguous_lst = []
-        # subgraph_num = len(subgraphs)
-        # shared_obs = subgraphs, edit_dis
-        # with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
-        #     for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num), progress_bar=self.config.verbose):
-        #         if genu_ambi_lst[0]:
-        #             genuine_lst.extend(genu_ambi_lst[0])
-        #             ambiguous_lst.extend(genu_ambi_lst[1])
+
+            del shared_obs, subgraphs, graph
 
         genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
 
@@ -463,42 +476,62 @@ class DataGneration():
 
         subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
         # subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
-
+        # print("test")
+        # print(len(subgraphs))
+        
         self.logger.info("Extracting genuine and ambiguous errors...")
-
-        chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 1:
-            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
-        else:
-            groups = subgraphs
-
-        # Write each group of subgraphs to separate files
-        gexf_files = []
-        for i, group in enumerate(groups):
-            # Create a new graph for the group of subgraphs
-            group_G = nx.Graph()
-            for subgraph_nodes in group:
-                group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
-                # Add node attributes to the new graph
-                for node in subgraph_nodes:
-                    group_G.nodes[node].update(graph.nodes[node])
-            # Generate the file name for the group
-            file_name = self.config.result_dir + f"group_{i}.gexf"
-
-            # Write the group of subgraphs to the file
-            nx.write_gexf(group_G, file_name)
-            gexf_files.append(file_name)
-    
-
-        high_idx = 0
         genuine_lst = []
         ambiguous_lst = []
-        for gexf_file in gexf_files:
-            cur_graph = nx.read_gexf(gexf_file)
-            sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+        chunk_size = len(subgraphs) // self.config.chunks_num
+        if chunk_size > 10:
+            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
+
+            self.logger.debug(len(groups))
+            # Write each group of subgraphs to separate files
+            gexf_files = []
+            for i, group in enumerate(groups):
+                # Create a new graph for the group of subgraphs
+                self.logger.debug(group)
+                group_G = nx.Graph()
+                for subgraph_nodes in group:
+                    group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
+                    # Add node attributes to the new graph
+                    self.logger.debug(subgraph_nodes)
+                    for node in subgraph_nodes:
+                        self.logger.debug(node)
+                        group_G.nodes[node].update(graph.nodes[node])
+                # Generate the file name for the group
+                file_name = self.config.result_dir + f"group_{i}.gexf"
+
+                # Write the group of subgraphs to the file
+                nx.write_gexf(group_G, file_name)
+                gexf_files.append(file_name)
+            del groups, subgraphs, graph
+            ####
+            for gexf_file in gexf_files:
+                cur_graph = nx.read_gexf(gexf_file)
+                sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+                try:
+                    subgraph_num = len(sub_graphs)
+                    shared_obs = sub_graphs, edit_dis
+                    with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                        for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
+                            if genu_ambi_lst[0]:
+                                genuine_lst.extend(genu_ambi_lst[0])
+                                ambiguous_lst.extend(genu_ambi_lst[1])
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+                os.remove(gexf_file)
+                del cur_graph, sub_graphs
+        else:
             try:
-                subgraph_num = len(sub_graphs)
-                shared_obs = sub_graphs, edit_dis
+                subgraph_num = len(subgraphs)
+                shared_obs = subgraphs, edit_dis
                 with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
                     for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
                         if genu_ambi_lst[0]:
@@ -507,15 +540,12 @@ class DataGneration():
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
-
             except Exception:
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-            
-            os.remove(gexf_file)
-            del cur_graph, sub_graphs
-        
+            del shared_obs, subgraphs, graph
+
         genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
 
         idx = 0
@@ -834,7 +864,7 @@ class DataGneration():
         high_freq = []
         low_freq = []
 
-        for read, frequency in tqdm(read_count.items(), miniters=int(len(read_count)/self.config.min_iters)):
+        for read, frequency in read_count.items():
             if not graph.has_node(read):
                 graph.add_node(read, count = frequency, flag=False)  
             # if frequency >= self.config.high_freq_thre:
@@ -866,7 +896,6 @@ class DataGneration():
         except KeyboardInterrupt:
             # Handle termination signal (Ctrl+C)
             pool.terminate()  # Terminate the WorkerPool before exiting
-
         except Exception:
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
@@ -959,7 +988,7 @@ class DataGneration():
         self.logger.info("Constructing the second 1nt-edit-distance based graph for further amplicon sequencing data correction.")
         graph, seq_lens_set, seqs2id_dict, unique_seqs = self.generate_graph(data_set, edit_dis=1)
         self.graph_summary(graph)
-        
+        del seq_lens_set, seqs2id_dict, unique_seqs
         subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2]
         
         amplicon_df = pd.DataFrame(columns=["idx", "StartRead","StartReadCount", "StartDegree", "ErrorTye", "ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])
@@ -972,39 +1001,42 @@ class DataGneration():
                     sub_graph.nodes[node]['flag'] = False
 
         chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 1:
-            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
-        else:
-            groups = subgraphs
-
-        # Write each group of subgraphs to separate files
-        gexf_files = []
-        for i, group in enumerate(groups):
-            # Create a new graph for the group of subgraphs
-            group_G = nx.Graph()
-            for subgraph_nodes in group:
-                group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
-                # Add node attributes to the new graph
-                for node in subgraph_nodes:
-                    group_G.nodes[node].update(graph.nodes[node])
-            # Generate the file name for the group
-            file_name = self.config.result_dir + f"group_{i}.gexf"
-
-            # Write the group of subgraphs to the file
-            nx.write_gexf(group_G, file_name)
-            gexf_files.append(file_name)
-
-        amplicon_lst = []
         idx = 0
-        for gexf_file in gexf_files:
-            cur_graph = nx.read_gexf(gexf_file)
-            sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
-            
-            cur_lst, cur_idx = self.extract_amplicon_errs(sub_graphs, idx)
+        amplicon_lst = []
+
+        if chunk_size > 10:
+            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
+            # Write each group of subgraphs to separate files
+            gexf_files = []
+            for i, group in enumerate(groups):
+                # Create a new graph for the group of subgraphs
+                group_G = nx.Graph()
+                for subgraph_nodes in group:
+                    group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
+                    # Add node attributes to the new graph
+                    for node in subgraph_nodes:
+                        group_G.nodes[node].update(graph.nodes[node])
+                # Generate the file name for the group
+                file_name = self.config.result_dir + f"group_{i}.gexf"
+
+                # Write the group of subgraphs to the file
+                nx.write_gexf(group_G, file_name)
+                gexf_files.append(file_name)
+            del groups, subgraphs, graph
+
+            for gexf_file in gexf_files:
+                cur_graph = nx.read_gexf(gexf_file)
+                sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+                cur_lst, cur_idx = self.extract_amplicon_errs(sub_graphs, idx)
+                amplicon_lst.extend(cur_lst)
+                idx = cur_idx + 1
+                os.remove(gexf_file)
+                del cur_graph, sub_graphs
+        else:
+            cur_lst, cur_idx = self.extract_amplicon_errs(subgraphs, idx)
             amplicon_lst.extend(cur_lst)
-            idx = cur_idx + 1
-            os.remove(gexf_file)
-            del cur_graph, sub_graphs
+            idx = cur_idx + 1   
+            del subgraphs, graph  
 
         for item in amplicon_lst:
             amplicon_df.loc[len(amplicon_df)] = item
