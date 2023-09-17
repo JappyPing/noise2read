@@ -266,7 +266,7 @@ class Simulation():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-
+        del shared_objects
         err_subdataset = self.config.result_dir + "err_subdataset" + file_type
         with open(err_subdataset, "w") as handle:
             SeqIO.write(err_records, handle, file_type)

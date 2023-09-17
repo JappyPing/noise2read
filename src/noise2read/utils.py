@@ -15,6 +15,38 @@ import random
 import editdistance
 import os
 import datetime
+import tracemalloc
+
+class MemoryMonitor:
+    def __init__(self, logger):
+        self.current_memory = 0
+        self.peak_memory = 0
+        self.traceback = None
+        self.logger = logger
+
+    def start(self):
+        tracemalloc.start()
+
+    def stop(self):
+        tracemalloc.stop()
+
+    def measure(self):
+        current, peak = tracemalloc.get_traced_memory()
+        self.current_memory = current
+        if peak > self.peak_memory:
+            self.peak_memory = peak
+
+        self.logger.info(f"Current memory usage: {self.current_memory / (1024 * 1024)} MB")
+        self.logger.info(f"Recent peak memory usage: {self.peak_memory / (1024 * 1024)} MB")
+
+    def get_memory_traceback(self, obj):
+        self.traceback = tracemalloc.get_object_traceback(obj)
+        self.logger.debug("Memory Allocation Traceback:")
+        for filename, lineno, funcname, line in self.traceback:
+            self.logger.debug(f"  File '{filename}', line {lineno}, in {funcname}")
+            if line:
+                self.logger.debug(f"    {line.strip()}")
+
 
 def custom_logger(root_name, debug_mode) -> logging.Logger: 
     logger = logging.getLogger(root_name)    

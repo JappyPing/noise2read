@@ -16,6 +16,7 @@ from networkx.drawing.nx_agraph import graphviz_layout
 from collections import Counter
 import sys
 import pandas as pd
+from noise2read.utils import MemoryMonitor
 
 class DataGneration():
     """
@@ -54,6 +55,8 @@ class DataGneration():
             self.out_file_tye = self.file_type.split(".gz")[0] 
         else:
             self.out_file_tye = self.file_type
+        # Create an instance of the MemoryMonitor
+        self.MM = MemoryMonitor(self.logger)
 
     def graph_summary(self, graph):
         """
@@ -214,7 +217,7 @@ class DataGneration():
         # print(len(subgraphs))
         genuine_lst = []
         chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 10:
+        if chunk_size >= self.config.num_workers:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
 
             # Write each group of subgraphs to separate files
@@ -250,12 +253,11 @@ class DataGneration():
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
-
                 except Exception:
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
                     raise
-                
+
                 for item in cur_genuine_lsts:
                     genuine_lst.extend(item)
 
@@ -269,11 +271,11 @@ class DataGneration():
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
-
             except Exception:
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
+
             del subgraphs, graph
 
             for item in cur_genuine_lsts:
@@ -355,14 +357,18 @@ class DataGneration():
             high_idx = 0
 
         chunk_size = len(subgraphs) // self.config.chunks_num
+        # chunk_size = self.config.num_workers
+        # chunk_num = len(subgraphs) // chunk_size
         self.logger.debug(chunk_size)
-        if chunk_size > 10:
+        if chunk_size >= self.config.num_workers:
+        # if chunk_num > 1:
+        # if False:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
             # self.logger.debug(groups)
             # Write each group of subgraphs to separate files
             gexf_files = []
             for i, group in enumerate(groups):
-                self.logger.debug(group)
+                # self.logger.debug(group)
                 # Create a new graph for the group of subgraphs
                 group_G = nx.Graph()
                 for subgraph_nodes in group:
@@ -370,7 +376,7 @@ class DataGneration():
                     # Add node attributes to the new graph
 
                     for node in subgraph_nodes:
-                        self.logger.debug(node)
+                        # self.logger.debug(node)
                         group_G.nodes[node].update(graph.nodes[node])
                 # Generate the file name for the group
                 file_name = self.config.result_dir + f"group_{i}.gexf"
@@ -390,6 +396,7 @@ class DataGneration():
                             if genu_ambi_lst[0]:
                                 genuine_lst.extend(genu_ambi_lst[0])
                                 ambiguous_lst.extend(genu_ambi_lst[1])
+                    del shared_obs
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -413,6 +420,7 @@ class DataGneration():
                         if genu_ambi_lst[0]:
                             genuine_lst.extend(genu_ambi_lst[0])
                             ambiguous_lst.extend(genu_ambi_lst[1])
+                del shared_obs
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -425,7 +433,7 @@ class DataGneration():
                 high_ambi_lst.extend(cur_lst)
                 high_idx = cur_idx + 1
 
-            del shared_obs, subgraphs, graph
+            del subgraphs, graph
 
         genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
 
@@ -451,7 +459,7 @@ class DataGneration():
             return genuine_df, ambiguous_df, high_ambiguous_df
         elif edit_dis == 1 or edit_dis == 2:
             return genuine_df, ambiguous_df
-
+    
     def extract_simplify_genuine_ambi_errs(self, graph, edit_dis):
         """
         extract genuine and ambiguous errors from read graph
@@ -482,8 +490,12 @@ class DataGneration():
         self.logger.info("Extracting genuine and ambiguous errors...")
         genuine_lst = []
         ambiguous_lst = []
-        chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size > 10:
+        # chunk_size = len(subgraphs) // self.config.chunks_num
+        # chunk_size = self.config.num_workers
+        # chunk_num = len(subgraphs) // chunk_size
+        # if chunk_size >= self.config.num_workers:
+        # if chunk_num > 1:
+        if False:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
 
             self.logger.debug(len(groups))
@@ -491,14 +503,14 @@ class DataGneration():
             gexf_files = []
             for i, group in enumerate(groups):
                 # Create a new graph for the group of subgraphs
-                self.logger.debug(group)
+                # self.logger.debug(group)
                 group_G = nx.Graph()
                 for subgraph_nodes in group:
                     group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
                     # Add node attributes to the new graph
-                    self.logger.debug(subgraph_nodes)
+                    # self.logger.debug(subgraph_nodes)
                     for node in subgraph_nodes:
-                        self.logger.debug(node)
+                        # self.logger.debug(node)
                         group_G.nodes[node].update(graph.nodes[node])
                 # Generate the file name for the group
                 file_name = self.config.result_dir + f"group_{i}.gexf"
@@ -519,6 +531,7 @@ class DataGneration():
                             if genu_ambi_lst[0]:
                                 genuine_lst.extend(genu_ambi_lst[0])
                                 ambiguous_lst.extend(genu_ambi_lst[1])
+                    del shared_obs
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -528,23 +541,24 @@ class DataGneration():
                     raise
                 os.remove(gexf_file)
                 del cur_graph, sub_graphs
-        else:
-            try:
-                subgraph_num = len(subgraphs)
-                shared_obs = subgraphs, edit_dis
-                with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
-                    for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
-                        if genu_ambi_lst[0]:
-                            genuine_lst.extend(genu_ambi_lst[0])
-                            ambiguous_lst.extend(genu_ambi_lst[1])
-            except KeyboardInterrupt:
-                # Handle termination signal (Ctrl+C)
-                pool.terminate()  # Terminate the WorkerPool before exiting
-            except Exception:
-                # Handle other exceptions
-                pool.terminate()  # Terminate the WorkerPool before exiting
-                raise
-            del shared_obs, subgraphs, graph
+        # else:
+        try:
+            subgraph_num = len(subgraphs)
+            shared_obs = subgraphs, edit_dis
+            with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
+                    if genu_ambi_lst[0]:
+                        genuine_lst.extend(genu_ambi_lst[0])
+                        ambiguous_lst.extend(genu_ambi_lst[1])
+            del shared_obs
+        except KeyboardInterrupt:
+            # Handle termination signal (Ctrl+C)
+            pool.terminate()  # Terminate the WorkerPool before exiting
+        except Exception:
+            # Handle other exceptions
+            pool.terminate()  # Terminate the WorkerPool before exiting
+            raise
+        del subgraphs, graph
 
         genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
 
@@ -690,18 +704,23 @@ class DataGneration():
         # 1nt-edit-distance-based graph
         # self.logger.info("-------------------------------------------------------------")
         # self.logger.info("1nt-edit-distance read graph error correction")
+        self.MM.start()
         graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(self.config.input_file, edit_dis)
         seq_max_len = max(seqs_lens_lst)
         seq_min_len = min(seqs_lens_lst)
         self.logger.debug(seqs_lens_lst)
         self.logger.debug("Reads Max length: {}".format(seq_max_len))
         self.logger.debug("Reads Min length: {}".format(seq_min_len))
+        self.MM.measure()
         if edit_dis == 1 and self.config.high_ambiguous:
             genuine_df, negative_df, ambiguous_df, high_ambiguous_df = self.extract_err_samples(graph, edit_dis)
         elif edit_dis == 2 or edit_dis == 1:
             genuine_df, negative_df, ambiguous_df = self.extract_err_samples(graph, edit_dis)
-            
+        self.MM.measure()
+
         isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
+        self.MM.measure()
+        self.MM.stop()
         del graph
         if self.config.high_ambiguous:
             return isolates_file, non_isolates_file, unique_seqs, seq_max_len, seq_min_len, genuine_df, negative_df, ambiguous_df, high_ambiguous_df
@@ -718,6 +737,7 @@ class DataGneration():
         Returns:
             MultiVariables: MultiVariables for next step error correction
         """
+        self.MM.start()
         # 1nt-edit-distance-based graph
         # self.logger.info("-------------------------------------------------------------")
         # self.logger.info("1nt-edit-distance read graph error correction")
@@ -728,12 +748,13 @@ class DataGneration():
             self.logger.debug(seqs_lens_lst)
             self.logger.debug("Reads Max length: {}".format(seq_max_len))
             self.logger.debug("Reads Min length: {}".format(seq_min_len))
-
+            self.MM.measure()
             genuine_df, ambiguous_df = self.extract_simplify_genuine_ambi_errs(graph, edit_dis)
-                
+            self.MM.measure()
             isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
             del graph
-
+            self.MM.measure()
+            self.MM.stop()
             return isolates_file, non_isolates_file, seq_max_len, seq_min_len, genuine_df, ambiguous_df
         elif edit_dis == 2:
             self.logger.debug(input_f)
@@ -741,7 +762,10 @@ class DataGneration():
             self.logger.info("Constructing 2nt-edit-distance based graph.")
             graph, unique_seqs = self.generate_graph(input_f, edit_dis=2)
             self.graph_summary(graph)  
+            self.MM.measure()
             genuine_df, ambiguous_df = self.extract_simplify_genuine_ambi_errs(graph, edit_dis)
+            self.MM.measure()
+            self.MM.stop()
             return genuine_df, ambiguous_df       
 
     def extract_isolated_negatives(self, graph, edit_dis):
@@ -900,7 +924,7 @@ class DataGneration():
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
-        
+        del shared_unique_seqs
         if len(edges_lst) > 0:
             self.logger.debug(len(edges_lst))
             self.logger.debug(edges_lst[0])
@@ -965,12 +989,16 @@ class DataGneration():
             list: unique_seqs save unique reads of input dataset
         """
         self.logger.debug(data_set)
+        self.MM.start()
         # if self.seq_min_len > 30:   
         self.logger.info("Constructing 2nt-edit-distance based graph.")
         graph, unique_seqs = self.generate_graph(data_set, edit_dis=2)
+        self.MM.measure()
         self.graph_summary(graph)
         genuine_df, negative_df, ambiguous_df = self.extract_err_samples(graph, edit_dis=2)
         del graph
+        self.MM.measure()
+        self.MM.stop()
         return genuine_df, negative_df, ambiguous_df, unique_seqs
 
     def extract_amplicon_err_samples(self, data_set):
@@ -984,10 +1012,12 @@ class DataGneration():
             DataFrame: amplicon_df, a dataframe saving the amplicon sequencing errors
             List: unique_seqs, a list saving unique reads of input dataset
         """
+        self.MM.start()
         self.logger.debug(data_set)
         self.logger.info("Constructing the second 1nt-edit-distance based graph for further amplicon sequencing data correction.")
         graph, seq_lens_set, seqs2id_dict, unique_seqs = self.generate_graph(data_set, edit_dis=1)
         self.graph_summary(graph)
+        self.MM.measure()
         del seq_lens_set, seqs2id_dict, unique_seqs
         subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2]
         
@@ -1004,7 +1034,7 @@ class DataGneration():
         idx = 0
         amplicon_lst = []
 
-        if chunk_size > 10:
+        if chunk_size >= self.config.num_workers:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
             # Write each group of subgraphs to separate files
             gexf_files = []
@@ -1041,7 +1071,9 @@ class DataGneration():
         for item in amplicon_lst:
             amplicon_df.loc[len(amplicon_df)] = item
         if self.config.verbose:
-            amplicon_df.to_csv(self.config.result_dir + "amplicon.csv", index=False)  
+            amplicon_df.to_csv(self.config.result_dir + "amplicon.csv", index=False) 
+        self.MM.measure()
+        self.MM.stop() 
         return amplicon_df
         
     def extract_amplicon_errs(self, subgraphs, idx):  

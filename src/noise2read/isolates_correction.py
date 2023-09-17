@@ -12,6 +12,7 @@ from collections import Counter
 from noise2read.utils import *
 from pathlib import Path
 from Bio.SeqRecord import SeqRecord
+from noise2read.utils import MemoryMonitor
 
 class IsolatesErrorCorrection():
     def __init__(self, 
@@ -31,7 +32,9 @@ class IsolatesErrorCorrection():
         self.base = bases.split('.')
         self.iso_change_detail = iso_change_detail
         self.min_iters = min_iters
-        
+        self.MM = MemoryMonitor(logger)
+        self.MM.start()
+
     def bcool_correct_isolates(self):
         # # bcool correction
         self.logger.info("Correcting Isolated nodes using bcool.")
@@ -49,7 +52,7 @@ class IsolatesErrorCorrection():
             os.system("bcool -u %s -t %s -o %s" % (self.isolates, self.num_workers, bcool_dir))
         bcool_isolates = self.output_dir + "bcool/reads_corrected.fa"
         frequency_file = self.output_dir + self.base[0] + '_frequency.txt'
-
+        self.MM.measure()
         corrected_isolates = self.select_correction(self.correct_non_isolates, self.isolates, bcool_isolates, self.output_dir + self.base[0], frequency_file)
         # os.system("rm %s" % bcool_isolates)
         self.logger.info("Isolated nodes Correction finished!")
@@ -148,7 +151,7 @@ class IsolatesErrorCorrection():
             bcool_seq2name_dict.setdefault(cor_seq,[]).append(cor_name)
 
         del ori_record_iterator, bcool_record_iterator, correct_record_iterator
-
+        self.MM.measure()
         ori_seqs_set = set(ori_seqs_lst)
         cor_seqs_set = set(cor_seqs_lst)
 
@@ -202,6 +205,7 @@ class IsolatesErrorCorrection():
         del ori_seqs_set
         del cor_seqs_lst
         del cor_seqs_set
+        self.MM.measure()
         ############################################################################
         if intersect_sequences_set:
             original_records, _ = parse_data_index(f_original)
@@ -235,6 +239,7 @@ class IsolatesErrorCorrection():
                 self.freqency_seq_extraction(original_bcool_inter_only_fastq_file, bcool_inter_only_fastq_file, frequency_file)
                 os.system("rm %s" % original_bcool_inter_only_fastq_file)
                 os.system("rm %s" % bcool_inter_only_fastq_file)
+        self.MM.measure()
         ######################################################################
         if new_sequences_set:
             keep_new_seq_bcool_name_lst = []
@@ -267,7 +272,7 @@ class IsolatesErrorCorrection():
                 self.freqency_seq_extraction(original_bcool_new_seq_only_fastq_file, bcool_new_seq_only_fastq_file, frequency_file)
                 os.system("rm %s" % original_bcool_new_seq_only_fastq_file)
                 os.system("rm %s" % bcool_new_seq_only_fastq_file)
-
+        self.MM.measure()
         ##################################################################################################################
         corrected_isolates = self.output_dir + 'corrected_isolates.' + ori_file_type
         keep_correct_f = prefix + '_keep_corrected_records.' + ori_file_type 
@@ -306,6 +311,8 @@ class IsolatesErrorCorrection():
             os.system("rm %s" % no_change_fastq_file)          
         else:   
             return self.isolates
+        self.MM.measure()
+        self.MM.stop()
         return corrected_isolates
 '''
     def covert_fq2fa(self, fin, fout):

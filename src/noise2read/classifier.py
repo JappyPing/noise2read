@@ -18,8 +18,9 @@ from matplotlib import pyplot
 from sklearn.metrics import f1_score
 import optuna
 import numpy as np
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 # from sklearn.metrics import classification_report, confusion_matrix
+from noise2read.utils import MemoryMonitor
 
 class MLClassifier:
     """
@@ -43,6 +44,7 @@ class MLClassifier:
         self.data = data
         self.label = label
         self.ambi_data = ambi_data
+        self.MM = MemoryMonitor(self.logger)
 
         # Shuffle the data in a deterministic way
         np.random.seed(self.config.random_state)
@@ -62,7 +64,8 @@ class MLClassifier:
         sm = SMOTE(random_state=self.config.random_state)
         self.X_resampled, self.y_resampled = sm.fit_resample(self.x_train, self.y_train)
         self.logger.info(f'After over-sampling: {sorted(collections.Counter(self.y_resampled).items())}')
-
+        del sm
+        self.MM.measure()
         # rus = RandomUnderSampler(random_state=42)
         # self.X_resampled, self.y_resampled = rus.fit_resample(self.x_train, self.y_train)
         # self.logger.info(f'After under-sampling {sorted(collections.Counter(self.y_resampled).items())}')
@@ -188,7 +191,7 @@ class MLClassifier:
         study = optuna.create_study(study_name = self.study_name, direction="maximize", sampler=sampler)
         study.optimize(self.objective, n_trials, show_progress_bar=False, gc_after_trial=True)
         # print(study.best_trial)
-
+        
         self.logger.info(f'Study Name: {self.study_name}')
         self.logger.info('Number of finished trials: {}'.format(len(study.trials)))
         self.logger.info('Best trial:')
@@ -197,7 +200,7 @@ class MLClassifier:
         self.logger.info('  Params: ')
         for key, value in best_trial.params.items():
             self.logger.info('    {}: {}'.format(key, value))
-
+        self.MM.measure()
         # best_trial_copy = copy.deepcopy(best_trial)
 
         # re-evaluate
@@ -220,6 +223,7 @@ class MLClassifier:
         best_model = best_trial.user_attrs["best_model"]
         #prediction
         results = best_model.evals_result()
+        
         # plot learning curves
         fig, ax = pyplot.subplots()
         
@@ -233,7 +237,9 @@ class MLClassifier:
         # show the plot
         fig.savefig(os.path.join(self.config.result_dir, self.study_name + '_train-test-logloss.png'))
         predictions = best_model.predict_proba(self.ambi_data)[:, 1]
-        
+        pyplot.clsoe()
         self.logger.info("-------------------------------------------------------------")
-        del study
+        del study, sampler, results, best_model
+        self.MM.measure()
+        self.MM.stop()
         return predictions

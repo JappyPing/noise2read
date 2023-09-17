@@ -126,7 +126,7 @@ class DataAnalysis():
             correct_record_dict[cor_id] = cor_seq
             
             id_lst.append(raw_id)
-
+        del raw_record_iterator, correct_record_iterator
         corrected_reads_num = 0
 
         for item in tqdm(id_lst):
@@ -136,7 +136,9 @@ class DataAnalysis():
                 corrected_reads_num += 1
                 
         raw_read2count = Counter(raw_seqs)
+        del raw_seqs
         correct_read2count = Counter(correct_seqs)
+        del correct_seqs
 
         raw_read2count_val_lst = list(raw_read2count.values())
         raw_read2count_val_lst.sort(reverse=True)
@@ -144,7 +146,7 @@ class DataAnalysis():
         correct_read2count_val_lst = list(correct_read2count.values())
         correct_read2count_val_lst.sort(reverse=True)
 
-        raw_counts_lst = raw_read2count_val_lst[ : self.config.top_n * 10]
+        # raw_counts_lst = raw_read2count_val_lst[ : self.config.top_n * 10]
         correct_counts_lst = correct_read2count_val_lst[ : self.config.top_n * 10]
         
         # self.workbook_flie = xlsxwriter.Workbook(self.result_file)
@@ -184,6 +186,7 @@ class DataAnalysis():
         self.logger.info("Unique reads decreased by {} from {} to {} ({:.6f}) reads".format(raw_unique_num - correct_unique_num, raw_unique_num, correct_unique_num, (raw_unique_num - correct_unique_num)/raw_unique_num))
         # no ground truth entropy
         self.evaluation_without_groundtruth(raw_read2count, correct_read2count, total_reads_num)
+        del raw_read2count, correct_read2count, total_reads_num
         return
 
     # rely on read frequency instead of sequecing id
@@ -229,9 +232,9 @@ class DataAnalysis():
             true_seqs_lst.append(true_seq)     
             raw_seqs_lst.append(raw_seq)
             correct_seqs_lst.append(correct_seq)
-
+        del true_records, correct_records, error_records
         raw_read2count = collections.Counter(raw_seqs_lst)
-        true_read2count = collections.Counter(true_seqs_lst)
+        # true_read2count = collections.Counter(true_seqs_lst)
         correct_read2count = collections.Counter(correct_seqs_lst)
 
         num = 0
@@ -262,17 +265,11 @@ class DataAnalysis():
                     true_umis2seqs.setdefault(umi, []).extend(true_umi2seqs[tmp_umi])   
                     raw_umis2seqs.setdefault(umi, []).extend(raw_umi2seqs[tmp_umi])
                     correct_umis2seqs.setdefault(umi, []).extend(correct_umi2seqs[tmp_umi])      
-
-
 ############################################################################################
         fn_lst = []
         positive_fp_lst = []
         # ii = 0
         original_high_ambiguous = []
-        # for umi in true_umi2seqs:
-        #     true_seqs = true_umi2seqs[umi]
-        #     raw_seqs = raw_umi2seqs[umi]
-        #     correct_seqs = correct_umi2seqs[umi]
 
         for umi in true_umis2seqs:
             true_seqs = true_umis2seqs[umi]
@@ -384,74 +381,14 @@ class DataAnalysis():
                 if len(untouched_positive_seqs) > 0:
                     # true_group = [t_seq, true_read2count[t_seq], raw_read2count[t_seq], correct_read2count[t_seq]]
                     for seq in untouched_positive_seqs:
-                        fn_lst.append([str(umi), t_seq, raw_read2count[t_seq], seq, raw_read2count[seq], correct_read2count[t_seq], correct_read2count[seq]])                                        
-            # fp
-            # elif len(raw_positive_seqs) == 0:
-            #     if len(untouched_positive_seqs) > 0:
-            #         true_group = [t_seq, true_read2count[t_seq], raw_read2count[t_seq], correct_read2count[t_seq]]
-            #         correct_group = []
-            #         for item in untouched_positive_seqs:
-            #             correct_group.append([item, true_read2count[item], raw_read2count[item], correct_read2count[item]])  
-            #         positive_fp_lst.append([umi, str(true_group), str(correct_group)]) 
-
-            # if len(raw_positive_seqs) > 0:
-            #     if len(untouched_positive_seqs) > 0:
-            #         intersec_seqs = untouched_positive_seqs & raw_positive_seqs
-            #         raw_group = []
-            #         if len(intersec_seqs) > 0:
-            #             for item in intersec_seqs:
-            #                 raw_group.append([item, true_read2count[item], raw_read2count[item], correct_read2count[item]])                    
-            #         correct_group = []
-            #         true_group = [t_seq, true_read2count[t_seq], raw_read2count[t_seq], correct_read2count[t_seq]]
-            #         for item in untouched_positive_seqs:
-            #             correct_group.append([item, true_read2count[item], raw_read2count[item], correct_read2count[item]])  
-            #         fn_lst.append([umi, str(true_group), str(raw_group), str(correct_group)])   
-
-            #         generate_fp_seqs = untouched_positive_seqs - raw_positive_seqs   
-            #         correct_group2 = []
-            #         if len(generate_fp_seqs) > 0:
-            #             for seq in generate_fp_seqs:
-            #                 correct_group2.append([seq, true_read2count[seq], raw_read2count[seq], correct_read2count[seq]])  
-            #             positive_fp_lst.append([umi, str(true_group), str(correct_group2)])                                       
-            # # fp
-            # elif len(raw_positive_seqs) == 0:
-            #     if len(untouched_positive_seqs) > 0:
-            #         true_group = [t_seq, true_read2count[t_seq], raw_read2count[t_seq], correct_read2count[t_seq]]
-            #         correct_group = []
-            #         for item in untouched_positive_seqs:
-            #             correct_group.append([item, true_read2count[item], raw_read2count[item], correct_read2count[item]])  
-            #         positive_fp_lst.append([umi, str(true_group), str(correct_group)])                    
-
-
-            # if len(untouched_positive_seqs) > 0:
-            #     intersec_seqs = untouched_positive_seqs & raw_positive_seqs
-            #     true_group = [true_seq, true_read2count[true_seq], raw_read2count[true_seq], correct_read2count[true_seq]]
-            #     raw_group = []
-            #     if len(intersec_seqs) > 0:
-            #         for item in intersec_seqs:
-            #             raw_group.append([item, true_read2count[item], raw_read2count[item], correct_read2count[item]])
-            #     correct_group = []
-            #     for item in untouched_positive_seqs:
-            #         correct_group.append([item, true_read2count[item], raw_read2count[item], correct_read2count[item]])
-            #     fn_lst.append([umi, str(true_group), str(raw_group), str(correct_group)])
-        #########
-        # high_ambi_worksheet = self.workbook_flie.add_worksheet('high_ambiguous')
-        # for r_n, data in enumerate(original_high_ambiguous):
-        #     high_ambi_worksheet.write_row(r_n, 0, data)
-
-        # fn_worksheet = self.workbook_flie.add_worksheet('fn')
-        # for row_num, data in enumerate(fn_lst):
-        #     fn_worksheet.write_row(row_num, 0, data)
-
-        # fp_worksheet = self.workbook_flie.add_worksheet('positive_fp')
-        # for row_num, data in enumerate(positive_fp_lst):
-        #     fp_worksheet.write_row(row_num, 0, data)
-
+                        fn_lst.append([str(umi), t_seq, raw_read2count[t_seq], seq, raw_read2count[seq], correct_read2count[t_seq], correct_read2count[seq]]) 
+        del raw_read2count, correct_read2count                                        
         self.evaluation_metircs(base_level, 'Base level')
         self.evaluation_metircs(read_level, 'Read level') 
         rawset_entropy = self.set_entropy(len(raw_err_seqs), len(raw_errfreee_seqs), total_reads_num)
         correctset_entropy = self.set_entropy(len(correct_err_seqs), len(correct_errfree_seqs), total_reads_num)
         self.save_entropy('Purity entropy', rawset_entropy, correctset_entropy)
+        del correct_err_seqs, correct_errfree_seqs, raw_errfreee_seqs, raw_err_seqs
         return
 
     def evaluation_without_groundtruth(self, raw_read2count, correct_read2count, total_reads_num):
