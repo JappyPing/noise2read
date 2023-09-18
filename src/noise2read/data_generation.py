@@ -16,7 +16,8 @@ from networkx.drawing.nx_agraph import graphviz_layout
 from collections import Counter
 import sys
 import pandas as pd
-from noise2read.utils import MemoryMonitor
+# from noise2read.utils import MemoryMonitor
+# import multiprocessing
 
 class DataGneration():
     """
@@ -56,7 +57,7 @@ class DataGneration():
         else:
             self.out_file_tye = self.file_type
         # Create an instance of the MemoryMonitor
-        self.MM = MemoryMonitor(self.logger)
+        #self.MM = MemoryMonitor(self.logger)
 
     def graph_summary(self, graph):
         """
@@ -176,7 +177,7 @@ class DataGneration():
         real_seqs =  total_seqs.intersection(possible_ed1)
         read_lst = [read] * len(real_seqs)
         edges = list(zip(read_lst, real_seqs))
-        del possible_ed1, read_lst, real_seqs
+        # del possible_ed1, read_lst, real_seqs
         return edges
 
     def extract_err_samples(self, graph, edit_dis):
@@ -705,23 +706,23 @@ class DataGneration():
         # 1nt-edit-distance-based graph
         # self.logger.info("-------------------------------------------------------------")
         # self.logger.info("1nt-edit-distance read graph error correction")
-        self.MM.start()
+        #self.MM.start()
         graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(self.config.input_file, edit_dis)
         seq_max_len = max(seqs_lens_lst)
         seq_min_len = min(seqs_lens_lst)
         self.logger.debug(seqs_lens_lst)
         self.logger.debug("Reads Max length: {}".format(seq_max_len))
         self.logger.debug("Reads Min length: {}".format(seq_min_len))
-        self.MM.measure()
+        #self.MM.measure()
         if edit_dis == 1 and self.config.high_ambiguous:
             genuine_df, negative_df, ambiguous_df, high_ambiguous_df = self.extract_err_samples(graph, edit_dis)
         elif edit_dis == 2 or edit_dis == 1:
             genuine_df, negative_df, ambiguous_df = self.extract_err_samples(graph, edit_dis)
-        self.MM.measure()
+        #self.MM.measure()
 
         isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
-        self.MM.measure()
-        self.MM.stop()
+        #self.MM.measure()
+        #self.MM.stop()
         del graph
         if self.config.high_ambiguous:
             return isolates_file, non_isolates_file, unique_seqs, seq_max_len, seq_min_len, genuine_df, negative_df, ambiguous_df, high_ambiguous_df
@@ -738,7 +739,7 @@ class DataGneration():
         Returns:
             MultiVariables: MultiVariables for next step error correction
         """
-        self.MM.start()
+        #self.MM.start()
         # 1nt-edit-distance-based graph
         # self.logger.info("-------------------------------------------------------------")
         # self.logger.info("1nt-edit-distance read graph error correction")
@@ -749,13 +750,13 @@ class DataGneration():
             self.logger.debug(seqs_lens_lst)
             self.logger.debug("Reads Max length: {}".format(seq_max_len))
             self.logger.debug("Reads Min length: {}".format(seq_min_len))
-            self.MM.measure()
+            #self.MM.measure()
             genuine_df, ambiguous_df = self.extract_simplify_genuine_ambi_errs(graph, edit_dis)
-            self.MM.measure()
+            #self.MM.measure()
             isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
             del graph
-            self.MM.measure()
-            self.MM.stop()
+            #self.MM.measure()
+            #self.MM.stop()
             return isolates_file, non_isolates_file, seq_max_len, seq_min_len, genuine_df, ambiguous_df
         elif edit_dis == 2:
             self.logger.debug(input_f)
@@ -763,10 +764,10 @@ class DataGneration():
             self.logger.info("Constructing 2nt-edit-distance based graph.")
             graph, unique_seqs = self.generate_graph(input_f, edit_dis=2)
             self.graph_summary(graph)  
-            self.MM.measure()
+            #self.MM.measure()
             genuine_df, ambiguous_df = self.extract_simplify_genuine_ambi_errs(graph, edit_dis)
-            self.MM.measure()
-            self.MM.stop()
+            #self.MM.measure()
+            #self.MM.stop()
             return genuine_df, ambiguous_df       
 
     def extract_isolated_negatives(self, graph, edit_dis):
@@ -866,6 +867,10 @@ class DataGneration():
         Returns:
             MultiVariables: Multi Variables after constructing edit-distance-based read graph
         """
+        # if not os.path.exists(data_set):
+        #     self.logger.error("No input file!")
+        #     # os._exit(0)
+        # else:
         self.logger.info("Input dataset '% s'" % data_set)
         record_iterator, file_type = parse_data(data_set)
         seqs2id_dict = {}
@@ -877,20 +882,15 @@ class DataGneration():
             seq_lens_set.add(ll)
             total_seqs.append(seq)
             seqs2id_dict.setdefault(seq, []).append(str(item.id))
-        del record_iterator
-
         unique_seqs = set(total_seqs)
 
         self.logger.info("Constructing " + str(edit_dis) + "nt-edit-distance read graph...")
         graph = nx.Graph()
         read_count = Counter(total_seqs)
-
-        del total_seqs
-
         high_freq = []
         low_freq = []
 
-        for read, frequency in read_count.items():
+        for read, frequency in tqdm(read_count.items(), miniters=int(len(read_count)/self.config.min_iters)):
             if not graph.has_node(read):
                 graph.add_node(read, count = frequency, flag=False)  
             # if frequency >= self.config.high_freq_thre:
@@ -902,7 +902,7 @@ class DataGneration():
             self.logger.error("Error Correction Failed as no high-frequency reads detected.")
             sys.exit(1)
         self.logger.debug(len(read_count))
-        del read_count
+
         ######################################################
         edges_lst = []
         if edit_dis == 1:
@@ -922,11 +922,12 @@ class DataGneration():
         except KeyboardInterrupt:
             # Handle termination signal (Ctrl+C)
             pool.terminate()  # Terminate the WorkerPool before exiting
+
         except Exception:
             # Handle other exceptions
             pool.terminate()  # Terminate the WorkerPool before exiting
             raise
-        del shared_unique_seqs
+        
         if len(edges_lst) > 0:
             self.logger.debug(len(edges_lst))
             self.logger.debug(edges_lst[0])
@@ -957,6 +958,8 @@ class DataGneration():
         else:
             return graph, unique_seqs
 
+
+
     def real_ed2_seqs(self, low_seqs, read):
         """
         given a read, generate all its 2nt-edit-distance substitution counterparts existing in the dataset to form the edges
@@ -971,14 +974,14 @@ class DataGneration():
         # possible_ed2 = set(self.ed2_seqs(read))
         possible_ed2 = enumerate_ed2_seqs(read)
         real_ed2_seqs = possible_ed2.intersection(low_seqs)
-        del possible_ed2
+        # del possible_ed2
         # real_ed2_seqs = []
         # for seq in possible_ed2:
         #     if seq in low_seqs:
         #         real_ed2_seqs.append(seq)
         read_lst = [read] * len(real_ed2_seqs)
         edges = list(zip(read_lst, real_ed2_seqs))  
-        del real_ed2_seqs   
+        # del real_ed2_seqs   
         return edges   
 
     def extract_ed2_errors(self, data_set): 
@@ -993,16 +996,16 @@ class DataGneration():
             list: unique_seqs save unique reads of input dataset
         """
         self.logger.debug(data_set)
-        self.MM.start()
+        #self.MM.start()
         # if self.seq_min_len > 30:   
         self.logger.info("Constructing 2nt-edit-distance based graph.")
         graph, unique_seqs = self.generate_graph(data_set, edit_dis=2)
-        self.MM.measure()
+        #self.MM.measure()
         self.graph_summary(graph)
         genuine_df, negative_df, ambiguous_df = self.extract_err_samples(graph, edit_dis=2)
         del graph
-        self.MM.measure()
-        self.MM.stop()
+        #self.MM.measure()
+        #self.MM.stop()
         return genuine_df, negative_df, ambiguous_df, unique_seqs
 
     def extract_amplicon_err_samples(self, data_set):
@@ -1016,12 +1019,12 @@ class DataGneration():
             DataFrame: amplicon_df, a dataframe saving the amplicon sequencing errors
             List: unique_seqs, a list saving unique reads of input dataset
         """
-        self.MM.start()
+        #self.MM.start()
         self.logger.debug(data_set)
         self.logger.info("Constructing the second 1nt-edit-distance based graph for further amplicon sequencing data correction.")
         graph, seq_lens_set, seqs2id_dict, unique_seqs = self.generate_graph(data_set, edit_dis=1)
         self.graph_summary(graph)
-        self.MM.measure()
+        #self.MM.measure()
         del seq_lens_set, seqs2id_dict, unique_seqs
         subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2]
         
@@ -1076,8 +1079,8 @@ class DataGneration():
             amplicon_df.loc[len(amplicon_df)] = item
         if self.config.verbose:
             amplicon_df.to_csv(self.config.result_dir + "amplicon.csv", index=False) 
-        self.MM.measure()
-        self.MM.stop() 
+        #self.MM.measure()
+        #self.MM.stop() 
         return amplicon_df
         
     def extract_amplicon_errs(self, subgraphs, idx):  
@@ -1392,4 +1395,147 @@ class DataGneration():
             high_ambiguous_df.to_csv(high_ambiguous_csv, index=False)  
         self.logger.info("Done!")
         return high_ambiguous_df
+    '''
+    '''
+    def generate_graph(self, data_set, edit_dis):
+        """
+        construct 1nt- or 2nt-edit-distance-based read graph
+
+        Args:
+            data_set (str): The filename including path to be corrected.
+            edit_dis (int): set edit distance 1 or 2 to search edges for constructing graph
+
+        Returns:
+            MultiVariables: Multi Variables after constructing edit-distance-based read graph
+        """
+        self.logger.info("Input dataset '% s'" % data_set)
+        # record_iterator, file_type = parse_data(data_set)
+        seqs2id_dict = {}
+        total_seqs = []
+        seq_lens_set = set()
+
+        file_type = parse_file_type(data_set)
+        if file_type == 'fastq.gz' or file_type == 'fq.gz' or file_type == 'fa.gz' or file_type == 'fasta.gz':
+            with gzip.open(data_set, 'rt') as handle:
+                ff_type = file_type.split('.')[0]
+                record_iterator = SeqIO.parse(handle, ff_type)
+                for item in record_iterator:
+                    seq = str(item.seq)
+                    ll = len(seq)
+                    seq_lens_set.add(ll)
+                    total_seqs.append(seq)
+                    seqs2id_dict.setdefault(seq, []).append(str(item.id))
+        else:
+            with open(data_set, 'r') as handle:
+                # Parse the sequence data using SeqIO.parse
+                record_iterator = SeqIO.parse(handle, file_type)
+                for item in record_iterator:
+                    seq = str(item.seq)
+                    ll = len(seq)
+                    seq_lens_set.add(ll)
+                    total_seqs.append(seq)
+                    seqs2id_dict.setdefault(seq, []).append(str(item.id))
+
+        unique_seqs = set(total_seqs)
+
+        self.logger.info("Constructing " + str(edit_dis) + "nt-edit-distance read graph...")
+        graph = nx.Graph()
+        read_count = Counter(total_seqs)
+
+        del total_seqs
+
+        high_freq = []
+        low_freq = []
+
+        for read, frequency in read_count.items():
+            if not graph.has_node(read):
+                graph.add_node(read, count = frequency, flag=False)  
+            # if frequency >= self.config.high_freq_thre:
+            if frequency > self.config.high_freq_thre:
+                high_freq.append(read)
+            else:
+                low_freq.append(read)
+        if len(high_freq) == 0:
+            self.logger.error("Error Correction Failed as no high-frequency reads detected.")
+            sys.exit(1)
+        self.logger.debug(len(read_count))
+        del read_count
+        ######################################################
+        edges_lst = []
+        if edit_dis == 1:
+            shared_unique_seqs = unique_seqs
+        elif edit_dis == 2:
+            shared_unique_seqs = low_freq
+        
+        self.logger.debug("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
+        # try:
+            # with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
+            #     if edit_dis == 1:
+            #         for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, progress_bar=self.config.verbose):
+            #             edges_lst.extend(edge_lst)
+                
+            #     elif edit_dis == 2:
+            #         for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, progress_bar=self.config.verbose):
+            #             edges_lst.extend(edge_lst)
+        # except KeyboardInterrupt:
+        #     # Handle termination signal (Ctrl+C)
+        #     pool.terminate()  # Terminate the WorkerPool before exiting
+        # except Exception:
+        #     # Handle other exceptions
+        #     pool.terminate()  # Terminate the WorkerPool before exiting
+        #     raise
+        try:
+            manager = multiprocessing.Manager()
+            shared_obj = manager.list(shared_unique_seqs)
+            pool = multiprocessing.Pool(processes=self.config.num_workers)
+            if edit_dis == 1:
+                results = pool.starmap(self.real_ed1_seqs, [(shared_obj, high_freq) for _ in range(self.config.num_workers)])
+                pool.close()
+                pool.join()
+                for i, edge_lst in enumerate(results):
+                    edges_lst.extend(edge_lst)
+            elif edit_dis == 2:
+                results = pool.starmap(self.real_ed2_seqs, [(shared_obj, high_freq) for _ in range(self.config.num_workers)])
+                pool.close()
+                pool.join()
+                for i, edge_lst in enumerate(results):
+                    edges_lst.extend(edge_lst)
+        except KeyboardInterrupt:
+            # Handle termination signal (Ctrl+C)
+            pool.terminate()  # Terminate the WorkerPool before exiting
+        except Exception:
+            # Handle other exceptions
+            pool.terminate()  # Terminate the WorkerPool before exiting
+            raise       
+                     
+        del shared_unique_seqs
+        if len(edges_lst) > 0:
+            self.logger.debug(len(edges_lst))
+            self.logger.debug(edges_lst[0])
+            graph.add_edges_from(edges_lst)
+        # self.logger.info(str(edit_dis) + "nt-edit-distance read graph construction done.")
+        self.logger.info("Done!")
+        ########################################################
+        # save graphs
+        if self.config.graph_visualization or self.config.save_graph:
+            if edit_dis == 1:
+                subdir = self.config.result_dir + "graph1/"                
+            elif edit_dis == 2:
+                subdir = self.config.result_dir + "graph2/"
+            if os.path.exists(subdir):
+                self.logger.info("Directory '%s' already exists" % subdir)
+            else:
+                os.makedirs(subdir)
+                self.logger.info("Directory '%s' created" % subdir)
+        if self.config.save_graph:
+            graph_filename = subdir + 'graph.gexf'
+            nx.write_gexf(graph, graph_filename)
+            self.logger.info("Graph file *.gexf saved!")
+        if self.config.graph_visualization:
+            self.draw_graph(graph, subdir, self.config.drawing_graph_num)
+            self.logger.info("Graph file *.png saved!")
+        if edit_dis == 1:
+            return graph, seq_lens_set, seqs2id_dict, unique_seqs
+        else:
+            return graph, unique_seqs
     '''

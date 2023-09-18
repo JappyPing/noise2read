@@ -16,7 +16,7 @@ from noise2read.utils import *
 from noise2read.reads2vectors import Reads2Vectors
 import sys
 # import shutil
-from noise2read.utils import MemoryMonitor
+# from noise2read.utils import MemoryMonitor
 
 class ErrorCorrection():
     """
@@ -40,7 +40,7 @@ class ErrorCorrection():
         bases = config.input_file.split('/')[-1]
         self.base = bases.split('.')
         # Create an instance of the MemoryMonitor
-        self.MM = MemoryMonitor(self.logger)
+        ##self.MM = MemoryMonitor(self.logger)
 
     def simplify_ambiguous_err_prediction(self, genuine_df, ambiguous_df):
         """
@@ -85,16 +85,16 @@ class ErrorCorrection():
         Returns:
             str: corrected data filename including path
         """
-        self.MM.start()
+        ##self.MM.start()
         if not genuine_df.empty and not ambiguous_df.empty:
             genuine_ambi_errs_df = self.simplify_ambiguous_err_prediction(genuine_df, ambiguous_df)
-            self.MM.measure()
+            ##self.MM.measure()
             correct_file = self.all_in_one_2nt_correct_errors(data_set, genuine_ambi_errs_df)
             os.system("rm %s" % data_set)
             del genuine_ambi_errs_df
             self.logger.info("Error Correction finished.")
-            self.MM.measure()
-            self.MM.stop()
+            ##self.MM.measure()
+            ##self.MM.stop()
             return correct_file
         else:
             return data_set
@@ -110,12 +110,12 @@ class ErrorCorrection():
         Returns:
             corrected_file (str): The corrected data filename including path.
         """
-        self.MM.start()
+        ##self.MM.start()
         corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + self.out_file_tye  
 
         if not genuine_df.empty and not ambiguous_df.empty:
             genuine_ambi_errs_df = self.simplify_ambiguous_err_prediction(genuine_df, ambiguous_df)
-            self.MM.measure()
+            ##self.MM.measure()
             # correct errors
             self.logger.info("Correcting 1nt-edit-distance based Errors")
             non_isolates_correct = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
@@ -145,8 +145,8 @@ class ErrorCorrection():
             os.system("rm %s" % corrected_isolates)
         if os.path.exists(non_isolates_correct):     
             os.system("rm %s" % non_isolates_correct)
-        self.MM.measure()
-        self.MM.stop()
+        ##self.MM.measure()
+        ##self.MM.stop()
         return corrected_file
 
     def all_in_one_correction(self, isolates_file, non_isolates_file, unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df):
@@ -168,18 +168,18 @@ class ErrorCorrection():
                 tmp_correct: The filename including path of corrected data without prediction high ambiguous errors
                 new_negative_df: pandas dataframe containing negative samples from the prediction result of ambiguous errors
         """
-        self.MM.start()
+        ##self.MM.start()
         corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + self.out_file_tye  
         if isinstance(high_ambiguous_df, pd.DataFrame) and high_ambiguous_df.empty:
             self.logger.info("No ambiguous between high-frequency reads identified!")
         if not genuine_df.empty and not ambiguous_df.empty and not negative_df.empty:
             if isinstance(high_ambiguous_df, pd.DataFrame) and not high_ambiguous_df.empty:
                 genuine_ambi_errs_df, new_negative_df, high_ambi_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df, edit_dis=1)
-                self.MM.measure()
+                ##self.MM.measure()
                 # correct errors
                 genuine_corrected_file = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
                 self.logger.info("Genuine and ambiguous errors corrected.")
-                self.MM.measure()
+                ##self.MM.measure()
                 del genuine_ambi_errs_df, genuine_df, negative_df, ambiguous_df, unique_seqs
                 ###############################################################################################
                 # IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, genuine_corrected_file, self.config.result_dir, self.config.iso_change_detail, self.config.min_iters)
@@ -195,22 +195,22 @@ class ErrorCorrection():
                 del high_ambiguous_df
                 self.logger.info("High ambiguous errors corrected.")
                 self.logger.info('1nt-edit-distance based Errors Correction finished.')
-                self.MM.measure()
+                ##self.MM.measure()
                 self.logger.info("#############################################")
             else:
                 genuine_ambi_errs_df, new_negative_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df=None, edit_dis=1)
-                self.MM.measure()
+                ##self.MM.measure()
                 # correct errors
                 self.logger.info("Correcting 1nt-edit-distance based Errors")
 
                 non_isolates_correct = self.correct_errors(non_isolates_file, genuine_ambi_errs_df)
                 self.logger.info('1nt-edit-distance based Errors Correction Finished')
                 del genuine_ambi_errs_df, negative_df, ambiguous_df, unique_seqs
-                self.MM.measure()
+                ##self.MM.measure()
         elif not genuine_df.empty:
             non_isolates_correct = self.correct_errors(non_isolates_file, genuine_df)
             new_negative_df = pd.DataFrame()
-            self.MM.measure()
+            ##self.MM.measure()
         else:
             self.logger.error("No genuine and ambiguous errors identified, failed to do error correction!")
             non_isolates_correct = non_isolates_file
@@ -237,8 +237,8 @@ class ErrorCorrection():
         #     del high_ambiguous_df
         #     return corrected_file, tmp_correct, new_negative_df
         # else:
-        self.MM.measure()
-        self.MM.stop()
+        ##self.MM.measure()
+        ##self.MM.stop()
         return corrected_file, new_negative_df
 
     def all_in_one_ambiguous_err_prediction(self, total_reads, genuine_df, negative_df, ambiguous_df, high_ambiguous_df, edit_dis):
@@ -442,16 +442,16 @@ class ErrorCorrection():
         Returns:
             str: corrected data filename including path
         """
-        self.MM.start()
+        ##self.MM.start()
         if not genuine_df.empty and not ambiguous_df.empty and not negative_df.empty:
             genuine_ambi_prediction_result, new_negative_df = self.all_in_one_ambiguous_err_prediction(total_reads, genuine_df, negative_df, ambiguous_df, high_ambiguous_df=None, edit_dis=2)
-            self.MM.measure()
+            ##self.MM.measure()
             correct_file = self.all_in_one_2nt_correct_errors(data_set, genuine_ambi_prediction_result)
             os.system("rm %s" % data_set)
             del genuine_ambi_prediction_result, new_negative_df
             self.logger.info("Error Correction finished.")
-            self.MM.measure()
-            self.MM.stop()
+            ##self.MM.measure()
+            ##self.MM.stop()
             return correct_file
         else:
             return data_set
@@ -639,18 +639,18 @@ class ErrorCorrection():
         Returns:
             _type_: _description_
         """
-        self.MM.start()
+        ##self.MM.start()
         study_name = 'amplicon_1nt'
         RV = Reads2Vectors(self.logger, self.config, edit_dis=1)
         # RV = Reads2Vectors(self.logger, self.config.num_workers, self.config.result_dir, self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type, edit_dis=1)
         # train_data, train_labels, amplicon_data = RV.all_in_one_embedding(total_reads, genuine_df, negative_df, amplicon_df, high_flag=False)  
         train_data, train_labels, amplicon_data = RV.high_all_in_one_embedding(genuine_df, negative_df, new_negative_df, amplicon_df)
         del TV
-        self.MM.measure()
+        ##self.MM.measure()
         TM = MLClassifier(self.logger, self.config, study_name, train_data, train_labels, amplicon_data)
         predictions = TM.tunning(self.config.n_trials)
         del TM
-        self.MM.measure()
+        ##self.MM.measure()
         amplicon_df.insert(amplicon_df.shape[1], 'predictand', predictions)
         if self.config.verbose:
             amplicon_df.to_csv(os.path.join(self.config.result_dir, 'amplicon_predition.csv'), index = False)
@@ -672,8 +672,8 @@ class ErrorCorrection():
                     pred_df = pd.concat([pred_df, entry], ignore_index=True)
         # corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + self.out_file_tye 
         del train_data, train_labels, amplicon_data
-        self.MM.measure()
-        self.MM.stop()
+        ##self.MM.measure()
+        ##self.MM.stop()
         if len(pred_df) > 1:
             correct_file = self.correct_errors(original_file, pred_df)
             if os.path.exists(original_file):     

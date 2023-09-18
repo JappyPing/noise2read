@@ -20,7 +20,7 @@ import optuna
 import numpy as np
 # from matplotlib import pyplot as plt
 # from sklearn.metrics import classification_report, confusion_matrix
-from noise2read.utils import MemoryMonitor
+# from noise2read.utils import MemoryMonitor
 
 class MLClassifier:
     """
@@ -44,7 +44,7 @@ class MLClassifier:
         self.data = data
         self.label = label
         self.ambi_data = ambi_data
-        self.MM = MemoryMonitor(self.logger)
+        #self.MM = MemoryMonitor(self.logger)
 
         # Shuffle the data in a deterministic way
         np.random.seed(self.config.random_state)
@@ -65,7 +65,7 @@ class MLClassifier:
         self.X_resampled, self.y_resampled = sm.fit_resample(self.x_train, self.y_train)
         self.logger.info(f'After over-sampling: {sorted(collections.Counter(self.y_resampled).items())}')
         del sm
-        self.MM.measure()
+        #self.MM.measure()
         # rus = RandomUnderSampler(random_state=42)
         # self.X_resampled, self.y_resampled = rus.fit_resample(self.x_train, self.y_train)
         # self.logger.info(f'After under-sampling {sorted(collections.Counter(self.y_resampled).items())}')
@@ -200,7 +200,7 @@ class MLClassifier:
         self.logger.info('  Params: ')
         for key, value in best_trial.params.items():
             self.logger.info('    {}: {}'.format(key, value))
-        self.MM.measure()
+        #self.MM.measure()
         # best_trial_copy = copy.deepcopy(best_trial)
 
         # re-evaluate
@@ -240,6 +240,6 @@ class MLClassifier:
         pyplot.close()
         self.logger.info("-------------------------------------------------------------")
         del study, sampler, results, best_model
-        self.MM.measure()
-        self.MM.stop()
+        #self.MM.measure()
+        #self.MM.stop()
         return predictions

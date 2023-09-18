@@ -14,7 +14,7 @@ from mpire import WorkerPool
 from noise2read.utils import *
 import itertools
 import pickle
-from noise2read.utils import MemoryMonitor
+# from noise2read.utils import MemoryMonitor
 
 class Reads2Vectors():
     def __init__(self, logger, config, edit_dis):
@@ -22,7 +22,7 @@ class Reads2Vectors():
         self.edit_dis = edit_dis
         self.config = config
         # Create an instance of the MemoryMonitor
-        self.MM = MemoryMonitor(self.logger)
+        #self.MM = MemoryMonitor(self.logger)
 
     def read2features(self, shared_objs, idx):
         ES, ori_features = shared_objs
@@ -49,7 +49,7 @@ class Reads2Vectors():
 
     def all_in_one_embedding(self, total_reads, genuine_df, negative_df, ambiguous_df, high_flag):
         self.logger.info("Embedding genuine and ambiguous data.")
-        self.MM.start()
+        #self.MM.start()
         if self.edit_dis == 1:
             base_lst = ['A', 'C', 'G', 'T', 'N']
             if self.config.read_type == "DNA":
@@ -121,7 +121,7 @@ class Reads2Vectors():
             self.logger.debug(err_tyes2count)
             juge_indels = err_tyes2count.keys() & set(['N-X', 'X-N', 'X-A', 'X-C', 'X-G', 'X-T', 'A-X', 'C-X', 'G-X', 'T-X'])
             indel_num = len(juge_indels)
-        self.MM.measure()
+        #self.MM.measure()
         genuine_feature_lst = []
         for idx, row in genuine_df.iterrows():
             # genuine_feature_lst.append(row['StartRead'])
@@ -150,7 +150,7 @@ class Reads2Vectors():
 
         genuine_fea = self.read2vec(genuine_feature_lst)
         del genuine_feature_lst
-        self.MM.measure()
+        #self.MM.measure()
         #################################################################################
         # print("encoding negative samples...")
         negative_count = 0
@@ -236,7 +236,7 @@ class Reads2Vectors():
 
         negative_fea = self.read2vec(negative_feature_lst)
         del negative_feature_lst
-        self.MM.measure()
+        #self.MM.measure()
         ###############################################################
         '''
         for idx, row in negative_df.iterrows():
@@ -319,7 +319,7 @@ class Reads2Vectors():
 
         ambiguous_fea = self.read2vec(ambiguous_feature_lst)
         del ambiguous_feature_lst
-        self.MM.measure()
+        #self.MM.measure()
         ##################################################################
         read_features = genuine_fea + negative_fea
         feature_len = len(read_features[0])
@@ -345,8 +345,8 @@ class Reads2Vectors():
             train, ambiguous = self.scaler2(train_data, ambiguous_data)
         self.logger.debug(train[0])
         del train_data, ambiguous_data
-        self.MM.measure()
-        self.MM.stop()
+        #self.MM.measure()
+        #self.MM.stop()
         return train, labels, ambiguous
 
     def scaler2(self, lab_fea, ambiguous_ulab_fea):
@@ -551,7 +551,7 @@ class Reads2Vectors():
     
     def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
         self.logger.info("Embedding genuine and high ambiguous data.")
-        self.MM.start()
+        #self.MM.start()
         base_lst = ['A', 'C', 'G', 'T', 'N']
         if self.config.read_type == "DNA":
             error_tyes = ["A-G", "G-A", "A-T", "T-A", "A-C", "C-A", "G-T", "T-G", "G-C", "C-G", "T-C", "C-T", "T-X", "X-T", "C-X", "X-C", "A-X", "X-A", "G-X", "X-G", "X-N", "N-X", 'A-N', 'T-N','G-N','C-N','N-A','N-T', 'N-C', 'N-G']
@@ -583,7 +583,7 @@ class Reads2Vectors():
         total_err_kmers.extend(genuine_df['EndErrKmer'].tolist())
         total_err_kmers.extend(ambiguous_df['EndErrKmer'].tolist())
         total_err_kmers.extend(new_negative_df['EndErrKmer'].tolist())
-        # self.MM.measure()
+        # #self.MM.measure()
         # for idx, row in genuine_df.iterrows():
         #     total_err_tyes.append(row['ErrorTye'])
         #     total_err_kmers.append(row['StartErrKmer'])
@@ -622,7 +622,7 @@ class Reads2Vectors():
             base_prior += 0.01        
         self.logger.debug(err_kmers2count)
         self.logger.debug(err_tyes2count)
-        self.MM.measure()
+        #self.MM.measure()
         ##################################################################################
         genuine_feature_lst = []
         for idx, row in genuine_df.iterrows():
@@ -639,7 +639,7 @@ class Reads2Vectors():
             genuine_feature_lst.append((row['StartRead'], row['EndRead'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
         genuine_fea = self.read2vec(genuine_feature_lst)
         del genuine_feature_lst
-        self.MM.measure()
+        #self.MM.measure()
         #################################################################################
         negative_feature_lst = []
         for idx, row in new_negative_df.iterrows():
@@ -673,7 +673,7 @@ class Reads2Vectors():
         
         negative_fea = self.read2vec(negative_feature_lst)
         del negative_feature_lst
-        self.MM.measure()
+        #self.MM.measure()
         ###############################################################
         ambiguous_feature_lst = []
         for idx, row in ambiguous_df.iterrows():
@@ -689,7 +689,7 @@ class Reads2Vectors():
             ambiguous_feature_lst.append((row['StartRead'], row['EndRead'], cur_err_tye_val, cur_err_kmer_val1, cur_err_kmer_val2))
         ambiguous_fea = self.read2vec(ambiguous_feature_lst)
         del ambiguous_feature_lst
-        self.MM.measure()
+        #self.MM.measure()
         ##################################################################
         read_features = genuine_fea + negative_fea
         labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
@@ -706,8 +706,8 @@ class Reads2Vectors():
         train, ambiguous = self.scaler(train_data, ambiguous_data, high_flag=True)
         self.logger.debug(train[0])
         del train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
-        self.MM.measure()
-        self.MM.stop()
+        #self.MM.measure()
+        #self.MM.stop()
         return train, labels, ambiguous
 
     '''
