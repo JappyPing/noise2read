@@ -237,7 +237,7 @@ class MLClassifier:
         # show the plot
         fig.savefig(os.path.join(self.config.result_dir, self.study_name + '_train-test-logloss.png'))
         predictions = best_model.predict_proba(self.ambi_data)[:, 1]
-        pyplot.clsoe()
+        pyplot.close()
         self.logger.info("-------------------------------------------------------------")
         del study, sampler, results, best_model
         self.MM.measure()

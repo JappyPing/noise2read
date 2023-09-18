@@ -472,57 +472,23 @@ class Reads2Vectors():
     '''
     def read2vec(self, original_features_lst):  
         ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
-
-        if len(original_features_lst) > (self.config.chunks_num * 10):
-            chunk_size = len(original_features_lst) // self.config.chunks_num
-            # remainder = len(original_features_lst) % self.config.chunks_num
-            # chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
-            combined_data = []
-            if chunk_size >= self.config.num_workers:
-                chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
-                chunk_names = []
-                # combined_data = []
-                # for i in range(len(chunks)):
-                i = 0
-                while chunks:
-                    chunk = chunks.pop(0)
-                    vectors = []
-                    try:
-                        shared_objects = ES, chunk
-                        with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-                            for item in pool.imap(self.read2features, range(len(chunk))):
-                                vectors.append(item)
-                        del shared_objects
-                    except KeyboardInterrupt:
-                        # Handle termination signal (Ctrl+C)
-                        pool.terminate()  # Terminate the WorkerPool before exiting
-                    except Exception:
-                        # Handle other exceptions
-                        pool.terminate()  # Terminate the WorkerPool before exiting
-                        raise
-                    del chunk        
-                    # Generate the pickle file name
-                    file_name = self.config.result_dir + f"chunk_{i}.pickle"
-                    i += 1
-                    # Write the vectors to the pickle file
-                    with open(file_name, "wb") as file:
-                        pickle.dump(vectors, file)
-                    chunk_names.append(file_name)
-                    del vectors
-                del chunks
-                
-                for file_name in chunk_names:
-                    with open(file_name, "rb") as file:
-                        vectors = pickle.load(file)
-                        combined_data.extend(vectors)
-                        del vectors
-                    os.remove(file_name)
-            else:
+        chunk_size = len(original_features_lst) // self.config.chunks_num
+        combined_data = []
+        if chunk_size >= self.config.num_workers:
+            chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
+            chunk_names = []
+            # combined_data = []
+            for i in range(len(chunks)):
+            # i = 0
+            # while chunks:
+                # chunk = chunks.pop(0)
+                chunk = chunks[i]
+                vectors = []
                 try:
-                    shared_objects = ES, original_features_lst
+                    shared_objects = ES, chunk
                     with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-                        for item in pool.imap(self.read2features, range(len(original_features_lst))):
-                            combined_data.append(item)
+                        for item in pool.imap(self.read2features, range(len(chunk))):
+                            vectors.append(item)
                     del shared_objects
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
@@ -530,16 +496,30 @@ class Reads2Vectors():
                 except Exception:
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
-                    raise   
-            del ES, original_features_lst         
-            return combined_data
+                    raise
+                del chunk        
+                # Generate the pickle file name
+                file_name = self.config.result_dir + f"chunk_{i}.pickle"
+                # i += 1
+                # Write the vectors to the pickle file
+                with open(file_name, "wb") as file:
+                    pickle.dump(vectors, file)
+                chunk_names.append(file_name)
+                del vectors
+            del chunks
+            
+            for file_name in chunk_names:
+                with open(file_name, "rb") as file:
+                    vectors = pickle.load(file)
+                    combined_data.extend(vectors)
+                    del vectors
+                os.remove(file_name)
         else:
             try:
-                vectors = []
                 shared_objects = ES, original_features_lst
                 with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
                     for item in pool.imap(self.read2features, range(len(original_features_lst))):
-                        vectors.append(item)
+                        combined_data.append(item)
                 del shared_objects
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
@@ -547,9 +527,26 @@ class Reads2Vectors():
             except Exception:
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
-                raise
-            del ES, original_features_lst    
-            return vectors
+                raise   
+        del ES, original_features_lst         
+        return combined_data
+        # else:
+        #     try:
+        #         vectors = []
+        #         shared_objects = ES, original_features_lst
+        #         with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
+        #             for item in pool.imap(self.read2features, range(len(original_features_lst))):
+        #                 vectors.append(item)
+        #         del shared_objects
+        #     except KeyboardInterrupt:
+        #         # Handle termination signal (Ctrl+C)
+        #         pool.terminate()  # Terminate the WorkerPool before exiting
+        #     except Exception:
+        #         # Handle other exceptions
+        #         pool.terminate()  # Terminate the WorkerPool before exiting
+        #         raise
+        #     del ES, original_features_lst    
+        #     return vectors
 
     
     def high_all_in_one_embedding(self, genuine_df, negative_df, new_negative_df, ambiguous_df):
@@ -586,7 +583,7 @@ class Reads2Vectors():
         total_err_kmers.extend(genuine_df['EndErrKmer'].tolist())
         total_err_kmers.extend(ambiguous_df['EndErrKmer'].tolist())
         total_err_kmers.extend(new_negative_df['EndErrKmer'].tolist())
-        self.MM.measure()
+        # self.MM.measure()
         # for idx, row in genuine_df.iterrows():
         #     total_err_tyes.append(row['ErrorTye'])
         #     total_err_kmers.append(row['StartErrKmer'])

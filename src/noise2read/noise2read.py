@@ -20,7 +20,7 @@ from noise2read.utils import MemoryMonitor
 def main():
     argv = sys.argv[1:]
     # create logger
-    logger = custom_logger("noise2read", debug_mode=True)
+    logger = custom_logger("noise2read", debug_mode=False)
     MM = MemoryMonitor(logger)
     MM.start()
     ##############################################################

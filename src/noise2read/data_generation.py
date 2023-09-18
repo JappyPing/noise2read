@@ -176,6 +176,7 @@ class DataGneration():
         real_seqs =  total_seqs.intersection(possible_ed1)
         read_lst = [read] * len(real_seqs)
         edges = list(zip(read_lst, real_seqs))
+        del possible_ed1, read_lst, real_seqs
         return edges
 
     def extract_err_samples(self, graph, edit_dis):
@@ -865,10 +866,6 @@ class DataGneration():
         Returns:
             MultiVariables: Multi Variables after constructing edit-distance-based read graph
         """
-        # if not os.path.exists(data_set):
-        #     self.logger.error("No input file!")
-        #     # os._exit(0)
-        # else:
         self.logger.info("Input dataset '% s'" % data_set)
         record_iterator, file_type = parse_data(data_set)
         seqs2id_dict = {}
@@ -880,11 +877,16 @@ class DataGneration():
             seq_lens_set.add(ll)
             total_seqs.append(seq)
             seqs2id_dict.setdefault(seq, []).append(str(item.id))
+        del record_iterator
+
         unique_seqs = set(total_seqs)
 
         self.logger.info("Constructing " + str(edit_dis) + "nt-edit-distance read graph...")
         graph = nx.Graph()
         read_count = Counter(total_seqs)
+
+        del total_seqs
+
         high_freq = []
         low_freq = []
 
@@ -900,7 +902,7 @@ class DataGneration():
             self.logger.error("Error Correction Failed as no high-frequency reads detected.")
             sys.exit(1)
         self.logger.debug(len(read_count))
-
+        del read_count
         ######################################################
         edges_lst = []
         if edit_dis == 1:
@@ -969,12 +971,14 @@ class DataGneration():
         # possible_ed2 = set(self.ed2_seqs(read))
         possible_ed2 = enumerate_ed2_seqs(read)
         real_ed2_seqs = possible_ed2.intersection(low_seqs)
+        del possible_ed2
         # real_ed2_seqs = []
         # for seq in possible_ed2:
         #     if seq in low_seqs:
         #         real_ed2_seqs.append(seq)
         read_lst = [read] * len(real_ed2_seqs)
-        edges = list(zip(read_lst, real_ed2_seqs))     
+        edges = list(zip(read_lst, real_ed2_seqs))  
+        del real_ed2_seqs   
         return edges   
 
     def extract_ed2_errors(self, data_set): 
