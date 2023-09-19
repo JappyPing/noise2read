@@ -38,6 +38,7 @@ def main():
 
         for arg in args:
             input_commands.append(arg)
+        logger.info("Version: " + "".join(noise2read.__version__))
         logger.info("Commands: " + " ".join(input_commands))
         
         if opts:

@@ -219,7 +219,8 @@ class DataGneration():
         # print(len(subgraphs))
         genuine_lst = []
         chunk_size = len(subgraphs) // self.config.chunks_num
-        if chunk_size >= self.config.num_workers:
+        if chunk_size > 1:
+        # if chunk_size >= self.config.num_workers:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
 
             # Write each group of subgraphs to separate files
@@ -323,7 +324,126 @@ class DataGneration():
             else:
                 continue   
         return gen_lst
+
+    # def extract_genuine_ambi_errs(self, graph, edit_dis):
+    #     """
+    #     extract genuine and ambiguous errors from read graph
+
+    #     Args:
+    #         subgraphs (class): Subgraphs of graph constructed using NetworkX.
+    #         edit_dis (int): set edit distance 1 or 2 to search edges for constructing graph
+
+    #     Returns:
+    #         DataFrame: two pandas dataframes saving genuine and ambiguous errors
+    #     """
+    #     if edit_dis == 1:
+    #         genu_columns = ["StartRead","StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"]
+    #         ambiguous_df= pd.DataFrame(columns=["idx", "StartRead","StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])
+    #         genuine_csv = self.config.result_dir + "genuine1.csv"
+    #         ambiguous_csv = self.config.result_dir + "ambiguous1.csv"
+    #     elif edit_dis == 2: #or edit_dis == 3:
+    #         genu_columns = ["StartRead","StartReadCount", "StartDegree", "EndRead", "EndReadCount", "EndDegree"]
+    #         ambiguous_df= pd.DataFrame(columns=["idx", "StartRead", "StartReadCount", "StartDegree", "EndRead", "EndReadCount", "EndDegree"])
+    #         genuine_csv = self.config.result_dir + "genuine2.csv"
+    #         ambiguous_csv = self.config.result_dir + "ambiguous2.csv"  
+
+    #     subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
+    #     # subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+
+    #     self.logger.info("Extracting genuine and ambiguous errors...")
+
+    #     chunk_size = len(subgraphs) // self.config.chunks_num
+    #     if chunk_size > 1:
+    #         groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
+    #     else:
+    #         groups = subgraphs
+
+    #     # Write each group of subgraphs to separate files
+    #     gexf_files = []
+    #     for i, group in enumerate(groups):
+    #         # Create a new graph for the group of subgraphs
+    #         group_G = nx.Graph()
+    #         for subgraph_nodes in group:
+    #             group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
+    #             # Add node attributes to the new graph
+    #             for node in subgraph_nodes:
+    #                 group_G.nodes[node].update(graph.nodes[node])
+    #         # Generate the file name for the group
+    #         file_name = self.config.result_dir + f"group_{i}.gexf"
+
+    #         # Write the group of subgraphs to the file
+    #         nx.write_gexf(group_G, file_name)
+    #         gexf_files.append(file_name)
+
+    #     if self.config.high_ambiguous:
+    #         high_ambiguous_df = pd.DataFrame(columns=["idx", "StartRead", "StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"])    
+    #         high_ambi_lst = []        
+
+    #     high_idx = 0
+    #     genuine_lst = []
+    #     ambiguous_lst = []
+    #     for gexf_file in gexf_files:
+    #         cur_graph = nx.read_gexf(gexf_file)
+    #         sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+    #         try:
+    #             subgraph_num = len(sub_graphs)
+    #             shared_obs = sub_graphs, edit_dis
+    #             with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+    #                 for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
+    #                     if genu_ambi_lst[0]:
+    #                         genuine_lst.extend(genu_ambi_lst[0])
+    #                         ambiguous_lst.extend(genu_ambi_lst[1])
+    #         except KeyboardInterrupt:
+    #             # Handle termination signal (Ctrl+C)
+    #             pool.terminate()  # Terminate the WorkerPool before exiting
+
+    #         except Exception:
+    #             # Handle other exceptions
+    #             pool.terminate()  # Terminate the WorkerPool before exiting
+    #             raise
+            
+    #         if self.config.high_ambiguous:
+    #             cur_lst, cur_idx = self.extract_high_ambiguous_errs(sub_graphs, high_idx)
+    #             high_ambi_lst.extend(cur_lst)
+    #             high_idx = cur_idx + 1
+    #         os.remove(gexf_file)
+    #         del cur_graph, sub_graphs
         
+    #     # genuine_lst = []
+    #     # ambiguous_lst = []
+    #     # subgraph_num = len(subgraphs)
+    #     # shared_obs = subgraphs, edit_dis
+    #     # with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+    #     #     for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num), progress_bar=self.config.verbose):
+    #     #         if genu_ambi_lst[0]:
+    #     #             genuine_lst.extend(genu_ambi_lst[0])
+    #     #             ambiguous_lst.extend(genu_ambi_lst[1])
+
+    #     genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
+
+    #     idx = 0
+    #     for a_item in ambiguous_lst:
+    #         for sub_item in a_item:
+    #             sub_item.insert(0, idx)
+    #             ambiguous_df.loc[len(ambiguous_df)] = sub_item
+    #         idx += 1
+
+    #     if self.config.high_ambiguous: 
+    #         for item in high_ambi_lst:
+    #             high_ambiguous_df.loc[len(high_ambiguous_df)] = item
+            
+    #     if self.config.verbose:
+    #         genuine_df.to_csv(genuine_csv, index=False)  
+    #         ambiguous_df.to_csv(ambiguous_csv, index=False) 
+    #         if self.config.high_ambiguous:   
+    #             high_ambiguous_csv = self.config.result_dir + "high_ambiguous_1nt.csv"
+    #             high_ambiguous_df.to_csv(high_ambiguous_csv, index=False)  
+    #     self.logger.info("Done!")
+    #     if edit_dis == 1 and self.config.high_ambiguous:
+    #         return genuine_df, ambiguous_df, high_ambiguous_df
+    #     elif edit_dis == 1 or edit_dis == 2:
+    #         return genuine_df, ambiguous_df
+
     def extract_genuine_ambi_errs(self, graph, edit_dis):
         """
         extract genuine and ambiguous errors from read graph
@@ -362,7 +482,8 @@ class DataGneration():
         # chunk_size = self.config.num_workers
         # chunk_num = len(subgraphs) // chunk_size
         self.logger.debug(chunk_size)
-        if chunk_size >= self.config.num_workers:
+        if chunk_size > 1:
+        # if chunk_size >= self.config.num_workers:
         # if chunk_num > 1:
         # if False:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
@@ -390,8 +511,8 @@ class DataGneration():
             for gexf_file in gexf_files:
                 cur_graph = nx.read_gexf(gexf_file)
                 sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+                subgraph_num = len(sub_graphs)
                 try:
-                    subgraph_num = len(sub_graphs)
                     shared_obs = sub_graphs, edit_dis
                     with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
                         for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
@@ -408,15 +529,35 @@ class DataGneration():
                     raise
 
                 if self.config.high_ambiguous:
-                    cur_lst, cur_idx = self.extract_high_ambiguous_errs(sub_graphs, high_idx)
-                    high_ambi_lst.extend(cur_lst)
-                    high_idx = cur_idx + 1
+                    # cur_lst, cur_idx = self.extract_high_ambiguous_errs(sub_graphs, high_idx)
+                    try:
+                        with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
+                            for high_ambi_pair_lst in pool.imap(self.extract_high_ambiguous_errs, range(subgraph_num)): # progress_bar=self.config.verbose
+                                for (a2b, b2a) in high_ambi_pair_lst:
+                                    a2b.insert(0, high_idx)
+                                    b2a.insert(0, high_idx)
+                                    high_idx += 1
+                                    high_ambi_lst.append(a2b)
+                                    high_ambi_lst.append(b2a)
+                    except KeyboardInterrupt:
+                        # Handle termination signal (Ctrl+C)
+                        pool.terminate()  # Terminate the WorkerPool before exiting
+                    except Exception:
+                        # Handle other exceptions
+                        pool.terminate()  # Terminate the WorkerPool before exiting
+                        raise
+
+                    # high_ambi_lst.extend(cur_lst)
+                    # high_idx = cur_idx + 1
+
+                
                 os.remove(gexf_file)
                 del cur_graph, sub_graphs
-        else:    
+        else: 
+            subgraph_num = len(subgraphs)
+              
             try:
-                subgraph_num = len(subgraphs)
-                shared_obs = subgraphs, edit_dis
+                shared_obs = subgraphs, edit_dis 
                 with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
                     for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
                         if genu_ambi_lst[0]:
@@ -431,10 +572,25 @@ class DataGneration():
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
             if self.config.high_ambiguous:
-                cur_lst, cur_idx = self.extract_high_ambiguous_errs(subgraphs, high_idx)
-                high_ambi_lst.extend(cur_lst)
-                high_idx = cur_idx + 1
-
+                # cur_lst, cur_idx = self.extract_high_ambiguous_errs(subgraphs, high_idx)
+                # high_ambi_lst.extend(cur_lst)
+                # high_idx = cur_idx + 1
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=subgraphs, start_method='fork') as pool:
+                        for high_ambi_pair_lst in pool.imap(self.extract_high_ambiguous_errs, range(subgraph_num)): # progress_bar=self.config.verbose
+                            for (a2b, b2a) in high_ambi_pair_lst:
+                                a2b.insert(0, high_idx)
+                                b2a.insert(0, high_idx)
+                                high_idx += 1
+                                high_ambi_lst.append(a2b)
+                                high_ambi_lst.append(b2a)
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
             del subgraphs, graph
 
         genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
@@ -492,12 +648,13 @@ class DataGneration():
         self.logger.info("Extracting genuine and ambiguous errors...")
         genuine_lst = []
         ambiguous_lst = []
-        # chunk_size = len(subgraphs) // self.config.chunks_num
+        chunk_size = len(subgraphs) // self.config.chunks_num
         # chunk_size = self.config.num_workers
         # chunk_num = len(subgraphs) // chunk_size
+        if chunk_size > 1:
         # if chunk_size >= self.config.num_workers:
         # if chunk_num > 1:
-        if False:
+        # if False:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
 
             self.logger.debug(len(groups))
@@ -543,24 +700,23 @@ class DataGneration():
                     raise
                 os.remove(gexf_file)
                 del cur_graph, sub_graphs
-        # else:
-        try:
-            subgraph_num = len(subgraphs)
-            shared_obs = subgraphs, edit_dis
-            with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
-                for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
-                    if genu_ambi_lst[0]:
-                        genuine_lst.extend(genu_ambi_lst[0])
-                        ambiguous_lst.extend(genu_ambi_lst[1])
-            del shared_obs
-        except KeyboardInterrupt:
-            # Handle termination signal (Ctrl+C)
-            pool.terminate()  # Terminate the WorkerPool before exiting
-        except Exception:
-            # Handle other exceptions
-            pool.terminate()  # Terminate the WorkerPool before exiting
-            raise
-        del subgraphs, graph
+        else:
+            try:
+                subgraph_num = len(subgraphs)
+                shared_obs = subgraphs, edit_dis
+                with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                    for genu_ambi_lst in pool.imap(self.extract_genuine_ambi_errs_subgraph, range(subgraph_num)): # progress_bar=self.config.verbose
+                        if genu_ambi_lst[0]:
+                            genuine_lst.extend(genu_ambi_lst[0])
+                            ambiguous_lst.extend(genu_ambi_lst[1])
+                del shared_obs, subgraphs, graph
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
 
         genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
 
@@ -576,7 +732,6 @@ class DataGneration():
             ambiguous_df.to_csv(ambiguous_csv, index=False) 
         self.logger.info("Done!")
         return genuine_df, ambiguous_df
-
 
     def add_genu_sample(self, shared_obs, i):
         """
@@ -801,6 +956,7 @@ class DataGneration():
                 k_degree = graph.degree[k]
                 line = [k, k_count, k_degree]
                 negative_df.loc[len(negative_df)] = line  
+
         if self.config.verbose:
             negative_df.to_csv(negative_csv, index=False) 
         self.logger.info("Done!")
@@ -958,8 +1114,6 @@ class DataGneration():
         else:
             return graph, unique_seqs
 
-
-
     def real_ed2_seqs(self, low_seqs, read):
         """
         given a read, generate all its 2nt-edit-distance substitution counterparts existing in the dataset to form the edges
@@ -1041,7 +1195,8 @@ class DataGneration():
         idx = 0
         amplicon_lst = []
 
-        if chunk_size >= self.config.num_workers:
+        if chunk_size > 1:
+        # if chunk_size >= self.config.num_workers:
             groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
             # Write each group of subgraphs to separate files
             gexf_files = []
@@ -1147,6 +1302,48 @@ class DataGneration():
                     break
         return
 
+    def extract_high_ambiguous_errs(self, sub_graphs, ii):
+        """
+        extract high ambiguous errors from read graph
+
+        Args:
+            subgraphs (class): Subgraphs of graph constructed using NetworkX.
+
+        Returns:
+            DataFrame: One pandas dataframe saving high ambiguous errors
+        """
+ 
+        sub_graph = sub_graphs[ii]
+        high_ambi_lst = []
+        # for s in sub_graph:
+        edges_lst = [e for e in sub_graph.edges()]
+        for (a, b) in edges_lst:
+            a_count = sub_graph.nodes[a]['count']
+            b_count = sub_graph.nodes[b]['count']
+            a_degree = sub_graph.degree[a]
+            b_degree = sub_graph.degree[b]
+            if a_count > self.config.high_freq_thre and b_count > self.config.high_freq_thre: 
+                a2b = [a, a_count, a_degree, b, b_count, b_degree]
+                new_a2b = self.err_type_classification(a2b) 
+                # new_a2b.insert(0, idx)     
+                # high_ambi_lst.append(new_a2b)
+                # high_ambiguous_df.loc[len(high_ambiguous_df)] = new_a2b 
+                b2a = [b, b_count, b_degree, a, a_count, a_degree]
+                new_b2a = self.err_type_classification(b2a)
+                # new_b2a.insert(0, idx)
+                high_ambi_lst.append((new_a2b, new_b2a))
+                # high_ambiguous_df.loc[len(high_ambiguous_df)] = new_b2a
+                # idx += 1
+        del edges_lst
+        # if self.config.verbose:
+        #     high_ambiguous_csv = self.config.result_dir + "high_ambiguous_1nt.csv"
+        #     high_ambiguous_df.to_csv(high_ambiguous_csv, index=False)  
+        # self.logger.info("Done!")
+        # return high_ambiguous_df
+        # return high_ambi_lst, idx
+        return high_ambi_lst
+    
+    '''
     def extract_high_ambiguous_errs(self, subgraphs, idx):
         """
         extract high ambiguous errors from read graph
@@ -1184,7 +1381,7 @@ class DataGneration():
         # self.logger.info("Done!")
         # return high_ambiguous_df
         return high_ambi_lst, idx
-
+    '''
 
     '''
     def extract_genuine_ambi_errs(self, subgraphs, edit_dis):

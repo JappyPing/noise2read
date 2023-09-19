@@ -474,7 +474,8 @@ class Reads2Vectors():
         ES = EncodeScheme(self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type)
         chunk_size = len(original_features_lst) // self.config.chunks_num
         combined_data = []
-        if chunk_size >= self.config.num_workers:
+        if chunk_size > 1:
+        # if chunk_size >= self.config.num_workers:
             chunks = [original_features_lst[i:i+chunk_size] for i in range(0, len(original_features_lst), chunk_size)]
             chunk_names = []
             # combined_data = []
@@ -497,7 +498,9 @@ class Reads2Vectors():
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
                     raise
-                del chunk        
+                # combined_data.extend(vectors)
+                # del chunk, vectors       
+                del chunk 
                 # Generate the pickle file name
                 file_name = self.config.result_dir + f"chunk_{i}.pickle"
                 # i += 1
