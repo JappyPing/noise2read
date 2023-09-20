@@ -41,7 +41,7 @@ class Config(object):
             if conf.has_option("General", "chunks_num"):
                 self.chunks_num = conf.getint("General", "chunks_num")
             else:   
-                self.chunks_num = 100
+                self.chunks_num = 50
             if conf.has_option("General", "verbose"):
                 self.verbose = conf.getboolean("General", "verbose")
             else:
@@ -340,7 +340,7 @@ class Config(object):
 
             # general
             self.num_workers = -1 
-            self.chunks_num = 100
+            self.chunks_num = 50
             self.min_iters = 1000
             self.verbose = True 
             self.iso_change_detail = False     

@@ -1077,8 +1077,8 @@ class DataGneration():
         
         self.logger.debug("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
         
-
-        chunk_size = len(high_freq) // 10
+        # chunk_size = len(high_freq) // self.config.chunks_num
+        chunk_size = len(high_freq) // 20
         # chunk_size = self.config.num_workers * 2
         # chunk_num = len(high_freq) // chunk_size
 
@@ -1112,7 +1112,7 @@ class DataGneration():
                     elif edit_dis == 2:
                         for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, progress_bar=self.config.verbose):
                             edges_lst.extend(edge_lst)
-                # gc.collect()
+                gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
