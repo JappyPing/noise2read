@@ -15,6 +15,7 @@ from noise2read.utils import *
 import itertools
 import pickle
 # from noise2read.utils import MemoryMonitor
+import gc
 
 class Reads2Vectors():
     def __init__(self, logger, config, edit_dis):
@@ -491,6 +492,7 @@ class Reads2Vectors():
                         for item in pool.imap(self.read2features, range(len(chunk))):
                             vectors.append(item)
                     del shared_objects
+                    gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -524,6 +526,7 @@ class Reads2Vectors():
                     for item in pool.imap(self.read2features, range(len(original_features_lst))):
                         combined_data.append(item)
                 del shared_objects
+                gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting

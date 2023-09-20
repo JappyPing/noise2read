@@ -27,6 +27,7 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from random import shuffle
 from tqdm import tqdm
 from mpire import WorkerPool
+import gc
 
 class DataAnalysis():
     """
@@ -608,68 +609,158 @@ class DataAnalysis():
         ###################################################################
         # raw entropy
         raw_nonFre_reads_total_num = sum(raw_entropy_items)
-        try:
-            with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
-                raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
-            raw_entropy = sum(raw_entropy_lst) 
-        except KeyboardInterrupt:
-            # Handle termination signal (Ctrl+C)
-            pool.terminate()  # Terminate the WorkerPool before exiting
-        except Exception:
-            # Handle other exceptions
-            pool.terminate()  # Terminate the WorkerPool before exiting
-            raise
+        chunk_size = len(raw_entropy_items) // self.config.chunks_num
+        if chunk_size > 1:
+            groups = [raw_entropy_items[i:i+chunk_size] for i in range(0, len(raw_entropy_items), chunk_size)]
+            for group in tqdm(groups):
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
+                        raw_entropy_lst = pool.map(self.entropy_item, group)
+                    raw_entropy = sum(raw_entropy_lst) 
+                    gc.collect()
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+        else:
+            try:
+
+                with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
+                    raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
+                raw_entropy = sum(raw_entropy_lst) 
+                gc.collect()
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
         del raw_entropy_items, raw_entropy_lst, raw_nonFre_reads_total_num
+        #############################################################
         # correct entropy
         correct_nonFre_reads_total_num = sum(correct_entropy_items)
-        try:
-            with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
-                correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
-            correct_entropy = sum(correct_entropy_lst)
-        except KeyboardInterrupt:
-            # Handle termination signal (Ctrl+C)
-            pool.terminate()  # Terminate the WorkerPool before exiting
-        except Exception:
-            # Handle other exceptions
-            pool.terminate()  # Terminate the WorkerPool before exiting
-            raise
+        chunk_size = len(correct_entropy_items) // self.config.chunks_num
+        if chunk_size > 1:
+            groups = [correct_entropy_items[i:i+chunk_size] for i in range(0, len(correct_entropy_items), chunk_size)]
+            for group in tqdm(groups):
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
+                        correct_entropy_lst = pool.map(self.entropy_item, group) 
+                    correct_entropy = sum(correct_entropy_lst)
+                    gc.collect()
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+        else:
+            try:
+                with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
+                    correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
+                correct_entropy = sum(correct_entropy_lst)
+                gc.collect()
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
         del correct_entropy_items, correct_entropy_lst, correct_nonFre_reads_total_num
         ##################################################################################
         #information gain (\delta I) heatmap
-        try:
-            with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-                raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
-        except KeyboardInterrupt:
-            # Handle termination signal (Ctrl+C)
-            pool.terminate()  # Terminate the WorkerPool before exiting
-        except Exception:
-            # Handle other exceptions
-            pool.terminate()  # Terminate the WorkerPool before exiting
-            raise
+        chunk_size = len(raw_kept_counts) // self.config.chunks_num
+        if chunk_size > 1:
+            groups = [raw_kept_counts[i:i+chunk_size] for i in range(0, len(raw_kept_counts), chunk_size)]
+            for group in tqdm(groups):
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                        raw_kept_entropy_lst = pool.map(self.entropy_item, group)
+                    gc.collect()
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+        else:
+            try:
+                with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                    raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
+                gc.collect()
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
         del raw_kept_counts
-        ########
-        try:
-            with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-                correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
-        except KeyboardInterrupt:
-            # Handle termination signal (Ctrl+C)
-            pool.terminate()  # Terminate the WorkerPool before exiting
-        except Exception:
-            # Handle other exceptions
-            pool.terminate()  # Terminate the WorkerPool before exiting
-            raise
+        ########################################################
+        chunk_size = len(correct_kept_counts) // self.config.chunks_num
+        if chunk_size > 1:
+            groups = [correct_kept_counts[i:i+chunk_size] for i in range(0, len(correct_kept_counts), chunk_size)]
+            for group in tqdm(groups):
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                        correct_kept_entropy_lst = pool.map(self.entropy_item, group) 
+                    gc.collect()
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+        else:
+            try:
+                with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                    correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
+                gc.collect()
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
         del correct_kept_counts
-        ######
-        try:
-            with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-                raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
-        except KeyboardInterrupt:
-            # Handle termination signal (Ctrl+C)
-            pool.terminate()  # Terminate the WorkerPool before exiting
-        except Exception:
-            # Handle other exceptions
-            pool.terminate()  # Terminate the WorkerPool before exiting
-            raise
+        ############################################################################
+        chunk_size = len(raw_removed_items) // self.config.chunks_num
+        if chunk_size > 1:
+            groups = [raw_removed_items[i:i+chunk_size] for i in range(0, len(raw_removed_items), chunk_size)]
+            for group in tqdm(groups):
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                        raw_removed_entropy_items_lst = pool.map(self.entropy_item, group)
+                    gc.collect()
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+        else:
+            try:
+                with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                    raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
+                gc.collect()
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
+
         del raw_removed_items
         #######
         # for i in raw_removed_entropy_items_lst:

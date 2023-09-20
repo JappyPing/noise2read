@@ -17,7 +17,7 @@ from collections import Counter
 import sys
 import pandas as pd
 # from noise2read.utils import MemoryMonitor
-# import multiprocessing
+import gc
 
 class DataGneration():
     """
@@ -253,14 +253,14 @@ class DataGneration():
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
                         cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
+                    gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
                 except Exception:
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
-                    raise
-
+                    raise  
                 for item in cur_genuine_lsts:
                     genuine_lst.extend(item)
 
@@ -271,6 +271,7 @@ class DataGneration():
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=subgraphs, start_method='fork') as pool:
                     cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
+                gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -278,7 +279,6 @@ class DataGneration():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-
             del subgraphs, graph
 
             for item in cur_genuine_lsts:
@@ -290,6 +290,7 @@ class DataGneration():
         if self.config.verbose:
             genuine_csv = os.path.join(self.config.result_dir, "umi_gnuine.csv")
             genuine_df.to_csv(genuine_csv, index=False) 
+        gc.collect()
         return genuine_df
 
     def extract_umi_genuine_errs_subgraph(self, sub_graphs, i): 
@@ -520,6 +521,7 @@ class DataGneration():
                                 genuine_lst.extend(genu_ambi_lst[0])
                                 ambiguous_lst.extend(genu_ambi_lst[1])
                     del shared_obs
+                    gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -539,6 +541,7 @@ class DataGneration():
                                     high_idx += 1
                                     high_ambi_lst.append(a2b)
                                     high_ambi_lst.append(b2a)
+                        gc.collect() 
                     except KeyboardInterrupt:
                         # Handle termination signal (Ctrl+C)
                         pool.terminate()  # Terminate the WorkerPool before exiting
@@ -546,7 +549,7 @@ class DataGneration():
                         # Handle other exceptions
                         pool.terminate()  # Terminate the WorkerPool before exiting
                         raise
-
+                       
                     # high_ambi_lst.extend(cur_lst)
                     # high_idx = cur_idx + 1
 
@@ -564,6 +567,7 @@ class DataGneration():
                             genuine_lst.extend(genu_ambi_lst[0])
                             ambiguous_lst.extend(genu_ambi_lst[1])
                 del shared_obs
+                gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -584,6 +588,7 @@ class DataGneration():
                                 high_idx += 1
                                 high_ambi_lst.append(a2b)
                                 high_ambi_lst.append(b2a)
+                    gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -591,6 +596,7 @@ class DataGneration():
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
                     raise
+                
             del subgraphs, graph
 
         genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
@@ -691,6 +697,8 @@ class DataGneration():
                                 genuine_lst.extend(genu_ambi_lst[0])
                                 ambiguous_lst.extend(genu_ambi_lst[1])
                     del shared_obs
+                    gc.collect()
+                    
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -710,6 +718,7 @@ class DataGneration():
                             genuine_lst.extend(genu_ambi_lst[0])
                             ambiguous_lst.extend(genu_ambi_lst[1])
                 del shared_obs, subgraphs, graph
+                gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -1011,7 +1020,7 @@ class DataGneration():
 
         self.logger.info("Done!")
         return isolates_file, non_isolates_file
-
+    
     def generate_graph(self, data_set, edit_dis):
         """
         construct 1nt- or 2nt-edit-distance-based read graph
@@ -1046,7 +1055,7 @@ class DataGneration():
         high_freq = []
         low_freq = []
 
-        for read, frequency in tqdm(read_count.items(), miniters=int(len(read_count)/self.config.min_iters)):
+        for read, frequency in read_count.items():
             if not graph.has_node(read):
                 graph.add_node(read, count = frequency, flag=False)  
             # if frequency >= self.config.high_freq_thre:
@@ -1067,22 +1076,50 @@ class DataGneration():
             shared_unique_seqs = low_freq
         
         self.logger.debug("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
-        try:
-            with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
-                if edit_dis == 1:
-                    for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, progress_bar=self.config.verbose):
-                        edges_lst.extend(edge_lst)
-                elif edit_dis == 2:
-                    for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, progress_bar=self.config.verbose):
-                        edges_lst.extend(edge_lst)
-        except KeyboardInterrupt:
-            # Handle termination signal (Ctrl+C)
-            pool.terminate()  # Terminate the WorkerPool before exiting
+        
 
-        except Exception:
-            # Handle other exceptions
-            pool.terminate()  # Terminate the WorkerPool before exiting
-            raise
+        chunk_size = len(high_freq) // 10
+        # chunk_size = self.config.num_workers * 2
+        # chunk_num = len(high_freq) // chunk_size
+
+        if chunk_size > 1:
+        # if chunk_num > 1:
+        # if chunk_size >= self.config.num_workers:
+            groups = [high_freq[i:i+chunk_size] for i in range(0, len(high_freq), chunk_size)]
+            for group in tqdm(groups):
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
+                        if edit_dis == 1:
+                            for edge_lst in pool.imap(self.real_ed1_seqs, group): #, progress_bar=self.config.verbose, worker_lifespan=1, chunk_size=1
+                                edges_lst.extend(edge_lst)
+                        elif edit_dis == 2:
+                            for edge_lst in pool.imap(self.real_ed2_seqs, group):
+                                edges_lst.extend(edge_lst)
+                    gc.collect()
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise                
+        else:
+            try:
+                with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
+                    if edit_dis == 1:
+                        for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, progress_bar=self.config.verbose): #, worker_lifespan=1, chunk_size=1
+                            edges_lst.extend(edge_lst)
+                    elif edit_dis == 2:
+                        for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, progress_bar=self.config.verbose):
+                            edges_lst.extend(edge_lst)
+                # gc.collect()
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
         
         if len(edges_lst) > 0:
             self.logger.debug(len(edges_lst))
@@ -1137,7 +1174,8 @@ class DataGneration():
         edges = list(zip(read_lst, real_ed2_seqs))  
         # del real_ed2_seqs   
         return edges   
-
+    
+    
     def extract_ed2_errors(self, data_set): 
         """
         extract genuine errors, error-free records, ambiguous errors and unique reads from 2nt-edit-distance-based read graph
@@ -1682,19 +1720,33 @@ class DataGneration():
         #     pool.terminate()  # Terminate the WorkerPool before exiting
         #     raise
         try:
-            manager = multiprocessing.Manager()
-            shared_obj = manager.list(shared_unique_seqs)
-            pool = multiprocessing.Pool(processes=self.config.num_workers)
+            # manager = multiprocessing.Manager()
+            # shared_obj = manager.list(shared_unique_seqs)
+            # pool = multiprocessing.Pool(processes=self.config.num_workers)
             if edit_dis == 1:
-                results = pool.starmap(self.real_ed1_seqs, [(shared_obj, high_freq) for _ in range(self.config.num_workers)])
-                pool.close()
-                pool.join()
+                # results = pool.starmap(self.real_ed1_seqs, [(shared_obj, high_freq) for _ in range(self.config.num_workers)])
+                # pool.close()
+                # pool.join()
+
+                with multiprocessing.Pool(processes=self.config.num_workers) as pool: #, maxtasksperchild=self.config.num_workers
+                    # Create a partial function with the fixed parameter
+                    partial_function = partial(self.real_ed1_seqs, shared_unique_seqs)
+                    
+                    # Use starmap to apply the partial function to variable values
+                    results = pool.starmap(partial_function, [(val,) for val in high_freq])
+
                 for i, edge_lst in enumerate(results):
                     edges_lst.extend(edge_lst)
             elif edit_dis == 2:
-                results = pool.starmap(self.real_ed2_seqs, [(shared_obj, high_freq) for _ in range(self.config.num_workers)])
-                pool.close()
-                pool.join()
+                # results = pool.starmap(self.real_ed2_seqs, [(shared_obj, high_freq) for _ in range(self.config.num_workers)])
+                # pool.close()
+                # pool.join()
+                with multiprocessing.Pool(processes=self.config.num_workers) as pool:
+                    # Create a partial function with the fixed parameter
+                    partial_function = partial(self.real_ed2_seqs, shared_unique_seqs)
+                    
+                    # Use starmap to apply the partial function to variable values
+                    results = pool.starmap(partial_function, [(val,) for val in high_freq])
                 for i, edge_lst in enumerate(results):
                     edges_lst.extend(edge_lst)
         except KeyboardInterrupt:
@@ -1735,4 +1787,4 @@ class DataGneration():
             return graph, seq_lens_set, seqs2id_dict, unique_seqs
         else:
             return graph, unique_seqs
-    '''
+        '''

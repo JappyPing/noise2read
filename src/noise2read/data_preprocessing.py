@@ -16,6 +16,7 @@ import editdistance
 from tqdm import tqdm
 from Bio.Seq import Seq
 import json
+import gc
 
 class DataProcessing():
     # def __init__(self, logger, num_workers, output_dir, umi_start=None, umi_end=None, non_umi_start=None):
