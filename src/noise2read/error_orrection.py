@@ -196,7 +196,7 @@ class ErrorCorrection():
                 self.logger.info("High ambiguous errors corrected.")
                 self.logger.info('1nt-edit-distance based Errors Correction finished.')
                 ##self.MM.measure()
-                self.logger.info("#############################################")
+                # self.logger.info("#############################################")
             else:
                 genuine_ambi_errs_df, new_negative_df = self.all_in_one_ambiguous_err_prediction(unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df=None, edit_dis=1)
                 ##self.MM.measure()

@@ -334,9 +334,11 @@ def main():
                     if (not new_negative_df.empty or not negative_df.empty) and not genuine_df.empty:
                         amplicon_df = DG.extract_amplicon_err_samples(mid_result)
                         config.correct_data = EC.correct_amplicon_err(mid_result, genuine_df, negative_df, new_negative_df, amplicon_df, config.amplicon_threshold_proba)
+                        logger.info("Error Correction finished.")
                     else:
                         logger.warning("No genuine or negative samples for amplicon errors prediction!")
                         config.correct_data = mid_result
+                        logger.info("Error Correction finished.")
                     del DG, EC
                     #MM.measure()
                     #gc.collect()
