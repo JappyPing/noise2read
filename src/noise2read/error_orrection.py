@@ -645,7 +645,7 @@ class ErrorCorrection():
         # RV = Reads2Vectors(self.logger, self.config.num_workers, self.config.result_dir, self.config.read_max_len, self.config.entropy_kmer, self.config.entropy_q, self.config.kmer_freq, self.config.read_type, edit_dis=1)
         # train_data, train_labels, amplicon_data = RV.all_in_one_embedding(total_reads, genuine_df, negative_df, amplicon_df, high_flag=False)  
         train_data, train_labels, amplicon_data = RV.high_all_in_one_embedding(genuine_df, negative_df, new_negative_df, amplicon_df)
-        del TV
+        del RV
         ##self.MM.measure()
         TM = MLClassifier(self.logger, self.config, study_name, train_data, train_labels, amplicon_data)
         predictions = TM.tunning(self.config.n_trials)

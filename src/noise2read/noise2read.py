@@ -161,6 +161,7 @@ def main():
                         config.correct_data = EC.all_in_one_ed2_correction(corrected_file, unique_seqs2, genuine_df2, negative_df2, ambiguous_df2)
                     else:
                         config.correct_data = corrected_file
+                        logger.info("Error Correction finished.")
                     del DG, EC
                     #MM.measure()
                     #gc.collect()
@@ -241,6 +242,7 @@ def main():
                         config.correct_data = EC.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
                     else:
                         config.correct_data = corrected_file
+                        logger.info("Error Correction finished.")
                     del DG, EC
                     #MM.measure()
                     #gc.collect()
