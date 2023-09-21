@@ -21,6 +21,7 @@ import numpy as np
 # from matplotlib import pyplot as plt
 # from sklearn.metrics import classification_report, confusion_matrix
 # from noise2read.utils import MemoryMonitor
+import gc
 
 class MLClassifier:
     """
@@ -65,6 +66,7 @@ class MLClassifier:
         self.X_resampled, self.y_resampled = sm.fit_resample(self.x_train, self.y_train)
         self.logger.info(f'After over-sampling: {sorted(collections.Counter(self.y_resampled).items())}')
         del sm
+        #gc.collect()
         #self.MM.measure()
         # rus = RandomUnderSampler(random_state=42)
         # self.X_resampled, self.y_resampled = rus.fit_resample(self.x_train, self.y_train)
@@ -169,6 +171,7 @@ class MLClassifier:
         # test_logloss = results['validation_1']['logloss']
         # test_auc = results['validation_1']['auc']
         # return test_logloss
+        #gc.collect()
         return test_accuracy
         # return test_f1
         
@@ -242,4 +245,5 @@ class MLClassifier:
         del study, sampler, results, best_model
         #self.MM.measure()
         #self.MM.stop()
+        #gc.collect()
         return predictions

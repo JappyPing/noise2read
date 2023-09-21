@@ -160,6 +160,7 @@ class DataGneration():
             new_line_list = [read1, read1_fre, line[2], errorType, position, f_kmer, s_kmer, read2, read2_fre, line[5]]
         else:
             raise ValueError("The edit distance of two reads in the input list must equal to one!")
+        #gc.collect()
         return new_line_list
 
     def real_ed1_seqs(self, total_seqs, read):
@@ -201,9 +202,11 @@ class DataGneration():
         if edit_dis == 1 and self.config.high_ambiguous: #
             # high_ambiguous_df = self.extract_high_ambiguous_errs(subgraphs)
             genuine_df, ambiguous_df, high_ambiguous_df = self.extract_genuine_ambi_errs(graph, edit_dis)
+            #gc.collect()
             return genuine_df, negative_df, ambiguous_df, high_ambiguous_df
         elif edit_dis == 1 or edit_dis == 2:
             genuine_df, ambiguous_df = self.extract_genuine_ambi_errs(graph, edit_dis)
+            #gc.collect()
             return genuine_df, negative_df, ambiguous_df
 
     def extract_umi_genuine_errs(self, input_file):  
@@ -253,7 +256,7 @@ class DataGneration():
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=sub_graphs, start_method='fork') as pool:
                         cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -271,7 +274,7 @@ class DataGneration():
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=subgraphs, start_method='fork') as pool:
                     cur_genuine_lsts = pool.imap(self.extract_umi_genuine_errs_subgraph, range(subgraph_num))
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -290,7 +293,7 @@ class DataGneration():
         if self.config.verbose:
             genuine_csv = os.path.join(self.config.result_dir, "umi_gnuine.csv")
             genuine_df.to_csv(genuine_csv, index=False) 
-        gc.collect()
+        #gc.collect()
         return genuine_df
 
     def extract_umi_genuine_errs_subgraph(self, sub_graphs, i): 
@@ -324,6 +327,7 @@ class DataGneration():
                     sub_graph.nodes[node]['flag'] = True
             else:
                 continue   
+        #gc.collect()
         return gen_lst
 
     # def extract_genuine_ambi_errs(self, graph, edit_dis):
@@ -521,7 +525,7 @@ class DataGneration():
                                 genuine_lst.extend(genu_ambi_lst[0])
                                 ambiguous_lst.extend(genu_ambi_lst[1])
                     del shared_obs
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -541,7 +545,7 @@ class DataGneration():
                                     high_idx += 1
                                     high_ambi_lst.append(a2b)
                                     high_ambi_lst.append(b2a)
-                        gc.collect() 
+                        #gc.collect() 
                     except KeyboardInterrupt:
                         # Handle termination signal (Ctrl+C)
                         pool.terminate()  # Terminate the WorkerPool before exiting
@@ -567,7 +571,7 @@ class DataGneration():
                             genuine_lst.extend(genu_ambi_lst[0])
                             ambiguous_lst.extend(genu_ambi_lst[1])
                 del shared_obs
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -588,7 +592,7 @@ class DataGneration():
                                 high_idx += 1
                                 high_ambi_lst.append(a2b)
                                 high_ambi_lst.append(b2a)
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -619,6 +623,7 @@ class DataGneration():
                 high_ambiguous_csv = self.config.result_dir + "high_ambiguous_1nt.csv"
                 high_ambiguous_df.to_csv(high_ambiguous_csv, index=False)  
         self.logger.info("Done!")
+        #gc.collect()
         if edit_dis == 1 and self.config.high_ambiguous:
             return genuine_df, ambiguous_df, high_ambiguous_df
         elif edit_dis == 1 or edit_dis == 2:
@@ -697,7 +702,7 @@ class DataGneration():
                                 genuine_lst.extend(genu_ambi_lst[0])
                                 ambiguous_lst.extend(genu_ambi_lst[1])
                     del shared_obs
-                    gc.collect()
+                    #gc.collect()
                     
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
@@ -718,7 +723,7 @@ class DataGneration():
                             genuine_lst.extend(genu_ambi_lst[0])
                             ambiguous_lst.extend(genu_ambi_lst[1])
                 del shared_obs, subgraphs, graph
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -740,6 +745,7 @@ class DataGneration():
             genuine_df.to_csv(genuine_csv, index=False)  
             ambiguous_df.to_csv(ambiguous_csv, index=False) 
         self.logger.info("Done!")
+        #gc.collect()
         return genuine_df, ambiguous_df
 
     def add_genu_sample(self, shared_obs, i):
@@ -759,6 +765,7 @@ class DataGneration():
             tmp_df = pd.DataFrame(columns=["StartRead","StartReadCount", "StartDegree", "EndRead", "EndReadCount", "EndDegree"])
         # for item in item_lst:
         tmp_df.loc[len(tmp_df)] = item_lst[i]
+        #gc.collect()
         return tmp_df
 
     def add_ambi_sample(self, idx, item_lst):
@@ -777,6 +784,7 @@ class DataGneration():
                 sub_item.insert(0, idx)
                 tmp_df.loc[len(tmp_df)] = sub_item
             idx += 1
+        #gc.collect()
         return tmp_df
 
     '''
@@ -888,6 +896,7 @@ class DataGneration():
         #self.MM.measure()
         #self.MM.stop()
         del graph
+        #gc.collect()
         if self.config.high_ambiguous:
             return isolates_file, non_isolates_file, unique_seqs, seq_max_len, seq_min_len, genuine_df, negative_df, ambiguous_df, high_ambiguous_df
         else:
@@ -921,6 +930,7 @@ class DataGneration():
             del graph
             #self.MM.measure()
             #self.MM.stop()
+            #gc.collect()
             return isolates_file, non_isolates_file, seq_max_len, seq_min_len, genuine_df, ambiguous_df
         elif edit_dis == 2:
             self.logger.debug(input_f)
@@ -932,6 +942,7 @@ class DataGneration():
             genuine_df, ambiguous_df = self.extract_simplify_genuine_ambi_errs(graph, edit_dis)
             #self.MM.measure()
             #self.MM.stop()
+            #gc.collect()
             return genuine_df, ambiguous_df       
 
     def extract_isolated_negatives(self, graph, edit_dis):
@@ -969,6 +980,7 @@ class DataGneration():
         if self.config.verbose:
             negative_df.to_csv(negative_csv, index=False) 
         self.logger.info("Done!")
+        #gc.collect()
         return negative_df
 
     def extract_isolates(self, graph, unique_seqs, seqs2id_dict):
@@ -1019,6 +1031,7 @@ class DataGneration():
         extract_records(self.config.result_dir, non_name_lst, self.config.input_file, non_isolates_file)
 
         self.logger.info("Done!")
+        #gc.collect()
         return isolates_file, non_isolates_file
     
     def generate_graph(self, data_set, edit_dis):
@@ -1063,7 +1076,8 @@ class DataGneration():
                 high_freq.append(read)
             else:
                 low_freq.append(read)
-        if len(high_freq) == 0:
+        highseq_num = len(high_freq)
+        if highseq_num == 0:
             self.logger.error("Error Correction Failed as no high-frequency reads detected.")
             sys.exit(1)
         self.logger.debug(len(read_count))
@@ -1076,9 +1090,27 @@ class DataGneration():
             shared_unique_seqs = low_freq
         
         self.logger.debug("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
-        
+        # try:
+        #     # chunk_size = len(high_freq) // self.config.chunks_num
+        #     chunk_size = len(high_freq) // (self.config.num_workers//3)
+        #     with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs) as pool:
+        #         if edit_dis == 1:
+        #             for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, chunk_size=chunk_size, progress_bar=self.config.verbose): #, worker_lifespan=1, chunk_size=1
+        #                 edges_lst.extend(edge_lst)
+        #         elif edit_dis == 2:
+        #             for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, chunk_size=chunk_size, progress_bar=self.config.verbose):
+        #                 edges_lst.extend(edge_lst)
+        #     #gc.collect()
+        # except KeyboardInterrupt:
+        #     # Handle termination signal (Ctrl+C)
+        #     pool.terminate()  # Terminate the WorkerPool before exiting
+        # except Exception:
+        #     # Handle other exceptions
+        #     pool.terminate()  # Terminate the WorkerPool before exiting
+        #     raise
+        #############################################################################################################
         # chunk_size = len(high_freq) // self.config.chunks_num
-        chunk_size = len(high_freq) // 20
+        chunk_size = len(high_freq) // (self.config.num_workers//3)
         # chunk_size = self.config.num_workers * 2
         # chunk_num = len(high_freq) // chunk_size
 
@@ -1095,7 +1127,7 @@ class DataGneration():
                         elif edit_dis == 2:
                             for edge_lst in pool.imap(self.real_ed2_seqs, group):
                                 edges_lst.extend(edge_lst)
-                    gc.collect()
+                    # #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -1112,7 +1144,7 @@ class DataGneration():
                     elif edit_dis == 2:
                         for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, progress_bar=self.config.verbose):
                             edges_lst.extend(edge_lst)
-                gc.collect()
+                # #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -1120,7 +1152,7 @@ class DataGneration():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-        
+        ######################################################################################################
         if len(edges_lst) > 0:
             self.logger.debug(len(edges_lst))
             self.logger.debug(edges_lst[0])
@@ -1146,6 +1178,7 @@ class DataGneration():
         if self.config.graph_visualization:
             self.draw_graph(graph, subdir, self.config.drawing_graph_num)
             self.logger.info("Graph file *.png saved!")
+        #gc.collect()
         if edit_dis == 1:
             return graph, seq_lens_set, seqs2id_dict, unique_seqs
         else:
@@ -1198,6 +1231,7 @@ class DataGneration():
         del graph
         #self.MM.measure()
         #self.MM.stop()
+        #gc.collect()
         return genuine_df, negative_df, ambiguous_df, unique_seqs
 
     def extract_amplicon_err_samples(self, data_set):
@@ -1274,6 +1308,7 @@ class DataGneration():
             amplicon_df.to_csv(self.config.result_dir + "amplicon.csv", index=False) 
         #self.MM.measure()
         #self.MM.stop() 
+        #gc.collect()        
         return amplicon_df
         
     def extract_amplicon_errs(self, subgraphs, idx):  
@@ -1303,7 +1338,8 @@ class DataGneration():
                         idx += 1
                         sub_graph.nodes[node]['flag'] = True
                     else:
-                        continue     
+                        continue 
+        #gc.collect()    
         return amplicon_errs_lst, idx
   
     def draw_graph(self, graph, sub_dir, drawing_graph_num = 50):
@@ -1338,6 +1374,7 @@ class DataGneration():
                 plt.close()
                 if i == drawing_graph_num:
                     break
+        #gc.collect()
         return
 
     def extract_high_ambiguous_errs(self, sub_graphs, ii):
@@ -1379,6 +1416,7 @@ class DataGneration():
         # self.logger.info("Done!")
         # return high_ambiguous_df
         # return high_ambi_lst, idx
+        #gc.collect()
         return high_ambi_lst
     
     '''
@@ -1589,6 +1627,7 @@ class DataGneration():
                     sub_graph.nodes[node]['flag'] = True        
                 else:
                     continue
+        #gc.collect()
         return [gen_lst, ambi_lst]
 
 

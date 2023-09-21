@@ -10,6 +10,7 @@ import numpy as np
 import statistics
 from scipy.fftpack import fft
 import math
+import gc
 
 class FourierTransform():
     def __init__(self, read):
@@ -479,6 +480,7 @@ class ChaosGame():
         # encoding_vector = np.concatenate((ed1, ed2, ed3, ed4), axis=None)
         # return encoding_vector
         # return ed1 + ed2 + ed3 + ed4
+        #gc.collect()
         return ed2 + ed4
 
 #######################################################################################################
@@ -538,6 +540,7 @@ class Entropy():
     def Encoding(self):
         ed1 = self.entropy_equation(entropy_type = "tsallis")
         ed2 = self.entropy_equation(entropy_type = "shannon")
+        #gc.collect()
         return ed1 + ed2
 
 ###############################################################################
@@ -704,6 +707,7 @@ class FickettScore():
     def calculate_sequences(self):
         measure_orf = self.fickett_value_orf(self.read)
         measure_full = self.fickett_value_full_sequence(self.read)
+        #gc.collect()
         return [measure_orf, measure_full]
 
 class EncodeScheme():
@@ -770,4 +774,5 @@ class EncodeScheme():
             features = self.binary(read)
         elif method == "atomic_number":
             features = self.atomic_number(read)
+        #gc.collect()
         return features

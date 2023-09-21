@@ -71,6 +71,7 @@ class DataProcessing():
         with open(non_umi_raw_dataset, "w") as handle:
             SeqIO.write(non_umi_records, handle, ff_type) 
         self.logger.info("Split umi and non-umis completed.") 
+        gc.collect()
         return umi_raw_dataset, non_umi_raw_dataset
 
     def real_umi_data(self, original_data):
@@ -89,6 +90,7 @@ class DataProcessing():
         # step3: use umi and real dataset to generate raw and true dataset
         # raw_file, true_file = self.raw_true_umi(corrected_file, non_umi_raw_dataset)
         raw_file, true_file = self.raw_true_umi(umi_raw_dataset, non_umi_raw_dataset)
+        gc.collect()
         return raw_file, true_file
 
     def raw_true_umi(self, correct_umi_f, non_umi_f):
@@ -153,7 +155,7 @@ class DataProcessing():
         with open(true_file, "w") as handle:
             SeqIO.write(true_records, handle, ori_file_type) 
         self.logger.info("Real umi data processing completed.")                 
-
+        gc.collect()
         return raw_file, true_file
 
     def raw_true_umi_1(self, correct_umi_f, non_umi_f):
@@ -279,7 +281,7 @@ class DataProcessing():
         with open(true_file, "w") as handle:
             SeqIO.write(true_records, handle, ori_file_type) 
         self.logger.info("Real umi data processing completed.")                 
-
+        gc.collect()
         return raw_file, true_file
 
     def umi_cluster_analysis(self, correct_umi_f, non_umi_f):
@@ -465,7 +467,7 @@ class DataProcessing():
         with open(true_file, "w") as handle:
             SeqIO.write(true_records, handle, ori_file_type) 
         self.logger.info("Real umi data processing completed.")                 
-
+        gc.collect()
         return raw_file, true_file
 
     def pairwise_edit_distances(self, strings):
@@ -477,7 +479,7 @@ class DataProcessing():
                 distance = editdistance.eval(strings[i], strings[j])
                 distances[i][j] = distance
                 distances[j][i] = distance
-
+        gc.collect()
         return distances
 
     def get_smallest_edit_dis_seq(self, seq_lst, read):
@@ -488,6 +490,7 @@ class DataProcessing():
             if dis < smallest_edit_dis:
                 smallest_edit_dis = dis
                 target_read = seq
+        gc.collect()
         return target_read, smallest_edit_dis
 
 
@@ -534,7 +537,8 @@ class DataProcessing():
             SeqIO.write(raw_records, handle, raw_file_type)        
         with open(umi_true_dataset, "w") as handle:
             SeqIO.write(true_records, handle, true_file_type) 
-        self.logger.info("Mimic_umi preprocessing completed.") 
+        self.logger.info("Mimic_umi preprocessing completed.")
+        gc.collect() 
         return umi_raw_dataset, umi_true_dataset
     
     def extract_umis2fasta(self):
@@ -559,6 +563,7 @@ class DataProcessing():
         with open(umi_raw_dataset, "w") as handle:
             SeqIO.write(umi_records, handle, 'fasta')        
         self.logger.info("Extract umi to fasta completed.") 
+        gc.collect()
         return umi_raw_dataset, self.config.input_file
     
     def real_umi_in_name_data(self):
@@ -576,7 +581,7 @@ class DataProcessing():
         corrected_file = EC.umi_correction(umi_raw_dataset, genuine_df)
 
         raw_file, true_file = self.raw_true_umi(corrected_file, non_umi_raw_dataset)
-        
+        gc.collect()
         return raw_file, true_file
 
     def umi2groundtruth(self):

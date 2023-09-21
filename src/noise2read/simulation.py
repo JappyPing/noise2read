@@ -41,6 +41,7 @@ class Simulation():
         # if self.config.indels:
         #     possible_ed1.extend(self.seq2deletion(read))
         #     possible_ed1.extend(self.seq2insertion(read))
+        #gc.collect()
         return list(set(possible_ed1))
 
     def replace_char(self, seq, char, index):
@@ -81,6 +82,7 @@ class Simulation():
                 if b != 'N':
                     sub_seq = self.replace_char(seq, b, i)
                     editdis1_list.append(sub_seq)
+        #gc.collect()
         return set(editdis1_list)
 
     def seq2deletion(self, read):
@@ -98,6 +100,7 @@ class Simulation():
         for i in range(n):
             del_seq = read[:i] + read[(i+1):]
             editdis1_list.append(del_seq)
+        #gc.collect()
         return set(editdis1_list)
 
     def seq2insertion(self, read):
@@ -118,6 +121,7 @@ class Simulation():
                 raw_seq = copy.deepcopy(seq)
                 raw_seq.insert(i, b)
                 editdis1_list.append(''.join(raw_seq))
+        #gc.collect()
         return set(editdis1_list)
         
     def read2err_read(self, read):
@@ -126,6 +130,7 @@ class Simulation():
         random.seed(self.config.sim_seed)
         random.shuffle(possible_seqs)
         idx = random.randint(0, num-1)
+        #gc.collect()
         return possible_seqs[idx]
 
     def error_correction(self, config):
@@ -148,6 +153,7 @@ class Simulation():
             correct_data = EC.all_in_one_ed2_correction(corrected_file, unique_seqs2, genuine_df2, negative_df2, ambiguous_df2)
         else:
             correct_data = corrected_file
+        #gc.collect()
         return correct_data        
 
     def simplify_error_correction(self, config):
@@ -163,6 +169,7 @@ class Simulation():
             correct_data = EC.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
         else:
             correct_data = corrected_file
+        #gc.collect()
         return correct_data    
 
     def simulation(self):
@@ -186,6 +193,7 @@ class Simulation():
             os.system("rm %s" % true_data)
         if os.path.exists(corrected_data):
             os.system("rm %s" % corrected_data)
+        #gc.collect()
         return umi_raw_dataset, umi_true_dataset
     
     def error_injection(self, data_set):
@@ -348,7 +356,7 @@ class Simulation():
         random.shuffle(possible_seqs)
         ii = random.randint(0, num-1)
         mutation_seq = possible_seqs[ii]
-
+        #gc.collect()
         if file_type == "fastq":
             return SeqRecord(Seq(mutation_seq), id=records_dict[idx].id, description=records_dict[idx].description, letter_annotations=records_dict[idx].letter_annotations)
         elif file_type == "fasta":
@@ -360,6 +368,7 @@ class Simulation():
         possible_ed2 = []
         for seq in possible_ed1:
             possible_ed2.extend(list(set(seq2substitution(seq)) - possible_ed1))
+        #gc.collect()
         return list(set(possible_ed2))
 
     '''

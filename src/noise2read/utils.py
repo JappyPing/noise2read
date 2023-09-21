@@ -16,6 +16,7 @@ import editdistance
 import os
 import datetime
 import tracemalloc
+import gc
 
 class MemoryMonitor:
     def __init__(self, logger):
@@ -172,6 +173,7 @@ def extract_records(working_dir, name_lst, data_set, sub_dataset):
     # record_iterator, file_type = parse_data(data_set)
     # records = [rec for rec in record_iterator if str(rec.id) in name_lst]
     # SeqIO.write(records, sub_dataset, file_type)
+    #gc.collect()
     return
 #####################################################################################
 def sub_base(base):
@@ -212,6 +214,7 @@ def seq2substitution(read):
             if b != 'N':
                 sub_seq = replace_char(seq, b, i)
                 editdis1_list.append(sub_seq)
+    #gc.collect()
     return set(editdis1_list)
 
 def seq2deletion(read):
@@ -229,6 +232,7 @@ def seq2deletion(read):
     for i in range(n):
         del_seq = read[:i] + read[(i+1):]
         editdis1_list.append(del_seq)
+    #gc.collect()
     return set(editdis1_list)
 
 def seq2insertion(read):
@@ -249,6 +253,7 @@ def seq2insertion(read):
             raw_seq = copy.deepcopy(seq)
             raw_seq.insert(i, b)
             editdis1_list.append(''.join(raw_seq))
+    #gc.collect()
     return set(editdis1_list)
 
 def enumerate_ed1_seqs(read):
@@ -256,6 +261,7 @@ def enumerate_ed1_seqs(read):
     possible_ed1.extend(seq2deletion(read))
     possible_ed1.extend(seq2substitution(read))
     possible_ed1.extend(seq2insertion(read))
+    #gc.collect()
     return set(possible_ed1)
 
 def enumerate_ed2_seqs(read):
@@ -264,6 +270,7 @@ def enumerate_ed2_seqs(read):
     possible_ed2 = []
     for seq in possible_ed1:
         possible_ed2.extend(list(set(seq2substitution(seq)) - possible_ed1))
+    #gc.collect()
     return set(possible_ed2)
     
 def random_ed2_seq(read, total_reads, num):
@@ -289,6 +296,7 @@ def random_ed2_seq(read, total_reads, num):
         sub_seq = replace_char(seq, j_sub_base, j)
         if sub_seq not in total_reads:
             editdis2_list.append(sub_seq)
+    #gc.collect()
     return editdis2_list
 
 def error_type_classification(read1, read2):
@@ -366,7 +374,7 @@ def error_type_classification(read1, read2):
                 s_kmer = read2[position-1] + 'X' + read2[position]    
 
         errorType = first + '-' + second
-    
+        #gc.collect()
         return [errorType, f_kmer, s_kmer]
     else:
         raise ValueError("The editdistance of two reads in the input list must equal to one!")

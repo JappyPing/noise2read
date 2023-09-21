@@ -46,6 +46,7 @@ class Reads2Vectors():
 
         features.extend(cur_feature[2:])
         # self.logger.debug(f'FourierTransform: {len(ft_fea1)}, ChaosGame: {len(cg_fea1)}, Entropy: {len(entropy_fea1)}, FickettScore: {len(fs_fea1)}')
+        #gc.collect()
         return features 
 
     def all_in_one_embedding(self, total_reads, genuine_df, negative_df, ambiguous_df, high_flag):
@@ -348,6 +349,7 @@ class Reads2Vectors():
         del train_data, ambiguous_data
         #self.MM.measure()
         #self.MM.stop()
+        #gc.collect()
         return train, labels, ambiguous
 
     def scaler2(self, lab_fea, ambiguous_ulab_fea):
@@ -384,6 +386,7 @@ class Reads2Vectors():
         lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f2))
         ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f2))
         del lab_scale_f0, lab_scale_f2, ulab_scale_f0, ulab_scale_f2
+        #gc.collect()
         return lab_scale_f, ulab_scale_f 
 
     def scaler(self, lab_fea, ambiguous_ulab_fea, high_flag):
@@ -446,7 +449,7 @@ class Reads2Vectors():
 
         # lab_scale_f = np.hstack((lab_scale_f0, lab_scale_f1, lab_scale_f2, lab_scale_f3))
         # ulab_scale_f = np.hstack((ulab_scale_f0, ulab_scale_f1, ulab_scale_f2, ulab_scale_f3))
-        
+        #gc.collect()
         return lab_scale_f, ulab_scale_f 
 
     '''
@@ -492,7 +495,7 @@ class Reads2Vectors():
                         for item in pool.imap(self.read2features, range(len(chunk))):
                             vectors.append(item)
                     del shared_objects
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -526,7 +529,7 @@ class Reads2Vectors():
                     for item in pool.imap(self.read2features, range(len(original_features_lst))):
                         combined_data.append(item)
                 del shared_objects
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -534,7 +537,8 @@ class Reads2Vectors():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise   
-        del ES, original_features_lst         
+        del ES, original_features_lst 
+        #gc.collect()        
         return combined_data
         # else:
         #     try:
@@ -629,7 +633,7 @@ class Reads2Vectors():
         self.logger.debug(err_kmers2count)
         self.logger.debug(err_tyes2count)
         #self.MM.measure()
-        gc.collect()
+        #gc.collect()
         ##################################################################################
         genuine_feature_lst = []
         for idx, row in genuine_df.iterrows():
@@ -647,7 +651,7 @@ class Reads2Vectors():
         genuine_fea = self.read2vec(genuine_feature_lst)
         del genuine_feature_lst
         #self.MM.measure()
-        gc.collect()
+        #gc.collect()
         #################################################################################
         negative_feature_lst = []
         for idx, row in new_negative_df.iterrows():
@@ -682,7 +686,7 @@ class Reads2Vectors():
         negative_fea = self.read2vec(negative_feature_lst)
         del negative_feature_lst
         #self.MM.measure()
-        gc.collect()
+        #gc.collect()
         ###############################################################
         ambiguous_feature_lst = []
         for idx, row in ambiguous_df.iterrows():
@@ -699,7 +703,7 @@ class Reads2Vectors():
         ambiguous_fea = self.read2vec(ambiguous_feature_lst)
         del ambiguous_feature_lst
         #self.MM.measure()
-        gc.collect()
+        #gc.collect()
         ##################################################################
         read_features = genuine_fea + negative_fea
         labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
@@ -718,7 +722,7 @@ class Reads2Vectors():
         del train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
         #self.MM.measure()
         #self.MM.stop()
-        gc.collect()
+        #gc.collect()
         return train, labels, ambiguous
 
     '''

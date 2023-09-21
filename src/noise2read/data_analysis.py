@@ -188,6 +188,7 @@ class DataAnalysis():
         # no ground truth entropy
         self.evaluation_without_groundtruth(raw_read2count, correct_read2count, total_reads_num)
         del raw_read2count, correct_read2count, total_reads_num
+        #gc.collect()
         return
 
     # rely on read frequency instead of sequecing id
@@ -390,6 +391,7 @@ class DataAnalysis():
         correctset_entropy = self.set_entropy(len(correct_err_seqs), len(correct_errfree_seqs), total_reads_num)
         self.save_entropy('Purity entropy', rawset_entropy, correctset_entropy)
         del correct_err_seqs, correct_errfree_seqs, raw_errfreee_seqs, raw_err_seqs
+        #gc.collect()
         return
 
     def evaluation_without_groundtruth(self, raw_read2count, correct_read2count, total_reads_num):
@@ -425,7 +427,7 @@ class DataAnalysis():
         # relative_entropyq2p, entropyp2q = self.total_variation_differnce(raw_read2count, correct_read2count, total_reads_num)
         # entropy = self.spectral_entropy(raw_read2count, correct_read2count, total_reads_num)
         # raw_entropy = self.spectral_entropy(raw_read2count, raw_read2count, total_reads_num)
-        
+        #gc.collect()
         return
         
     def evaluation_metircs(self, confusion_dict, sheet_name):
@@ -480,6 +482,7 @@ class DataAnalysis():
         worksheet3.write('H2', gain)
         worksheet3.write('I1', 'Fall-out')
         worksheet3.write('I2', fall_out)
+        #gc.collect()
         return
 
     def entropy(self, seqs_num, total_num):
@@ -497,6 +500,7 @@ class DataAnalysis():
             entropy_val = 0
         else:
             entropy_val = -(p * math.log2(p))
+        #gc.collect()
         return entropy_val
 
     def gain2heatmap(self, correct2raw_diff):
@@ -557,13 +561,14 @@ class DataAnalysis():
         # cbar.cmap.set_over('red')
         fig.tight_layout()
         fig.savefig(os.path.join(self.config.result_dir, self.prefix + '_information_gain.png'), transparent=True)
-
+        #gc.collect()
         return
 
     def entropy_item(self, total_freq, freq):
         if freq > 0:
             p = freq / total_freq
             result = - p * math.log2(p)
+        #gc.collect()
         return result
 
     def noise2read_entropy(self, raw_read2count, correct_read2count, total_num):
@@ -617,7 +622,7 @@ class DataAnalysis():
                     with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
                         raw_entropy_lst = pool.map(self.entropy_item, group)
                     raw_entropy = sum(raw_entropy_lst) 
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -631,7 +636,7 @@ class DataAnalysis():
                 with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
                     raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
                 raw_entropy = sum(raw_entropy_lst) 
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -651,7 +656,7 @@ class DataAnalysis():
                     with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
                         correct_entropy_lst = pool.map(self.entropy_item, group) 
                     correct_entropy = sum(correct_entropy_lst)
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -664,7 +669,7 @@ class DataAnalysis():
                 with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
                     correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
                 correct_entropy = sum(correct_entropy_lst)
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -682,7 +687,7 @@ class DataAnalysis():
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                         raw_kept_entropy_lst = pool.map(self.entropy_item, group)
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -694,7 +699,7 @@ class DataAnalysis():
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                     raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -711,7 +716,7 @@ class DataAnalysis():
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                         correct_kept_entropy_lst = pool.map(self.entropy_item, group) 
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -723,7 +728,7 @@ class DataAnalysis():
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                     correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -740,7 +745,7 @@ class DataAnalysis():
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                         raw_removed_entropy_items_lst = pool.map(self.entropy_item, group)
-                    gc.collect()
+                    #gc.collect()
                 except KeyboardInterrupt:
                     # Handle termination signal (Ctrl+C)
                     pool.terminate()  # Terminate the WorkerPool before exiting
@@ -752,7 +757,7 @@ class DataAnalysis():
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                     raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
-                gc.collect()
+                #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
                 pool.terminate()  # Terminate the WorkerPool before exiting
@@ -774,6 +779,7 @@ class DataAnalysis():
             entropy_item_lst.extend([np.nan] * new_reads_num)
         shuffle(entropy_item_lst)
         self.gain2heatmap(entropy_item_lst)
+        #gc.collect()
         return [raw_entropy, correct_entropy]
 
     def set_entropy(self, err_seqs_num, errfree_seqs_num, total_num):
@@ -792,6 +798,7 @@ class DataAnalysis():
         # unique_len = len(set(total_seqs))
         err_entropy = self.entropy(err_seqs_num, total_num)
         errfree_entropy = self.entropy(errfree_seqs_num, total_num)
+        #gc.collect()
         return errfree_entropy + err_entropy
 
     def save_entropy(self, sheet_name, raw_set_entropy, correct_entropy):
@@ -811,6 +818,7 @@ class DataAnalysis():
         worksheet3.write('B2', correct_entropy) 
         worksheet3.write('C1', '\u0394 E')
         worksheet3.write('C2', raw_set_entropy - correct_entropy) 
+        #gc.collect()
         return   
 
     #############################################################################################################
