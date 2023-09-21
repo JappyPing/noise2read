@@ -16,7 +16,7 @@ import editdistance
 import os
 import datetime
 import tracemalloc
-import gc
+# import gc
 
 class MemoryMonitor:
     def __init__(self, logger):

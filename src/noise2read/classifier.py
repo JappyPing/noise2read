@@ -21,7 +21,7 @@ import numpy as np
 # from matplotlib import pyplot as plt
 # from sklearn.metrics import classification_report, confusion_matrix
 # from noise2read.utils import MemoryMonitor
-import gc
+# import gc
 
 class MLClassifier:
     """

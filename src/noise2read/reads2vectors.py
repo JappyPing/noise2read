@@ -15,7 +15,7 @@ from noise2read.utils import *
 import itertools
 import pickle
 # from noise2read.utils import MemoryMonitor
-import gc
+# import gc
 
 class Reads2Vectors():
     def __init__(self, logger, config, edit_dis):

@@ -7,7 +7,7 @@
 import editdistance
 import networkx as nx
 import os
-import csv
+# import csv
 from tqdm import tqdm
 from noise2read.utils import *
 from mpire import WorkerPool
@@ -17,7 +17,7 @@ from collections import Counter
 import sys
 import pandas as pd
 # from noise2read.utils import MemoryMonitor
-import gc
+# import gc
 
 class DataGneration():
     """

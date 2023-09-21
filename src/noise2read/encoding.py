@@ -10,7 +10,7 @@ import numpy as np
 import statistics
 from scipy.fftpack import fft
 import math
-import gc
+# import gc
 
 class FourierTransform():
     def __init__(self, read):

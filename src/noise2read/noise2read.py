@@ -15,15 +15,15 @@ from noise2read.utils import custom_logger, usage
 from noise2read.data_preprocessing import DataProcessing
 # from contextlib import redirect_stdout
 import noise2read
-from noise2read.utils import MemoryMonitor
-import gc
+# from noise2read.utils import MemoryMonitor
+# import gc
 
 def main():
     argv = sys.argv[1:]
     # create logger
     logger = custom_logger("noise2read", debug_mode=False)
-    MM = MemoryMonitor(logger)
-    MM.start()
+    # MM = MemoryMonitor(logger)
+    # #MM.start()
     ##############################################################
     try:
         # opts, args = getopt.getopt(argv, "m:c:i:u:t:r:d:p:a:g:o:l:h:", ["module=", "config=", "input=", "umi_file", "true", "rectification", "directory", "parallel", "high_ambiguous", "tree_method", "over_sampling", "libray_layout", "help"]) 
@@ -144,7 +144,7 @@ def main():
                     else:
                         isolates_file, non_isolates_file, unique_seqs, read_max_len, read_min_len, genuine_df, negative_df, ambiguous_df = DG.data_files(edit_dis=1)      
                     config.read_max_len = read_max_len
-                    MM.measure()
+                    #MM.measure()
                     #gc.collect()
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
@@ -162,7 +162,7 @@ def main():
                     else:
                         config.correct_data = corrected_file
                     del DG, EC
-                    MM.measure()
+                    #MM.measure()
                     #gc.collect()
                     ############################
                     DataAnalysis(logger, config).evaluation()  
@@ -171,8 +171,8 @@ def main():
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
                         os.system("rm -rf %s" % bcool_dir)
-                    MM.measure()
-                    MM.stop()
+                    #MM.measure()
+                    #MM.stop()
                     ###############################################################
                     # if config.high_ambiguous:
                     #     if read_min_len > config.min_read_len:
@@ -227,7 +227,7 @@ def main():
 
                     isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG.simplify_data_files(config.input_file, edit_dis=1)      
                     config.read_max_len = read_max_len
-                    MM.measure()
+                    #MM.measure()
                     #gc.collect()
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
@@ -242,7 +242,7 @@ def main():
                     else:
                         config.correct_data = corrected_file
                     del DG, EC
-                    MM.measure()
+                    #MM.measure()
                     #gc.collect()
                     ###################################
                     DataAnalysis(logger, config).evaluation()  
@@ -250,8 +250,8 @@ def main():
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
                         os.system("rm -rf %s" % bcool_dir) 
-                    MM.measure()
-                    MM.stop()        
+                    #MM.measure()
+                    #MM.stop()        
 ############################################################################################################################
                 elif module_arg == "amplicon_correction": 
                     if c_lst:
@@ -312,7 +312,7 @@ def main():
                     else:
                         isolates_file, non_isolates_file, unique_seqs, read_max_len, read_min_len, genuine_df, negative_df, ambiguous_df = DG.data_files(edit_dis=1)      
                     config.read_max_len = read_max_len
-                    MM.measure()
+                    #MM.measure()
                     #gc.collect()
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
@@ -336,7 +336,7 @@ def main():
                         logger.warning("No genuine or negative samples for amplicon errors prediction!")
                         config.correct_data = mid_result
                     del DG, EC
-                    MM.measure()
+                    #MM.measure()
                     #gc.collect()
                     ########################################
                     DataAnalysis(logger, config).evaluation()
@@ -344,8 +344,8 @@ def main():
                     bcool_dir = os.path.join(config.result_dir, 'bcool/')
                     if os.path.exists(bcool_dir):
                         os.system("rm -rf %s" % bcool_dir)
-                    MM.measure()
-                    MM.stop()
+                    #MM.measure()
+                    #MM.stop()
 ############################################################################################################################
                 elif module_arg == "umi_correction": 
                     if c_lst:
@@ -391,17 +391,17 @@ def main():
                     config.high_ambiguous=False
                     DG = DataGneration(logger, config)
                     genuine_df = DG.extract_umi_genuine_errs(config.input_file)
-                    MM.measure()
+                    #MM.measure()
                     #gc.collect()
                     # ##############################################################
                     EC = ErrorCorrection(logger, config)
                     config.correct_data = EC.umi_correction(config.input_file, genuine_df)
                     del DG, EC
-                    MM.measure()
+                    #MM.measure()
                     #gc.collect()
                     DataAnalysis(logger, config).evaluation()
-                    MM.measure()
-                    MM.stop()
+                    #MM.measure()
+                    #MM.stop()
 ############################################################################################################################
                 elif module_arg == "mimic_umi":   
                     if i_lst and t_lst:

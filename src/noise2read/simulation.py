@@ -9,7 +9,7 @@ from Bio import SeqIO
 # import gzip
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
-from tqdm import tqdm
+# from tqdm import tqdm
 import copy
 import random
 from mpire import WorkerPool
@@ -18,7 +18,7 @@ from noise2read.utils import *
 from noise2read.data_generation import DataGneration
 from noise2read.error_orrection import ErrorCorrection
 from noise2read.data_preprocessing import DataProcessing
-import numpy as np
+# import numpy as np
 import sys
 
 class Simulation():

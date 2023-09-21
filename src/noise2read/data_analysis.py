@@ -7,27 +7,27 @@
 from collections import Counter
 import collections
 import math
-from Bio import SeqIO
+# from Bio import SeqIO
 import os
 import editdistance
 import xlsxwriter
 from noise2read.utils import *
-from numpy.linalg import norm
-from numpy import array
-from numpy.fft import fft,rfft
+# from numpy.linalg import norm
+# from numpy import array
+# from numpy.fft import fft,rfft
 # import numpy as np
 # import antropy as ant
-import cmath
+# import cmath
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import seaborn as sns
+# import seaborn as sns
 import matplotlib as mpl
-from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+# from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from random import shuffle
-from tqdm import tqdm
+# from tqdm import tqdm
 from mpire import WorkerPool
-import gc
+# import gc
 
 class DataAnalysis():
     """
@@ -130,7 +130,7 @@ class DataAnalysis():
         del raw_record_iterator, correct_record_iterator
         corrected_reads_num = 0
 
-        for item in tqdm(id_lst):
+        for item in id_lst:
             ori_read = raw_record_dict[item]
             cor_read = correct_record_dict[item]
             if str(cor_read) != str(ori_read):
@@ -614,10 +614,10 @@ class DataAnalysis():
         ###################################################################
         # raw entropy
         raw_nonFre_reads_total_num = sum(raw_entropy_items)
-        chunk_size = len(raw_entropy_items) // self.config.chunks_num
+        chunk_size = len(raw_entropy_items) // (self.config.num_workers//3)
         if chunk_size > 1:
             groups = [raw_entropy_items[i:i+chunk_size] for i in range(0, len(raw_entropy_items), chunk_size)]
-            for group in tqdm(groups):
+            for group in groups:
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
                         raw_entropy_lst = pool.map(self.entropy_item, group)
@@ -648,10 +648,10 @@ class DataAnalysis():
         #############################################################
         # correct entropy
         correct_nonFre_reads_total_num = sum(correct_entropy_items)
-        chunk_size = len(correct_entropy_items) // self.config.chunks_num
+        chunk_size = len(correct_entropy_items) // (self.config.num_workers//3)
         if chunk_size > 1:
             groups = [correct_entropy_items[i:i+chunk_size] for i in range(0, len(correct_entropy_items), chunk_size)]
-            for group in tqdm(groups):
+            for group in groups:
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
                         correct_entropy_lst = pool.map(self.entropy_item, group) 
@@ -680,10 +680,10 @@ class DataAnalysis():
         del correct_entropy_items, correct_entropy_lst, correct_nonFre_reads_total_num
         ##################################################################################
         #information gain (\delta I) heatmap
-        chunk_size = len(raw_kept_counts) // self.config.chunks_num
+        chunk_size = len(raw_kept_counts) // (self.config.num_workers//3)
         if chunk_size > 1:
             groups = [raw_kept_counts[i:i+chunk_size] for i in range(0, len(raw_kept_counts), chunk_size)]
-            for group in tqdm(groups):
+            for group in groups:
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                         raw_kept_entropy_lst = pool.map(self.entropy_item, group)
@@ -709,10 +709,10 @@ class DataAnalysis():
                 raise
         del raw_kept_counts
         ########################################################
-        chunk_size = len(correct_kept_counts) // self.config.chunks_num
+        chunk_size = len(correct_kept_counts) // (self.config.num_workers//3)
         if chunk_size > 1:
             groups = [correct_kept_counts[i:i+chunk_size] for i in range(0, len(correct_kept_counts), chunk_size)]
-            for group in tqdm(groups):
+            for group in groups:
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                         correct_kept_entropy_lst = pool.map(self.entropy_item, group) 
@@ -738,10 +738,10 @@ class DataAnalysis():
                 raise
         del correct_kept_counts
         ############################################################################
-        chunk_size = len(raw_removed_items) // self.config.chunks_num
+        chunk_size = len(raw_removed_items) // (self.config.num_workers//3)
         if chunk_size > 1:
             groups = [raw_removed_items[i:i+chunk_size] for i in range(0, len(raw_removed_items), chunk_size)]
-            for group in tqdm(groups):
+            for group in groups:
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
                         raw_removed_entropy_items_lst = pool.map(self.entropy_item, group)

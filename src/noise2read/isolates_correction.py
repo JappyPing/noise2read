@@ -13,7 +13,7 @@ from noise2read.utils import *
 from pathlib import Path
 from Bio.SeqRecord import SeqRecord
 # from noise2read.utils import MemoryMonitor
-import gc
+# import gc
 
 class IsolatesErrorCorrection():
     def __init__(self, 

@@ -9,7 +9,7 @@
 
 # from collections import Counter
 import collections
-import math
+# import math
 from Bio import SeqIO
 # import os
 # import editdistance
