@@ -16,6 +16,7 @@ from noise2read.data_preprocessing import DataProcessing
 # from contextlib import redirect_stdout
 import noise2read
 from noise2read.utils import MemoryMonitor
+import gc
 
 def main():
     argv = sys.argv[1:]
@@ -144,6 +145,7 @@ def main():
                         isolates_file, non_isolates_file, unique_seqs, read_max_len, read_min_len, genuine_df, negative_df, ambiguous_df = DG.data_files(edit_dis=1)      
                     config.read_max_len = read_max_len
                     MM.measure()
+                    gc.collect()
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
                     ## one model to predict
@@ -161,6 +163,7 @@ def main():
                         config.correct_data = corrected_file
                     del DG, EC
                     MM.measure()
+                    gc.collect()
                     ############################
                     DataAnalysis(logger, config).evaluation()  
 
@@ -225,6 +228,7 @@ def main():
                     isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG.simplify_data_files(config.input_file, edit_dis=1)      
                     config.read_max_len = read_max_len
                     MM.measure()
+                    gc.collect()
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
                     corrected_file = EC.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
@@ -239,6 +243,7 @@ def main():
                         config.correct_data = corrected_file
                     del DG, EC
                     MM.measure()
+                    gc.collect()
                     ###################################
                     DataAnalysis(logger, config).evaluation()  
                     # delete bcool result
@@ -308,6 +313,7 @@ def main():
                         isolates_file, non_isolates_file, unique_seqs, read_max_len, read_min_len, genuine_df, negative_df, ambiguous_df = DG.data_files(edit_dis=1)      
                     config.read_max_len = read_max_len
                     MM.measure()
+                    gc.collect()
                     ###############################################################
                     EC = ErrorCorrection(logger, config)
                     ## one model to predict
@@ -315,11 +321,13 @@ def main():
                         corrected_file, new_negative_df = EC.all_in_one_correction(isolates_file, non_isolates_file, unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df)
                     else:
                         corrected_file, new_negative_df = EC.all_in_one_correction(isolates_file, non_isolates_file, unique_seqs, genuine_df, negative_df, ambiguous_df, high_ambiguous_df =None) 
+                    gc.collect()
                     if read_min_len > config.min_read_len:
                         genuine_df2, negative_df2, ambiguous_df2, unique_seqs2 = DG.extract_ed2_errors(corrected_file)
                         mid_result = EC.all_in_one_ed2_correction(corrected_file, unique_seqs2, genuine_df2, negative_df2, ambiguous_df2)
                     else:
                         mid_result = corrected_file
+                    gc.collect()
                     # mid_result = config.input_file
                     if (not new_negative_df.empty or not negative_df.empty) and not genuine_df.empty:
                         amplicon_df = DG.extract_amplicon_err_samples(mid_result)
@@ -329,6 +337,7 @@ def main():
                         config.correct_data = mid_result
                     del DG, EC
                     MM.measure()
+                    gc.collect()
                     ########################################
                     DataAnalysis(logger, config).evaluation()
                     # delete bcool result
@@ -383,11 +392,13 @@ def main():
                     DG = DataGneration(logger, config)
                     genuine_df = DG.extract_umi_genuine_errs(config.input_file)
                     MM.measure()
+                    gc.collect()
                     # ##############################################################
                     EC = ErrorCorrection(logger, config)
                     config.correct_data = EC.umi_correction(config.input_file, genuine_df)
                     del DG, EC
                     MM.measure()
+                    gc.collect()
                     DataAnalysis(logger, config).evaluation()
                     MM.measure()
                     MM.stop()

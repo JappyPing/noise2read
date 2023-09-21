@@ -629,6 +629,7 @@ class Reads2Vectors():
         self.logger.debug(err_kmers2count)
         self.logger.debug(err_tyes2count)
         #self.MM.measure()
+        gc.collect()
         ##################################################################################
         genuine_feature_lst = []
         for idx, row in genuine_df.iterrows():
@@ -646,6 +647,7 @@ class Reads2Vectors():
         genuine_fea = self.read2vec(genuine_feature_lst)
         del genuine_feature_lst
         #self.MM.measure()
+        gc.collect()
         #################################################################################
         negative_feature_lst = []
         for idx, row in new_negative_df.iterrows():
@@ -680,6 +682,7 @@ class Reads2Vectors():
         negative_fea = self.read2vec(negative_feature_lst)
         del negative_feature_lst
         #self.MM.measure()
+        gc.collect()
         ###############################################################
         ambiguous_feature_lst = []
         for idx, row in ambiguous_df.iterrows():
@@ -696,6 +699,7 @@ class Reads2Vectors():
         ambiguous_fea = self.read2vec(ambiguous_feature_lst)
         del ambiguous_feature_lst
         #self.MM.measure()
+        gc.collect()
         ##################################################################
         read_features = genuine_fea + negative_fea
         labels = np.array([1] * len(genuine_fea) + [0] * len(negative_fea))
@@ -714,6 +718,7 @@ class Reads2Vectors():
         del train_data, ambiguous_data, genuine_fea, negative_fea, ambiguous_fea, read_features
         #self.MM.measure()
         #self.MM.stop()
+        gc.collect()
         return train, labels, ambiguous
 
     '''
