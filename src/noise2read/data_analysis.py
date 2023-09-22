@@ -614,8 +614,22 @@ class DataAnalysis():
         ###################################################################
         # raw entropy
         raw_nonFre_reads_total_num = sum(raw_entropy_items)
-        chunk_size = len(raw_entropy_items) // (self.config.num_workers//3)
-        if chunk_size > 1:
+
+        if self.config.reads_chunks_num == 1:
+            try:
+                with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
+                    raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
+                raw_entropy = sum(raw_entropy_lst) 
+                #gc.collect()
+            except KeyboardInterrupt:
+                # Handle termination signal (Ctrl+C)
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
+        else:
+            chunk_size = len(raw_entropy_items) // self.config.reads_chunks_num
             groups = [raw_entropy_items[i:i+chunk_size] for i in range(0, len(raw_entropy_items), chunk_size)]
             for group in groups:
                 try:
@@ -630,12 +644,16 @@ class DataAnalysis():
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
                     raise
-        else:
-            try:
+        del raw_entropy_items, raw_entropy_lst, raw_nonFre_reads_total_num
+        #############################################################
+        # correct entropy
+        correct_nonFre_reads_total_num = sum(correct_entropy_items)
 
-                with WorkerPool(self.config.num_workers, shared_objects=raw_nonFre_reads_total_num, start_method='fork') as pool:
-                    raw_entropy_lst = pool.map(self.entropy_item, raw_entropy_items)
-                raw_entropy = sum(raw_entropy_lst) 
+        if self.config.reads_chunks_num == 1:
+            try:
+                with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
+                    correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
+                correct_entropy = sum(correct_entropy_lst)
                 #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
@@ -644,12 +662,8 @@ class DataAnalysis():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-        del raw_entropy_items, raw_entropy_lst, raw_nonFre_reads_total_num
-        #############################################################
-        # correct entropy
-        correct_nonFre_reads_total_num = sum(correct_entropy_items)
-        chunk_size = len(correct_entropy_items) // (self.config.num_workers//3)
-        if chunk_size > 1:
+        else:
+            chunk_size = len(correct_entropy_items) // self.config.reads_chunks_num
             groups = [correct_entropy_items[i:i+chunk_size] for i in range(0, len(correct_entropy_items), chunk_size)]
             for group in groups:
                 try:
@@ -664,11 +678,14 @@ class DataAnalysis():
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
                     raise
-        else:
+
+        del correct_entropy_items, correct_entropy_lst, correct_nonFre_reads_total_num
+        ##################################################################################
+        #information gain (\delta I) heatmap
+        if self.config.reads_chunks_num == 1:
             try:
-                with WorkerPool(self.config.num_workers, shared_objects=correct_nonFre_reads_total_num, start_method='fork') as pool:
-                    correct_entropy_lst = pool.map(self.entropy_item, correct_entropy_items) 
-                correct_entropy = sum(correct_entropy_lst)
+                with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
+                    raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
                 #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
@@ -677,11 +694,8 @@ class DataAnalysis():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-        del correct_entropy_items, correct_entropy_lst, correct_nonFre_reads_total_num
-        ##################################################################################
-        #information gain (\delta I) heatmap
-        chunk_size = len(raw_kept_counts) // (self.config.num_workers//3)
-        if chunk_size > 1:
+        else:
+            chunk_size = len(raw_kept_counts) // self.config.reads_chunks_num
             groups = [raw_kept_counts[i:i+chunk_size] for i in range(0, len(raw_kept_counts), chunk_size)]
             for group in groups:
                 try:
@@ -695,10 +709,14 @@ class DataAnalysis():
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
                     raise
-        else:
+
+        del raw_kept_counts
+        ########################################################
+
+        if self.config.reads_chunks_num == 1:
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-                    raw_kept_entropy_lst = pool.map(self.entropy_item, raw_kept_counts)
+                    correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
                 #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
@@ -707,10 +725,8 @@ class DataAnalysis():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-        del raw_kept_counts
-        ########################################################
-        chunk_size = len(correct_kept_counts) // (self.config.num_workers//3)
-        if chunk_size > 1:
+        else:
+            chunk_size = len(correct_kept_counts) // self.config.reads_chunks_num
             groups = [correct_kept_counts[i:i+chunk_size] for i in range(0, len(correct_kept_counts), chunk_size)]
             for group in groups:
                 try:
@@ -724,10 +740,13 @@ class DataAnalysis():
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
                     raise
-        else:
+        del correct_kept_counts
+        ############################################################################
+
+        if self.config.reads_chunks_num == 1:
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-                    correct_kept_entropy_lst = pool.map(self.entropy_item, correct_kept_counts) 
+                    raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
                 #gc.collect()
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
@@ -736,10 +755,8 @@ class DataAnalysis():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-        del correct_kept_counts
-        ############################################################################
-        chunk_size = len(raw_removed_items) // (self.config.num_workers//3)
-        if chunk_size > 1:
+        else:
+            chunk_size = len(raw_removed_items) // self.config.reads_chunks_num
             groups = [raw_removed_items[i:i+chunk_size] for i in range(0, len(raw_removed_items), chunk_size)]
             for group in groups:
                 try:
@@ -753,19 +770,6 @@ class DataAnalysis():
                     # Handle other exceptions
                     pool.terminate()  # Terminate the WorkerPool before exiting
                     raise
-        else:
-            try:
-                with WorkerPool(self.config.num_workers, shared_objects=total_num, start_method='fork') as pool:
-                    raw_removed_entropy_items_lst = pool.map(self.entropy_item, raw_removed_items)
-                #gc.collect()
-            except KeyboardInterrupt:
-                # Handle termination signal (Ctrl+C)
-                pool.terminate()  # Terminate the WorkerPool before exiting
-            except Exception:
-                # Handle other exceptions
-                pool.terminate()  # Terminate the WorkerPool before exiting
-                raise
-
         del raw_removed_items
         #######
         # for i in raw_removed_entropy_items_lst:

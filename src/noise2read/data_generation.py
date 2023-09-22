@@ -18,6 +18,7 @@ import sys
 import pandas as pd
 # from noise2read.utils import MemoryMonitor
 # import gc
+import multiprocessing
 
 class DataGneration():
     """
@@ -180,6 +181,42 @@ class DataGneration():
         edges = list(zip(read_lst, real_seqs))
         # del possible_ed1, read_lst, real_seqs
         return edges
+
+    # def read2seqs_nt(self, high_freq_reads, edit_dis):
+    #     try:
+    #         with WorkerPool(self.config.num_workers) as pool: #, start_method='fork'
+    #             if edit_dis == 1:
+    #                 potential_seqs_lst = pool.map(enumerate_ed1_seqs, high_freq_reads)     
+    #             elif edit_dis == 2:
+    #                 potential_seqs_lst = pool.map(enumerate_ed2_seqs, high_freq_reads) 
+    #     except KeyboardInterrupt:
+    #         # Handle termination signal (Ctrl+C)
+    #         pool.terminate()  # Terminate the WorkerPool before exiting
+    #     except Exception:
+    #         # Handle other exceptions
+    #         pool.terminate()  # Terminate the WorkerPool before exiting
+    #         raise         
+    #     return potential_seqs_lst
+
+
+    # def real_ed1_seqs(self, total_seqs, possible_ed1):
+    #     """
+    #     given a read, generate all its 1nt-edit-distance read counterparts existing in the dataset to form the edges  
+
+    #     Args:
+    #         total_seqs (list): The list consisting of all reads in the sequencing dataset.
+    #         read (str): A DNA/RNA sequence.
+
+    #     Returns:
+    #         list: list of tuples of read pairs with only one base different
+    #     """
+    #     # possible_ed1 = enumerate_ed1_seqs(read)
+    #     real_seqs =  set(total_seqs).intersection(set(possible_ed1))
+    #     read_lst = [read] * len(real_seqs)
+    #     edges = list(zip(read_lst, real_seqs))
+    #     # del possible_ed1, read_lst, real_seqs
+    #     return edges
+
 
     def extract_err_samples(self, graph, edit_dis):
         """
@@ -1090,52 +1127,8 @@ class DataGneration():
             shared_unique_seqs = low_freq
         
         self.logger.debug("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
-        # try:
-        #     # chunk_size = len(high_freq) // self.config.chunks_num
-        #     chunk_size = len(high_freq) // (self.config.num_workers//3)
-        #     with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs) as pool:
-        #         if edit_dis == 1:
-        #             for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, chunk_size=chunk_size, progress_bar=self.config.verbose): #, worker_lifespan=1, chunk_size=1
-        #                 edges_lst.extend(edge_lst)
-        #         elif edit_dis == 2:
-        #             for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, chunk_size=chunk_size, progress_bar=self.config.verbose):
-        #                 edges_lst.extend(edge_lst)
-        #     #gc.collect()
-        # except KeyboardInterrupt:
-        #     # Handle termination signal (Ctrl+C)
-        #     pool.terminate()  # Terminate the WorkerPool before exiting
-        # except Exception:
-        #     # Handle other exceptions
-        #     pool.terminate()  # Terminate the WorkerPool before exiting
-        #     raise
         #############################################################################################################
-        # chunk_size = len(high_freq) // self.config.chunks_num
-        chunk_size = len(high_freq) // (self.config.num_workers//3)
-        # chunk_size = self.config.num_workers * 2
-        # chunk_num = len(high_freq) // chunk_size
-
-        if chunk_size > 1:
-        # if chunk_num > 1:
-        # if chunk_size >= self.config.num_workers:
-            groups = [high_freq[i:i+chunk_size] for i in range(0, len(high_freq), chunk_size)]
-            for group in tqdm(groups):
-                try:
-                    with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
-                        if edit_dis == 1:
-                            for edge_lst in pool.imap(self.real_ed1_seqs, group): #, progress_bar=self.config.verbose, worker_lifespan=1, chunk_size=1
-                                edges_lst.extend(edge_lst)
-                        elif edit_dis == 2:
-                            for edge_lst in pool.imap(self.real_ed2_seqs, group):
-                                edges_lst.extend(edge_lst)
-                    # #gc.collect()
-                except KeyboardInterrupt:
-                    # Handle termination signal (Ctrl+C)
-                    pool.terminate()  # Terminate the WorkerPool before exiting
-                except Exception:
-                    # Handle other exceptions
-                    pool.terminate()  # Terminate the WorkerPool before exiting
-                    raise                
-        else:
+        if self.config.reads_chunks_num == 1:
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
                     if edit_dis == 1:
@@ -1152,6 +1145,28 @@ class DataGneration():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
+        # if chunk_size > 1:
+        else:
+            chunk_size = len(high_freq) // self.config.reads_chunks_num
+            groups = [high_freq[i:i+chunk_size] for i in range(0, len(high_freq), chunk_size)]
+            for group in tqdm(groups):
+                try:
+                    with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool: #, start_method='fork'
+                        if edit_dis == 1:
+                            for edge_lst in pool.imap(self.real_ed1_seqs, group): #, progress_bar=self.config.verbose, worker_lifespan=1, chunk_size=1
+                                edges_lst.extend(edge_lst)
+                        elif edit_dis == 2:
+                            for edge_lst in pool.imap(self.real_ed2_seqs, group):
+                                edges_lst.extend(edge_lst)
+                    # #gc.collect()
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise               
+
         ######################################################################################################
         if len(edges_lst) > 0:
             self.logger.debug(len(edges_lst))
@@ -1207,7 +1222,6 @@ class DataGneration():
         edges = list(zip(read_lst, real_ed2_seqs))  
         # del real_ed2_seqs   
         return edges   
-    
     
     def extract_ed2_errors(self, data_set): 
         """
