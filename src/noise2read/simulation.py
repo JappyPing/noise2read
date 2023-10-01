@@ -251,7 +251,7 @@ class Simulation():
         if flag1:
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-                    for tmp_rec in pool.imap(self.mutate_seq, err_1_id_lst, progress_bar=self.config.verbose):
+                    for tmp_rec in pool.imap(self.mutate_seq, err_1_id_lst):#, progress_bar=self.config.verbose):
                         err_records.append(tmp_rec)
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)
@@ -264,7 +264,7 @@ class Simulation():
         if flag2:
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=shared_objects, start_method='fork') as pool:
-                    for tmp_rec in pool.imap(self.mutate_2base_seq, err_2_id_lst, progress_bar=self.config.verbose):
+                    for tmp_rec in pool.imap(self.mutate_2base_seq, err_2_id_lst):#, progress_bar=self.config.verbose):
                         err_records.append(tmp_rec)
             except KeyboardInterrupt:
                 # Handle termination signal (Ctrl+C)

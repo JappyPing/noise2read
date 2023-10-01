@@ -129,7 +129,7 @@ class ErrorCorrection():
             sys.exit(1)
 
         # # bcool correction
-        IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, non_isolates_correct, self.config.result_dir, self.config.iso_change_detail, self.config.min_iters)
+        IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, non_isolates_correct, self.config.result_dir, self.config.iso_change_detail)
         corrected_isolates = IEC.bcool_correct_isolates() 
         if corrected_isolates and non_isolates_correct:
             os.system("cat %s %s > %s" % (corrected_isolates, non_isolates_correct, corrected_file))

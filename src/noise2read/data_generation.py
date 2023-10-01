@@ -41,7 +41,7 @@ class DataGneration():
                 config.graph_visualization (bool, optional): If true, noise2read will draw the connected subgraphs of the construted  graph. Defaults to False.
                 config.drawing_graph_num (int, optional): The number of subgraphs will be drawing. Defaults to 50.
                 config.high_ambiguous (bool, optional): If true, noise2read will predict high ambiguous errors. Defaults to False.
-                config.min_iters (int, optional): Minimum progress display update interval in iterations for the module tqdm. Defaults to 100.
+                # config.min_iters (int, optional): Minimum progress display update interval in iterations for the module tqdm. Defaults to 100.
                 config.verbose (bool, optional): If true, noise2read will save the genuine, ambiguous errors and negative reads to csv.
         """
         self.logger = logger

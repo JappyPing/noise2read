@@ -16,7 +16,6 @@ import collections
 # from imblearn.under_sampling import RandomUnderSampler
 from matplotlib import pyplot
 from sklearn.metrics import f1_score
-import optuna
 import numpy as np
 # from matplotlib import pyplot as plt
 # from sklearn.metrics import classification_report, confusion_matrix

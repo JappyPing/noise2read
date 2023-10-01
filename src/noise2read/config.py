@@ -52,10 +52,10 @@ class Config(object):
                 self.verbose = conf.getboolean("General", "verbose")
             else:
                 self.verbose = False
-            if conf.has_option("General", "min_iters"):
-                self.min_iters = conf.getint("General", "min_iters")
-            else:
-                self.min_iters = 1000
+            # if conf.has_option("General", "min_iters"):
+            #     self.min_iters = conf.getint("General", "min_iters")
+            # else:
+            #     self.min_iters = 1000
             if conf.has_option("General", "iso_change_detail"):
                 self.iso_change_detail = conf.getboolean("General", "iso_change_detail")
             else:
@@ -186,18 +186,18 @@ class Config(object):
             else:
                 self.max_depth_step = 1 # default 
 
-            if conf.has_option("ModelTuningSetup", "num_boost_round_min"):
-                self.num_boost_round_min = conf.getint("ModelTuningSetup", "num_boost_round_min")
-            else:
-                self.num_boost_round_min = 200 # default     
-            if conf.has_option("ModelTuningSetup", "num_boost_round_max"):
-                self.num_boost_round_max = conf.getint("ModelTuningSetup", "num_boost_round_max")
-            else:
-                self.num_boost_round_max = 300 # default     
-            if conf.has_option("ModelTuningSetup", "num_boost_round_step"):
-                self.num_boost_round_step = conf.getint("ModelTuningSetup", "num_boost_round_step")
-            else:
-                self.num_boost_round_step = 10 # default 
+            # if conf.has_option("ModelTuningSetup", "num_boost_round_min"):
+            #     self.num_boost_round_min = conf.getint("ModelTuningSetup", "num_boost_round_min")
+            # else:
+            #     self.num_boost_round_min = 200 # default     
+            # if conf.has_option("ModelTuningSetup", "num_boost_round_max"):
+            #     self.num_boost_round_max = conf.getint("ModelTuningSetup", "num_boost_round_max")
+            # else:
+            #     self.num_boost_round_max = 300 # default     
+            # if conf.has_option("ModelTuningSetup", "num_boost_round_step"):
+            #     self.num_boost_round_step = conf.getint("ModelTuningSetup", "num_boost_round_step")
+            # else:
+            #     self.num_boost_round_step = 10 # default 
 
             if conf.has_option("ModelTuningSetup", "subsample_min"):
                 self.subsample_min = conf.getfloat("ModelTuningSetup", "subsample_min")
@@ -233,10 +233,10 @@ class Config(object):
             else:
                 self.optuna_seed = 42 # default 
 
-            if conf.has_option("ModelTuningSetup", "best_accuracy"):
-                self.best_accuracy = conf.getfloat("ModelTuningSetup", "best_accuracy")
-            else:
-                self.best_accuracy = 0.85 # default     
+            # if conf.has_option("ModelTuningSetup", "best_accuracy"):
+            #     self.best_accuracy = conf.getfloat("ModelTuningSetup", "best_accuracy")
+            # else:
+            #     self.best_accuracy = 0.85 # default     
 
             # real umi
             if conf.has_option("RealUMI", "umi_in_read"):
@@ -348,8 +348,8 @@ class Config(object):
             self.num_workers = -1 
             self.chunks_num = 100
             self.reads_chunks_num = 1
-            self.min_iters = 1000
-            self.verbose = True 
+            # self.min_iters = 1000
+            self.verbose = False 
             self.iso_change_detail = False     
             self.top_n = 10      
             # self.over_sampling = True 
@@ -388,9 +388,9 @@ class Config(object):
             self.max_depth_min = 3 # default     
             self.max_depth_max = 15 # default     
             self.max_depth_step = 1 # default 
-            self.num_boost_round_min = 200 # default     
-            self.num_boost_round_max = 300 # default     
-            self.num_boost_round_step = 10 # default 
+            # self.num_boost_round_min = 200 # default     
+            # self.num_boost_round_max = 300 # default     
+            # self.num_boost_round_step = 10 # default 
             self.subsample_min = 0.8 # default     
             self.subsample_max = 1 # default     
             self.colsample_bytree_min = 0.8 # default     
@@ -400,7 +400,7 @@ class Config(object):
             self.xgboost_seed = 42 # default 
             self.optuna_seed = 42
             # optuna best trial accuracy
-            self.best_accuracy = 0.85
+            # self.best_accuracy = 0.85
 
             # real umi
             self.umi_in_read = False
@@ -427,8 +427,8 @@ class Config(object):
             self.min_read_count = 30
             # self.substations = True
             # self.indels = False
-            self.error_rate1 = 0.03
-            self.error_rate2 = 0.005
+            self.error_rate1 = 0.09
+            self.error_rate2 = 0.02
   
             # # Evaluation
             # self.delta = 1

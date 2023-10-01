@@ -22,8 +22,7 @@ class IsolatesErrorCorrection():
             isolates, 
             correct_non_isolates,
             output_dir,
-            iso_change_detail,
-            min_iters):
+            iso_change_detail):
         self.logger = logger
         self.num_workers = num_workers
         self.isolates = isolates
@@ -32,7 +31,7 @@ class IsolatesErrorCorrection():
         bases = self.isolates.split('/')[-1]
         self.base = bases.split('.')
         self.iso_change_detail = iso_change_detail
-        self.min_iters = min_iters
+        # self.min_iters = min_iters
         #self.MM = MemoryMonitor(logger)
         #self.MM.start()
 
