@@ -29,6 +29,7 @@ noise2read Documentation
 
    Usage/Installation
    Usage/Configuration
+   Usage/Parameters
    Usage/Modules/Index
    Usage/Examples/Index
 

@@ -11,7 +11,7 @@ Create virtual environments to run noise2read.
 
 .. code-block:: console
 
-  conda create -n noise2read_env python=3.8
+  conda create -n noise2read_env python=3.11
   conda activate noise2read_env
 
 **Or**
@@ -58,16 +58,17 @@ Create virtual environments to run noise2read.
       biopython == 1.79
       xgboost == 1.6.1
       Xlsxwriter == 3.0.3
-      tqdm == 4.64.0
-      scikit-learn == 1.1.1
+      tqdm == 4.66.1
+      scikit-learn == 1.3
       networkx == 2.8.5
-      pandas == 1.4.3
-      optuna == 2.10.1
+      pandas == 2.1.0
+      optuna >= 3.1.1
       matplotlib == 3.5.2
-      mpire >= 2.5.0
-      editdistance == 0.6.0
+      mpire >= 2.8.0
+      editdistance == 0.6.2
       imbalanced-learn == 0.9.1
       seaborn >= 0.12.1
+      psutil == 5.9.5
 
 will be installed automatically
 
