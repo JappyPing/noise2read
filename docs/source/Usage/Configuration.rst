@@ -82,7 +82,6 @@ The following contents are the default setting for noise2read using an INI file 
     num_workers = -1
     ; if num_workers = -1 or 0, noise2read will use all the available cpus 
     verbose = True 
-    min_iters = 100
     iso_change_detail = True
     top_n = 100
 
@@ -115,9 +114,6 @@ The following contents are the default setting for noise2read using an INI file 
     max_depth_min = 3     
     max_depth_max = 15     
     max_depth_step = 1 
-    num_boost_round_min = 200     
-    num_boost_round_max = 300     
-    num_boost_round_step = 10 
     subsample_min = 0.8     
     subsample_max = 1     
     colsample_bytree_min = 0.8     

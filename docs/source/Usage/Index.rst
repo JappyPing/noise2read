@@ -7,6 +7,7 @@ Contents
 
     Installation
     Configuration
+    Parameters
     Modules/Index
     Examples/Index
     Results
