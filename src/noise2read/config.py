@@ -52,10 +52,10 @@ class Config(object):
                 self.verbose = conf.getboolean("General", "verbose")
             else:
                 self.verbose = False
-            # if conf.has_option("General", "min_iters"):
-            #     self.min_iters = conf.getint("General", "min_iters")
-            # else:
-            #     self.min_iters = 1000
+            if conf.has_option("General", "min_iters"):
+                self.min_iters = conf.getint("General", "min_iters")
+            else:
+                self.min_iters = 1000
             if conf.has_option("General", "iso_change_detail"):
                 self.iso_change_detail = conf.getboolean("General", "iso_change_detail")
             else:
@@ -348,7 +348,7 @@ class Config(object):
             self.num_workers = -1 
             self.chunks_num = 100
             self.reads_chunks_num = 1
-            # self.min_iters = 1000
+            self.min_iters = 1000
             self.verbose = False 
             self.iso_change_detail = False     
             self.top_n = 10      
