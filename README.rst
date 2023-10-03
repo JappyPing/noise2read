@@ -16,7 +16,7 @@ Turn 'noise' to signal: accurately rectify millions of erroneous short reads thr
 Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to jump to its documentation
 ===============================================================================================
 
-**Note**: All the experimental results obtained in this study utilised version 0.1.5 of noise2read.
+**Note**: All the experimental results obtained in this study utilised version 0.2.7 of noise2read.
 
 Quick-run example
 =================
@@ -95,9 +95,9 @@ Please refer to `QuickStart <https://noise2read.readthedocs.io/en/latest/QuickSt
 
 * **Expected Results**
 
-Please find the expected log files and correction results at the folder `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_ for correcting data sets of D14-D16. The results under noise2read and noise2read-1 represent the corrected results with and without high ambiguous errors' prediction, respectively. 
+Please find the expected log files and correction results at the folder noise2read of `benchmark <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Eln7oX7Vv8lMhU8XSujBzjIBCjzD0rTPOsEO4uWTW0Bryw?e=6kEy3H>`_ for correcting data sets of D14-D16. The results under noise2read and noise2read-1 represent the corrected results with and without high ambiguous errors' prediction, respectively. 
 
-  **Note**: Noise2read may produce slightly different corrected result from these results under Examples/simulated_miRNAs/correct and `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_. This is because the easy-usable and automatic tuning of the classifiers' parameters facilitates wide-range explorations, different best models are obtained for each training, but the final prediction results are stable within a certain range. We have discussed this in the Discussion section of our paper. 
+  **Note**: Noise2read may produce slightly different corrected result from these results under Examples/simulated_miRNAs/correct and `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Eln7oX7Vv8lMhU8XSujBzjIBCjzD0rTPOsEO4uWTW0Bryw?e=6kEy3H>`_. This is because the easy-usable and automatic tuning of the classifiers' parameters facilitates wide-range explorations, different best models are obtained for each training, but the final prediction results are stable within a certain range. We have discussed this in the Discussion section of our paper. 
 
 Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https://noise2read.readthedocs.io/en/latest/>`_
 =========================================================================================================================
@@ -111,7 +111,7 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
     mkdir ABEs_CBEs
     cd ABEs_CBEs
 
-* Download datasets under the folder of data of `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Ej3EXo3Wt8xOjrpMhSPxpxYBvID7pvJjD7rf53ElNd9jAg?e=mwWnvX>`_.
+* Download datasets under the folder of data of `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EokIIeQd2nFHjlpurzDaBywB7Smy6Sm0dBR86GIJt0PSdg?e=S6w34F>`_.
 
 * Using `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to correct the datasets. The running time of each experiment is about 13 minutes using 26 cores and GPU for training.
 
@@ -122,9 +122,9 @@ Examples for correcting outcome sequence of ABEs and CBEs by `noise2read <https:
 
 * **Expected Results**
 
-Please find the expected log files and correction results at the folder `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Ej3EXo3Wt8xOjrpMhSPxpxYBvID7pvJjD7rf53ElNd9jAg?e=mwWnvX>`_. The results for correcting D32 and D33 are presented under the folders of ABE and CBE, respectively.
+Please find the expected log files and correction results at the folder `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EokIIeQd2nFHjlpurzDaBywB7Smy6Sm0dBR86GIJt0PSdg?e=S6w34F>`_. The results for correcting D32 and D33 are presented under the folders of ABE and CBE, respectively.
 
-  **Note**: Noise2read may produce slightly different corrected result from these under Examples/simulated_miRNAs/correct and `correction <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EoCymbAfWRBCvXFf5T3X7J4BIzj_V75iiohs_wvRyJO7EA?e=ZNN3RB>`_. This is because the easy-usable and automatic tuning of the classifiers' parameters facilitates wide-range explorations, different best models are obtained for each training, but the final prediction results are stable within a certain range. We have discussed this in the Discussion section of our paper. 
+  **Note**: Noise2read may produce slightly different corrected result from these under D32_ABE and D33_CBE of `D32_D33 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EokIIeQd2nFHjlpurzDaBywB7Smy6Sm0dBR86GIJt0PSdg?e=S6w34F>`_. This is because the easy-usable and automatic tuning of the classifiers' parameters facilitates wide-range explorations, different best models are obtained for each training, but the final prediction results are stable within a certain range. We have discussed this in the Discussion section of our paper. 
 
 More examples for reproducing our experiments in this paper can be found at the `Examples <https://noise2read.readthedocs.io/en/latest/Usage/Examples/Index.html>`_ of the documentation
 ========================================================================================================================================================================================
