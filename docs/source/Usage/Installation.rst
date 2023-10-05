@@ -29,62 +29,40 @@ Create virtual environments to run noise2read.
   
   make sure you have installed and currently using python 3
 
-2. Installing dependency
-------------------------
+2. Installing noise2read
+<<<<<<<<<<<<<<<<<<<<<<<<
+
+* Using bioconda
 
 .. code-block:: console
 
-   conda install -c bioconda seqtk
-   conda install -c bioconda bcool
+   conda install -c bioconda noise2read
 
-* Optional to install pygraphviz if you need the visualised read graph.
-
-.. code-block:: console
-
-   conda install -c conda-forge pygraphviz
-
-3. Installing noise2read
-------------------------
 
 * Using pip
   
-.. code-block:: console
+   .. code-block:: console
 
-   pip install noise2read
+      pip install noise2read
 
-.. code-block:: console
+   * dependencies available at pip will be installed automatically
 
-   pip dependencies of
-      biopython == 1.79
-      xgboost == 1.6.1
-      Xlsxwriter == 3.0.3
-      tqdm == 4.66.1
-      scikit-learn == 1.3
-      networkx == 2.8.5
-      pandas == 2.1.0
-      optuna >= 3.1.1
-      matplotlib == 3.5.2
-      mpire >= 2.8.0
-      editdistance == 0.6.2
-      imbalanced-learn == 0.9.1
-      seaborn >= 0.12.1
-      psutil == 5.9.5
+   * install dependencies only available at bioconda
 
-will be installed automatically
+      .. code-block:: console
+
+         conda install -c bioconda seqtk bcool
 
 * source code clone and Installation 
+
 .. code-block:: console
 
    git clone https://github.com/Jappy0/noise2read.git
    cd noise2read
    pip install -e .
 
-4. Bioconda version
--------------------
+* Optional to install pygraphviz if you need the visualised read graph.
 
-Bioconda channel-based noise2read will be released after paper published.
+.. code-block:: console
 
-5. Singularity version
-----------------------
-
-noise2read.simg will be released after paper published.
+   conda install -c conda-forge pygraphviz

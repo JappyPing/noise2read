@@ -1,35 +1,57 @@
 Parameters
 ----------
 
-noise2read is a command-line interface (CLI) based tool to eliminate PCR and sequencing errors for short reads. It utilises CLI mode and INI file for configuring the parameters. noise2read was mainly developed to correct short-read sequencing data, but it also provides several other modules. Therefore, to run noise2read, we must specify the module name from ["simplify_correction", "correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first. Then, we set the relevant parameters required by the each module, otherwise noise2read will use the default parameters.
+Noise2read is a command-line interface (CLI) based tool to eliminate PCR and sequencing errors for short reads. It utilises CLI mode and INI file for configuring the parameters. Noise2read was mainly developed to correct short-read sequencing data, but it also provides several other modules. Therefore, to run noise2read, we must specify the module name from ["simplify_correction", "correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first. Then, we set the relevant parameters required by the each module, otherwise noise2read will use the default parameters.
 
 1. Guidance on setting noise2read parameters:
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 Noise2read has many parameters. But, most of these parameters do not necessarily need to change for different datasets. 
 
-* We strongly suggest the users to set the ``tree_method`` as "gpu_hist" which means using gpu for traning the model. If you do not have GPU resources, please use the simplified version of noise2read to do error correction because using CPU training for large datasets may require serveral days.
+* We strongly suggest the users to set the ``tree_method`` as "gpu_hist" which means using GPU for training the model. If you do not have GPU resources, please use the simplified version of noise2read to do error correction because using CPU training for large datasets may require several days.
 
-* For the large datasets, we do not suggest use a big number of multiprocessing processes (``num_workers``) for noise2Read to run, as we have observed that those situations could suddenly consume a significant amount of memory, and the program ran out of memory and terminated. If noise2read run out of memory and terminate during searching 1nt- or 2nt-edit-distance edges, please use increase the ``reads_chunks_num`` and decrease ``num_workers`` to try again. Beware, a bigger ``reads_chunks_num`` may slow down the noise2read. If noise2read run out of memory and terminate during training, please use increase the ``chunks_num`` and decrease ``num_workers`` to try again. 
+* For the large datasets, we do not suggest use a big number of multiprocessing processes (``num_workers``) for noise2Read to run, as we have observed that those situations could suddenly consume a significant amount of memory, and the program ran out of memory and terminated. 
+
+    - If noise2read runs out of memory and terminates during searching 1nt- or 2nt-edit-distance edges, please increase the parameter ``reads_chunks_num`` (default 1) and decrease ``num_workers`` to try again. Beware, a bigger ``reads_chunks_num`` may slow down the noise2read. 
+    
+    - If noise2read runs out of memory and terminates during training, please increase the ``chunks_num`` (default 100) and decrease ``num_workers`` to try again.
 
 2. The parameters required by different modules are summarised as follows:
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 * simplify_correction
 
+``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``iso_change_detail``, ``top_n``, ``min_read_len``
+
+``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
+
 * correction
 
+All the parameters under "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup" and "ModelTuningSetup"
+
+.. ``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``iso_change_detail``, ``top_n``, ``min_read_len``, ``negative_sample_num``
+
+.. ``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
 * amplicon_correction
+
+All the parameters under "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup", "ModelTuningSetup" and "Amplicon".
 
 * umi_correction
 
+``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``top_n``
+
+``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
+
 * real_umi
+Todo
 
 * mimic_umi
+Todo
 
 * simulation
+Todo
 
 * evaluation
-
+Todo
 
 3. All the parameters of noise2read are descriped as follows,
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -37,6 +59,7 @@ Noise2read has many parameters. But, most of these parameters do not necessarily
 *****
 Paths
 *****
+
 * ``result_dir`` [default= ``working_dirctory/result/``]
 
     - the directory where all the outputs saved.
