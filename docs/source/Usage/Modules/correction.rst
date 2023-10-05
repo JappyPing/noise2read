@@ -1,5 +1,10 @@
 Correction
 ----------
+
+* Parameters required by "correction"
+
+All the parameters of "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup" and "ModelTuningSetup"
+
 * Run with ini configuration
    
 .. code-block:: console
@@ -14,13 +19,13 @@ Correction
 
   .. code-block:: console
 
-      noise2read -m correction -i path/to/raw.fastq -d ./results/ -p 60
+      noise2read -m correction -i path/to/raw.fastq -d ./results/
 
   * Evaluating with ground truth data
 
   .. code-block:: console
 
-      noise2read -m correction -i path/to/raw.fastq -t path/to/true.fastq -r path/to/corrected.fastq -d ./results/ 
+      noise2read -m correction -i path/to/raw.fastq -t path/to/true.fastq -d ./results/ 
 
   * Training with GPU (default CPU)
     

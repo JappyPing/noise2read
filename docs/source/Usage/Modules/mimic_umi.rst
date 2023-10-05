@@ -3,6 +3,10 @@ Mimic_UMI
 
 This module generates mimic UMIs for simulated datasets in order to evaluate using UMI tags rather sequencing IDs by the instruments.
 
+* Parameters required by "mimic_umi"
+
+``result_dir``, ``input_file``, ``ground_truth_data``
+
 * Usage
 
 .. code-block:: console
