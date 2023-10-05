@@ -26,35 +26,41 @@ Noise2read has many parameters. But, most of these parameters do not necessarily
 
 * correction
 
-All the parameters under "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup" and "ModelTuningSetup"
+All the parameters of "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup" and "ModelTuningSetup"
 
 .. ``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``iso_change_detail``, ``top_n``, ``min_read_len``, ``negative_sample_num``
 
 .. ``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
 * amplicon_correction
 
-All the parameters under "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup", "ModelTuningSetup" and "Amplicon".
+All the parameters of "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup", "ModelTuningSetup" and "Amplicon".
 
 * umi_correction
 
-``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``top_n``
+``result_dir``, ``input_file``, ``ground_truth_data``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``top_n``
 
 ``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
 
 * real_umi
-Todo
+
+``result_dir``, ``input_file``, ``num_workers``
+
+All the parameters of "real_umi" 
 
 * mimic_umi
-Todo
+
+``result_dir``, ``input_file``, ``ground_truth_data``
 
 * simulation
-Todo
+
+All the parameters required by "simplify_correction" and those parameters of "simulation"
 
 * evaluation
-Todo
 
-3. All the parameters of noise2read are descriped as follows,
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+``result_dir``, ``input_file``, ``ground_truth_data``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``
+
+3. Parameters Description
+<<<<<<<<<<<<<<<<<<<<<<<<<
 
 *****
 Paths

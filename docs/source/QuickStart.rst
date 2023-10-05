@@ -5,21 +5,26 @@ QuickStart
 Easy Install
 ============
 
-`noise2read <https://pypi.org/project/noise2read/>`_ is currently distributed on `PyPI <https://pypi.org/project/noise2read/>`_, quick install noise2read in the build environment.
+`noise2read <https://pypi.org/project/noise2read/>`_ is currently distributed on `PyPI <https://pypi.org/project/noise2read/>`_ and `bioconda <https://anaconda.org/bioconda/noise2read>`_, quick install noise2read in the build environment.
+
+* Install via bioconda
+
+.. code-block:: console
+
+    conda install -c bioconda noise2read
+
+
+* Install via pip
 
 .. code-block:: console
 
     pip install noise2read
 
-and then install three conda distributed packages of seqtk, bcool and pygraphviz, respectively.
+and then install bioconda distributed packages of seqtk and bcool.
 
 .. code-block:: console
 
-    conda install -c bioconda seqtk
-
-.. code-block:: console
-
-    conda install -c bioconda bcool
+    conda install -c bioconda seqtk bcool
 
 Optional to install pygraphviz if you need the visualised read graph.
 
@@ -30,6 +35,13 @@ Optional to install pygraphviz if you need the visualised read graph.
 ========
 Examples
 ========
+
+#. A simplified version of noise2read which excludes machine learning instead uses heuristics for error correction for short reads set with default parameters.
+
+   .. code-block:: console
+
+       noise2read -m simplify_correction -i *.fa/fasta/fastq/fq -d output_directory
+
 #. General correction for short reads set with default parameters.
    
    * Training with CPU
