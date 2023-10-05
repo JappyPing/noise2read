@@ -8,7 +8,7 @@ noise2read is a command-line interface (CLI) based tool to eliminate PCR and seq
 
 * Module selection
 
-Using noise2read, we must select the module name from ["correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first.
+Using noise2read, we must select the module name from ["simplify_correction", "correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first.
 
 .. code-block:: console
 
@@ -64,7 +64,7 @@ You can set some parameters using CLI mode with/without INI file configuration. 
 3. INI file configuration 
 <<<<<<<<<<<<<<<<<<<<<<<<< 
 
-The following contents are the default setting for noise2read using an INI file configuration. There is no need to set these if you only want to use the default parameters which have been embedded in the program.
+The following are the default setting for all parameters of noise2read using an INI file configuration. There is no need to set these if you only want to use the default parameters which have been embedded in the program.
 
 .. code-block:: console
 
@@ -75,18 +75,22 @@ The following contents are the default setting for noise2read using an INI file 
     [SourceInputData]
     input_file = path/to/data.fastq 
     ; set your data to be corrected
-    ground_truth_data = path/to/data.fastq
+    ground_truth_data = None
     ; only set when you have groundtruth data, otherwise comment it
 
     [General]
     num_workers = -1
     ; if num_workers = -1 or 0, noise2read will use all the available cpus 
+    chunks_num = 100
+    reads_chunks_num = 1
     verbose = True 
-    iso_change_detail = True
+    iso_change_detail = False
     top_n = 100
+    negative_sample_num = 300000
+    min_read_len = 30
 
     [GraphSetup]
-    high_freq_thre = 5
+    high_freq_thre = 4
     max_error_freq = 4
     save_graph = False
     graph_visualization = False
@@ -99,16 +103,16 @@ The following contents are the default setting for noise2read using an INI file 
     read_type = DNA
 
     [AmbiguousSetup]
-    ambiguous_error_node_degree = 4
-    high_ambiguous = False 
-    proba_deviation = 0.6  
+    high_ambiguous = True 
+    proba_deviation = 0.95 
+    iso_neg_high = True  
 
     [ModelTuningSetup]
-    n_trials = 1
-    n_estimators = 10 
+    n_trials = 20
+    n_estimators = 400 
     test_size = 0.1        
-    random_state = 32  
-    tree_method = 'auto'
+    random_state = 42  
+    tree_method = auto
     learning_rate_min = 1e-3     
     learning_rate_max = 1e-1 
     max_depth_min = 3     
@@ -118,23 +122,29 @@ The following contents are the default setting for noise2read using an INI file 
     subsample_max = 1     
     colsample_bytree_min = 0.8     
     colsample_bytree_max = 1     
-    verbose_eval = True
-    seed = 32 
-    best_accuracy = 0.75
+    verbose_eval = False
+    xgboost_seed = 42 
 
     [RealUMI]
+    umi_in_read = False
     umi_start = 0
     umi_end = 12
     non_umi_start = 24
+    group_read_number = 10
+    read_edit_dif = 2
+    separator1 = '_'
+    separator1_idx = 2
+    separator2 = ' '
+    separator2_idx = 0
 
     [Amplicon]
     amplicon_low_freq = 50
     amplicon_high_freq = 1500
-    amplicon_threshold_proba = 0.9
-    amplicon_error_node_degree = 4
+    amplicon_threshold_proba = 0.85
 
     [Simulation]
-    substations = True
-    indels = False
-    error_rate = 0.001
+    min_freq = 4
+    min_read_count = 30
+    error_rate1 = 0.09
+    error_rate2 = 0.02
 

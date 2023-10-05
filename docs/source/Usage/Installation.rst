@@ -4,10 +4,10 @@ Installation
 
 Create virtual environments to run noise2read.
 
-1. Creating Virtual Environment
+1. Create a Virtual Environment
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-* using conda (recommended because I developed noise2read using conda environment )
+* using conda (recommended because I developed noise2read using conda environment)
 
 .. code-block:: console
   conda create -n noise2read_env python=3.11
@@ -35,16 +35,15 @@ Create virtual environments to run noise2read.
   
   make sure you have installed and currently using python 3
 
-2. Installing noise2read
-<<<<<<<<<<<<<<<<<<<<<<<<
+2. Install noise2read
+<<<<<<<<<<<<<<<<<<<<<
 
-* Using bioconda
+* Install via bioconda
 
 .. code-block:: console
    conda install -c bioconda noise2read
 
-
-* Using pip
+* Install via pip
   
    .. code-block:: console
       pip install noise2read
