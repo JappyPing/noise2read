@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from noise2read.encoding import EncodeScheme
 from mpire import WorkerPool
-# from tqdm import tqdm
+
 from noise2read.utils import *
 import itertools
 import pickle

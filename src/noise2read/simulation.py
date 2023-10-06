@@ -9,7 +9,6 @@ from Bio import SeqIO
 # import gzip
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
-# from tqdm import tqdm
 import copy
 import random
 from mpire import WorkerPool

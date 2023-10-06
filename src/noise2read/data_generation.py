@@ -8,7 +8,7 @@ import editdistance
 import networkx as nx
 import os
 # import csv
-from tqdm import tqdm
+# from tqdm import tqdm
 from noise2read.utils import *
 from mpire import WorkerPool
 import matplotlib.pyplot as plt
@@ -18,7 +18,7 @@ import sys
 import pandas as pd
 # from noise2read.utils import MemoryMonitor
 # import gc
-import multiprocessing
+# import multiprocessing
 
 class DataGneration():
     """
@@ -1149,7 +1149,7 @@ class DataGneration():
         else:
             chunk_size = len(high_freq) // self.config.reads_chunks_num
             groups = [high_freq[i:i+chunk_size] for i in range(0, len(high_freq), chunk_size)]
-            for group in tqdm(groups):
+            for group in groups:
                 try:
                     with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool: #, start_method='fork'
                         if edit_dis == 1:

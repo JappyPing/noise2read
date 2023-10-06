@@ -13,7 +13,6 @@ from noise2read.data_generation import DataGneration
 from noise2read.error_orrection import ErrorCorrection
 # from noise2read.data_analysis import DataAnalysis
 import editdistance
-from tqdm import tqdm
 from Bio.Seq import Seq
 import json
 # import gc
@@ -43,7 +42,7 @@ class DataProcessing():
         umi_records = []
         non_umi_records = []
 
-        for item in tqdm(record_iterator):
+        for item in record_iterator:
             seq = str(item.seq)
             if 'N' not in seq:
                 umi_qual = {}
@@ -516,7 +515,7 @@ class DataProcessing():
         raw_records = []
         raw_records_dict, raw_file_type = parse_data_dict(raw_dataset)
         self.logger.info("Read Data")
-        for name in tqdm(true_records_dict):
+        for name in true_records_dict:
             true_seq = str(true_records_dict[name].seq)
             true_des = "umi:" + str(true_read2id[true_seq]) + "//" + str(true_records_dict[name].description)
             raw_des = "umi:" + str(true_read2id[true_seq]) + "//" + str(raw_records_dict[name].description)
@@ -547,7 +546,7 @@ class DataProcessing():
         umi_records = []
         # non_umi_records = []
 
-        for item in tqdm(record_iterator):
+        for item in record_iterator:
             # seq = str(item.seq)
             seq_id = str(item.id)
             seq_des = str(item.description)

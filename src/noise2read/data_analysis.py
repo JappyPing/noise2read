@@ -7,25 +7,15 @@
 from collections import Counter
 import collections
 import math
-# from Bio import SeqIO
 import os
 import editdistance
 import xlsxwriter
 from noise2read.utils import *
-# from numpy.linalg import norm
-# from numpy import array
-# from numpy.fft import fft,rfft
-# import numpy as np
-# import antropy as ant
-# import cmath
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-# import seaborn as sns
 import matplotlib as mpl
-# from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from random import shuffle
-# from tqdm import tqdm
 from mpire import WorkerPool
 # import gc
 
