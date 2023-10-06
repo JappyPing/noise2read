@@ -7,8 +7,6 @@
 import editdistance
 import networkx as nx
 import os
-# import csv
-# from tqdm import tqdm
 from noise2read.utils import *
 from mpire import WorkerPool
 import matplotlib.pyplot as plt
@@ -1132,10 +1130,10 @@ class DataGneration():
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
                     if edit_dis == 1:
-                        for edge_lst in pool.imap(self.real_ed1_seqs, high_freq, progress_bar=self.config.verbose): #, worker_lifespan=1, chunk_size=1
+                        for edge_lst in pool.imap(self.real_ed1_seqs, high_freq): #, worker_lifespan=1, chunk_size=1
                             edges_lst.extend(edge_lst)
                     elif edit_dis == 2:
-                        for edge_lst in pool.imap(self.real_ed2_seqs, high_freq, progress_bar=self.config.verbose):
+                        for edge_lst in pool.imap(self.real_ed2_seqs, high_freq):
                             edges_lst.extend(edge_lst)
                 # #gc.collect()
             except KeyboardInterrupt:
