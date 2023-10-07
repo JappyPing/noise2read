@@ -9,7 +9,7 @@ Take datasets D1-D8 as examples
 
 2. Download datasets
 
-  Download UMI-based ground truth datasets from `D1_D8 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Eq5inalIY-5Jia1-JwNlPEMBCyEQ_yydx84MszmIhCnS2g>`_ 
+  Download UMI-based ground truth datasets from `D1_D8 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Eu08Ycnf-mNOqvo9_kNesccBIekAmqNTd_ck2692R36GhQ?e=prmqsb>`_ 
 
 3. Configuration
 

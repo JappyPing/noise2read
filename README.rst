@@ -16,7 +16,7 @@ Turn 'noise' to signal: accurately rectify millions of erroneous short reads thr
 Click `noise2read <https://noise2read.readthedocs.io/en/latest/>`_ to jump to its documentation
 ===============================================================================================
 
-**Note**: All the experimental results obtained in this study utilised version 0.2.7 of noise2read.
+**Note**: All the experimental results obtained in this study utilised version 0.2.7 of `noise2read <https://pypi.org/project/noise2read/0.2.7/>`_.
 
 Quick-run example
 =================
