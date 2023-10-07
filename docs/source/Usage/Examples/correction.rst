@@ -13,17 +13,23 @@ Take datasets D1-D8 as examples
 
 3. Configuration
 
-   * Download config files from `configs_D1_D8 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EllBA14rl4BBsh8jbwhYS_0BXVbPNaA_vNECUoXP3wyz2w?e=ee8mDm>`_
+   * Download config files from D1_D8 of `configs <https://github.com/Jappy0/noise2read/tree/master/configs>`_
 
   
 4. Run correction on D1
 
   .. code-block:: console
 
-      noise2read -m correction -c ./configs/D1.ini
+      noise2read -m correction -c ./configs/correction/D1_D8/D1.ini
 
-5. Run amplicon correction on D7
+5. Run amplicon correction on D1
 
    .. code-block:: console
 
-      noise2read -m amplicon_correction -c ./configs/D7_amplicon.ini
+      noise2read -m amplicon_correction -c ./configs/D1_D8/amplicon_correction/D1.ini
+
+6. Run simplify_correction on D1
+
+   .. code-block:: console
+
+      noise2read -m simplify_correction -c ./configs/D1_D8/simplify_correction/D1.ini      

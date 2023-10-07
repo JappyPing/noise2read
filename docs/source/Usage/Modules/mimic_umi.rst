@@ -7,6 +7,8 @@ This module generates mimic UMIs for simulated datasets in order to evaluate usi
 
 ``result_dir``, ``input_file``, ``ground_truth_data``
 
+See parameter descriptions at `Parameters <https://noise2read.readthedocs.io/en/latest/Usage/Parameters.html>`_
+
 * Usage
 
 .. code-block:: console

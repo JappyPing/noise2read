@@ -7,6 +7,8 @@ Correction errors for Amplicon sequencing data
 
 All the parameters of "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup", "ModelTuningSetup" and "Amplicon".
 
+See parameter descriptions at `Parameters <https://noise2read.readthedocs.io/en/latest/Usage/Parameters.html>`_
+
 * Run with ini configuration
    
 .. code-block:: console

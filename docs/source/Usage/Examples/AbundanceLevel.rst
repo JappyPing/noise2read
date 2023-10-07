@@ -12,7 +12,7 @@ The instructions for the case studies of the abundance changes for the reference
 
 * For the abundance analysis of SARS_Cov_2
   
-* Download the reference and original and corrected datasets from folder of SARS_Cov_2 in `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EkbYfGVPeh1Aq70QblgXnN4BlLCR3ruyZTgWhBPIVrleFA>`_
+* Download the reference and original and corrected datasets from folder of SARS_Cov_2 in `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EiBpjj4SUGpNhyoSKjGSL6IBUl9j3Ot1nxbGWTpLYKsb-w>`_
 
 and move the datasets to the folder \*/noise2read/CaseStudies/
 
@@ -22,7 +22,7 @@ and move the datasets to the folder \*/noise2read/CaseStudies/
 
 * For the abundance analysis of Monkeypox
 
-* Download the reference and original and corrected datasets from folder of Monkeypox in `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EkbYfGVPeh1Aq70QblgXnN4BlLCR3ruyZTgWhBPIVrleFA>`_
+* Download the reference and original and corrected datasets from folder of Monkeypox in `D18_D21 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EiBpjj4SUGpNhyoSKjGSL6IBUl9j3Ot1nxbGWTpLYKsb-w>`_
 
 and move the datasets to the folder \*/noise2read/CaseStudies/
 

@@ -8,7 +8,7 @@ isomiRs_SNPs
     git clone https://github.com/Jappy0/noise2read
     cd noise2read/CaseStudies/IsomiRs_SNPs      
 
-* Download datasets `D22_D31 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/Eo2YQ1tynupLs_CxDGh-rBYBAXw77X2tt-2fZM4Jxv1n6Q>`_ and move it to the directory of \*CaseStudies/IsomiRs_SNPs
+* Download datasets under data of `D22_D31 <https://studentutsedu-my.sharepoint.com/:f:/g/personal/pengyao_ping_student_uts_edu_au/EjHgbWL5IyxOux_ioj76lHkBxZVtCHan2WboncLkcGAJjQ>`_ and move it to the directory of \*CaseStudies/IsomiRs_SNPs
 
 * Run correction
 

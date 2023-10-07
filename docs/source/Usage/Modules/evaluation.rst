@@ -3,9 +3,11 @@ Evaluation
 
 Correcting NGS sequencing datasets using noise2read, it will automatically produce the evaluation results. If you want to use this module to evaluate your own algorithms, 
 
-* Parameters required by "evaluation"
+* Parameters required by "evaluation" 
 
 ``result_dir``, ``input_file``, ``ground_truth_data``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``
+
+See parameter descriptions at `Parameters <https://noise2read.readthedocs.io/en/latest/Usage/Parameters.html>`_
 
 * Run with INI configuration
 

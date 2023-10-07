@@ -7,6 +7,8 @@ This module generates simulated datasets with mimic UMIs.
 
 All the parameters required by "simplify_correction" and those parameters of "simulation"
 
+See parameter descriptions at `Parameters <https://noise2read.readthedocs.io/en/latest/Usage/Parameters.html>`_
+
 * Usage
 
 .. code-block:: console

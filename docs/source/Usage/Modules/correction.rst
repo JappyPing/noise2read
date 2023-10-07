@@ -5,6 +5,8 @@ Correction
 
 All the parameters of "Paths", "SourceInputData", "General", "GraphSetup", "EmbeddingSetup", "AmbiguousSetup" and "ModelTuningSetup"
 
+See parameter descriptions at `Parameters <https://noise2read.readthedocs.io/en/latest/Usage/Parameters.html>`_
+
 * Run with ini configuration
    
 .. code-block:: console

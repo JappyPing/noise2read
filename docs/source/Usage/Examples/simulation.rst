@@ -16,7 +16,7 @@ Take the dataset `SRR12060401 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_b
 
 * Configuration
 
-  * Download `simulation.ini <https://raw.githubusercontent.com/Jappy0/noise2read/master/examples/simulation.ini>`_.
+  * Download `D9_simi.ini <https://github.com/Jappy0/noise2read/blob/master/configs/D9_D13/simulation/D9_simi.ini>`_.
 
   **Or**
 
@@ -24,65 +24,31 @@ Take the dataset `SRR12060401 <https://trace.ncbi.nlm.nih.gov/Traces/?view=run_b
     
 .. code-block:: console
 
-    [Paths]
-    result_dir = ./D9/
+        [Paths]
+        result_dir = ./D9_sim_test/
 
-    [SourceInputData]
-    input_file = ./SRR12060401.fastq
+        [SourceInputData]
+        input_file = ./data/SRR12060401.fastq
 
-    [General]
-    num_workers = -1
-    chunks_num = 100
-    negative_sample_num = 300000
-    verbose = True 
-    min_iters = 1000
-    iso_change_detail = False
-    top_n = 100
+        [General]
+        num_workers = 60
+        chunks_num = 100
 
-    [GraphSetup]
-    high_freq_thre = 4
-    max_error_freq = 4
-    save_graph = False
-    graph_visualization = False
-    drawing_graph_num = 50
+        [GraphSetup]
+        high_freq_thre = 4
+        max_error_freq = 4
 
-    [EmbeddingSetup]
-    entropy_kmer = 3
-    entropy_q = 2
-    kmer_freq = 3
-    read_type = DNA
-
-    [AmbiguousSetup]
-    high_ambiguous = False 
-    ; high ambiguous predict probability difference
-    proba_deviation = 0.95
-    iso_neg_high = False
-
-    [ModelTuningSetup]
-    n_trials = 30
-    n_estimators = 400
-    test_size = 0.1       
-    random_state = 42
-    tree_method = auto
-    learning_rate_min = 1e-3    
-    learning_rate_max = 1e-1
-    max_depth_min = 3    
-    max_depth_max = 15    
-    max_depth_step = 1
-    num_boost_round_min = 200    
-    num_boost_round_max = 300    
-    num_boost_round_step = 10
-    subsample_min = 0.8    
-    subsample_max = 1    
-    colsample_bytree_min = 0.8    
-    colsample_bytree_max = 1    
-    verbose_eval = True
-    xgboost_seed = 42
-    optuna_seed = 42
-    best_accuracy = 0.85
+        [Simulation]
+        min_freq = 4
+        min_read_count = 30
+        substations = True
+        indels = False
+        error_rate1 = 0.09
+        error_rate2 = 0.02
+        sim_random_state = 42
 
 * Run
   
 .. code-block:: console
 
-    noise2read -m simulation -c simulation.ini
+    noise2read -m simulation -c D9_simi.ini
