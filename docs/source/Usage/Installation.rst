@@ -39,7 +39,7 @@ Create virtual environments to run noise2read.
 
 .. Note:: 
   
-  make sure you have installed and currently using python 3
+  make sure you have installed and currently using python >=3.8
 
 2. Install noise2read
 <<<<<<<<<<<<<<<<<<<<<
