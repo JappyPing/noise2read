@@ -44,11 +44,11 @@ Create virtual environments to run noise2read.
 2. Install noise2read
 <<<<<<<<<<<<<<<<<<<<<
 
-* Install via bioconda
+.. * Install via bioconda
 
-.. code-block:: console
+.. .. code-block:: console
 
-   conda install -c bioconda noise2read
+..    conda install -c bioconda noise2read
 
 * Install via pip
   
