@@ -7,11 +7,11 @@ Easy Install
 
 `noise2read <https://pypi.org/project/noise2read/>`_ is currently distributed on `PyPI <https://pypi.org/project/noise2read/>`_ and `bioconda <https://anaconda.org/bioconda/noise2read>`_, quick install noise2read in the build environment.
 
-* Install via bioconda
+.. * Install via bioconda
 
-.. code-block:: console
+.. .. code-block:: console
 
-    conda install -c bioconda noise2read
+..     conda install -c bioconda noise2read
 
 
 * Install via pip
