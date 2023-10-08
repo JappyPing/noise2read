@@ -11,7 +11,7 @@ Create virtual environments to run noise2read.
 
 .. code-block:: console
 
-  conda create -n noise2read_env python=3.11
+  conda create -n noise2read_env python=3.8
 
 .. code-block:: console 
 
