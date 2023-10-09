@@ -44,11 +44,19 @@ Create virtual environments to run noise2read.
 2. Install noise2read
 <<<<<<<<<<<<<<<<<<<<<
 
-.. * Install via bioconda
+* Install via bioconda
 
-.. .. code-block:: console
+.. code-block:: console
 
-..    conda install -c bioconda noise2read
+   conda install -c bioconda noise2read
+
+.. code-block:: console
+  
+   conda install py-xgboost-gpu
+
+.. Note:: 
+  
+  Currently, noise2read at bioconda requires installing py-xgboost-gpu separately. I will include this dependency in later release.
 
 * Install via pip
   
