@@ -4,6 +4,8 @@
    :align: center
    :target: https://noise2read.readthedocs.io/en/latest/
 
+|
+
 .. image:: https://zenodo.org/badge/602315883.svg
     :target: https://zenodo.org/doi/10.5281/zenodo.10004122
 
