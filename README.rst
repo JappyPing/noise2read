@@ -8,6 +8,9 @@
     :target: https://noise2read.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
+.. image:: https://zenodo.org/badge/602315883.svg
+    :target: https://zenodo.org/doi/10.5281/zenodo.10004122
+
 Turn 'noise' to signal: accurately rectify millions of erroneous short reads through graph learning on edit distances
 =====================================================================================================================
 
