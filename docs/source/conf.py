@@ -10,11 +10,11 @@ from typing import Any, Dict
 # -- Project information
 
 project = 'noise2read'
-copyright = '2023, Pengyao Ping'
+copyright = '2024, Pengyao Ping'
 author = 'Pengyao Ping'
 
-release = '0.1'
-version = '0.1.0'
+release = '0.2'
+version = '0.2.0'
 
 # -- General configuration ---------------------------------------------------
 #
