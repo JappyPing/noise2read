@@ -9,6 +9,14 @@
 .. image:: https://zenodo.org/badge/602315883.svg
     :target: https://zenodo.org/doi/10.5281/zenodo.10004122
 
+.. image:: https://img.shields.io/pypi/v/noise2read?label=PyPI&labelColor=grey&color=green
+    :target: https://pypi.org/project/noise2read
+    :alt: PyPI - Version
+
+.. image:: https://img.shields.io/conda/v/bioconda/noise2read?color=blue
+    :target: https://anaconda.org/bioconda/noise2read
+    :alt: Conda Version
+
 .. image:: https://readthedocs.org/projects/noise2read/badge/?version=latest
     :target: https://noise2read.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
