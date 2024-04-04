@@ -8,7 +8,7 @@ noise2read is a command-line interface (CLI) based tool to eliminate PCR and seq
 
 * Module selection
 
-Using noise2read, we must select the module name from ["simplify_correction", "correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first.
+Using noise2read, we must select the module name from ["correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first.
 
 .. code-block:: console
 

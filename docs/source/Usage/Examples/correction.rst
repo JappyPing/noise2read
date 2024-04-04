@@ -28,8 +28,8 @@ Take datasets D1-D8 as examples
 
       noise2read -m amplicon_correction -c ./configs/D1_D8/amplicon_correction/D1.ini
 
-6. Run simplify_correction on D1
+.. 6. Run simplify_correction on D1
 
-   .. code-block:: console
+..    .. code-block:: console
 
-      noise2read -m simplify_correction -c ./configs/D1_D8/simplify_correction/D1.ini      
+..       noise2read -m simplify_correction -c ./configs/D1_D8/simplify_correction/D1.ini      

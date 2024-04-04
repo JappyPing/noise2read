@@ -7,10 +7,21 @@ noise2read was mainly developed to correct short-read sequencing data, but it al
     :maxdepth: 1  
     :hidden:
 
-    simplify_correction
     correction
     amplicon_correction
     real_umi
     mimic_umi
     simulation
     evaluation
+
+
+..     :maxdepth: 1  
+..     :hidden:
+
+..     simplify_correction
+..     correction
+..     amplicon_correction
+..     real_umi
+..     mimic_umi
+..     simulation
+..     evaluation

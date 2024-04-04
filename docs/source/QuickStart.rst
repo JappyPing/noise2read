@@ -43,11 +43,11 @@ Optional to install pygraphviz if you need the visualised read graph.
 Examples
 ========
 
-#. A simplified version of noise2read which excludes machine learning instead uses heuristics for error correction for short reads set with default parameters.
+.. #. A simplified version of noise2read which excludes machine learning instead uses heuristics for error correction for short reads set with default parameters.
 
-   .. code-block:: console
+..    .. code-block:: console
 
-       noise2read -m simplify_correction -i *.fa/fasta/fastq/fq -d output_directory
+..        noise2read -m simplify_correction -i *.fa/fasta/fastq/fq -d output_directory
 
 #. General correction for short reads set with default parameters.
    
@@ -79,4 +79,5 @@ Examples
 
 .. Note:: 
   
-  We strongly recommend utilizing GPU for model training and prediction, especially for large data sets, rather than using a CPU. If a GPU resource is available; otherwise, using the simplified version of noise2read (simplify_correction) is better.
+  We strongly recommend utilizing GPU for model training and prediction, especially for large data sets, rather than using a CPU. If a GPU resource is available. 
+..   ; otherwise, using the simplified version of noise2read (simplify_correction) is better.

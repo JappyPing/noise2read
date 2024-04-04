@@ -1,13 +1,14 @@
 Parameters
 ----------
 
-Noise2read is a command-line interface (CLI) based tool to eliminate PCR and sequencing errors for short reads. It utilises CLI mode and INI file for configuring the parameters. Noise2read was mainly developed to correct short-read sequencing data, but it also provides several other modules. Therefore, to run noise2read, we must specify the module name from ["simplify_correction", "correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first. Then, we set the relevant parameters required by the each module, otherwise noise2read will use the default parameters.
+Noise2read is a command-line interface (CLI) based tool to eliminate PCR and sequencing errors for short reads. It utilises CLI mode and INI file for configuring the parameters. Noise2read was mainly developed to correct short-read sequencing data, but it also provides several other modules. Therefore, to run noise2read, we must specify the module name from ["correction", "amplicon_correction", "mimic_umi", "real_umi", "umi_correction", "simulation", "evaluation"] first. Then, we set the relevant parameters required by the each module, otherwise noise2read will use the default parameters. 
 
 1. Guidance on setting noise2read parameters:
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 Noise2read has many parameters. But, most of these parameters do not necessarily need to change for different datasets. 
 
-* We strongly suggest the users to set the ``tree_method`` as "gpu_hist" which means using GPU for training the model. If you do not have GPU resources, please use the simplified version of noise2read to do error correction because using CPU training for large datasets may require several days.
+* We strongly suggest the users to set the ``tree_method`` as "gpu_hist" which means using GPU for training the model. Using CPU training for large datasets may require several days.
+.. If you do not have GPU resources, please use the simplified version of noise2read to do error correction because 
 
 * For the large datasets, we do not suggest use a big number of multiprocessing processes (``num_workers``) for noise2Read to run, as we have observed that those situations could suddenly consume a significant amount of memory, and the program ran out of memory and terminated. 
 
@@ -18,11 +19,11 @@ Noise2read has many parameters. But, most of these parameters do not necessarily
 2. The parameters required by different modules are summarised as follows:
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-* simplify_correction
+.. * simplify_correction
 
-``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``iso_change_detail``, ``top_n``, ``min_read_len``
+.. ``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``iso_change_detail``, ``top_n``, ``min_read_len``
 
-``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
+.. ``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
 
 * correction
 
@@ -53,7 +54,9 @@ All the parameters of "real_umi"
 
 * simulation
 
-All the parameters required by "simplify_correction" and those parameters of "simulation"
+``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``iso_change_detail``, ``top_n``, ``min_read_len``
+
+``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
 
 * evaluation
 
@@ -346,7 +349,7 @@ simulation
 
 * ``min_freq`` [default= ``5`` ]
 
-    - The predetermined threshold to filtered out low-frequency reads after correction by noise2read simplify_correction to eliminate noise for simulation. 
+    - The predetermined threshold to filtered out low-frequency reads after correction by the simplified version of noise2read to eliminate noise for simulation. 
 
 * ``min_read_count`` [default= ``30`` ]
 
