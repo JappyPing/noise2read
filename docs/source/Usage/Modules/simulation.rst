@@ -5,7 +5,9 @@ This module generates simulated datasets with mimic UMIs.
 
 * Parameters required by "simulation"
 
-All the parameters required by "simplify_correction" and those parameters of "simulation"
+``result_dir``, ``input_file``, ``num_workers``, ``chunks_num``, ``reads_chunks_num``, ``iso_change_detail``, ``top_n``, ``min_read_len``
+
+``high_freq_thre``, ``max_error_freq``, ``save_graph``, ``graph_visualization``, ``drawing_graph_num``
 
 See parameter descriptions at `Parameters <https://noise2read.readthedocs.io/en/latest/Usage/Parameters.html>`_
 
