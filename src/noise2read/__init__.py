@@ -4,4 +4,4 @@
 # @Last Modified by:   Pengyao Ping
 # @Last Modified time: 2023-09-07 14:03:54
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"

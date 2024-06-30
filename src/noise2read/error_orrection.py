@@ -682,6 +682,25 @@ class ErrorCorrection():
         else:
             return original_file
 
+    def get_deduplication(self, corrected_data):
+        record_iterator, file_type = parse_data(corrected_data)
+        seqs2id_dict = {}
+        for item in record_iterator:
+            seq = str(item.seq)
+            seqs2id_dict.setdefault(seq, []).append(str(item.id))
+        
+        seq_records = []
+        record_num = 1
+        for read, ids in seqs2id_dict.items():
+            frequency = len(ids)
+            record_id = f"read {record_num}, counts: {frequency}"
+
+            seq_record = SeqRecord(Seq(read), id=record_id, description=" ".join(ids))
+            seq_records.append(seq_record) 
+            record_num += 1    
+        deduplicated_file = self.config.result_dir + self.base[0] + "_deduplicated.fasta"     
+        SeqIO.write(seq_records, deduplicated_file, "fasta")
+
 '''
     def correct_amplicon_errors(self, orginal_file, df_data):
         """

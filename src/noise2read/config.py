@@ -331,6 +331,10 @@ class Config(object):
             else:
                 self.error_rate2 = 0.005 # default
 
+            if conf.has_option("Deduplication", "deduplication"):
+                self.umi_in_read = conf.getboolean("Deduplication", "deduplication")
+            else:
+                self.umi_in_read = True
 
             # # Evaluation
             # if conf.has_option("Evaluation", "delta"):
@@ -430,6 +434,7 @@ class Config(object):
             self.error_rate1 = 0.09
             self.error_rate2 = 0.02
   
+            self.deduplication = True
             # # Evaluation
             # self.delta = 1
 

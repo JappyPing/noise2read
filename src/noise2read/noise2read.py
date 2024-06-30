@@ -162,6 +162,9 @@ def main():
                     else:
                         config.correct_data = corrected_file
                         logger.info("Error Correction finished.")
+                    if config.deduplication:
+                        EC.get_deduplication(config.correct_data)
+
                     del DG, EC
                     #MM.measure()
                     #gc.collect()
@@ -243,6 +246,8 @@ def main():
                     else:
                         config.correct_data = corrected_file
                         logger.info("Error Correction finished.")
+                    if config.deduplication:
+                        EC.get_deduplication(config.correct_data)
                     del DG, EC
                     #MM.measure()
                     #gc.collect()
@@ -339,6 +344,9 @@ def main():
                         logger.warning("No genuine or negative samples for amplicon errors prediction!")
                         config.correct_data = mid_result
                         logger.info("Error Correction finished.")
+                    if config.deduplication:
+                        EC.get_deduplication(config.correct_data)
+
                     del DG, EC
                     #MM.measure()
                     #gc.collect()
@@ -563,7 +571,7 @@ def main():
                     if os.path.exists(bcool_dir):
                         os.system("rm -rf %s" % bcool_dir)
 ############################################################################################################################
-                # elif module_arg == "extract_isolates": 
+                # elif module_arg == "deduplication": 
 
                 else:
                     # logger.error("Invalid module name, please check.")
