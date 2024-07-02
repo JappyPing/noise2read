@@ -561,8 +561,7 @@ class DataProcessing():
             seq_id = str(item.id)
             seq_des = str(item.description)
             # print(seq_des)
-            split_char = self.config["RealUMI"]["separator2"][1:-1]
-            umi = seq_des.split(self.config.separator1)[self.config.separator1_idx].split(self.config.separator2)[self.config.separator2_idx]
+            umi = seq_des.split(self.config.separator1)[self.config.separator1_idx].split(self.config.separator2[1:-1])[self.config.separator2_idx]
 
             umi_rec = SeqRecord(Seq(umi), id=seq_id, description=seq_des)        
             umi_records.append(umi_rec)
