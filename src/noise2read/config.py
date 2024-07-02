@@ -332,9 +332,19 @@ class Config(object):
                 self.error_rate2 = 0.005 # default
 
             if conf.has_option("Deduplication", "deduplication"):
-                self.umi_in_read = conf.getboolean("Deduplication", "deduplication")
+                self.deduplication = conf.getboolean("Deduplication", "deduplication")
             else:
-                self.umi_in_read = True
+                self.deduplication = True
+
+            if conf.has_option("UMIReadCorrection", "top_count"):
+                self.top_count = conf.getint("UMIReadCorrection", "top_count")
+            else:
+                self.top_count = 3
+
+            if conf.has_option("UMIReadCorrection", "max_dis"):
+                self.max_dis = conf.getint("UMIReadCorrection", "max_dis")
+            else:
+                self.max_dis = 3
 
             # # Evaluation
             # if conf.has_option("Evaluation", "delta"):
@@ -435,6 +445,9 @@ class Config(object):
             self.error_rate2 = 0.02
   
             self.deduplication = True
+
+            self.top_count = 3
+            self.max_dis = 3
             # # Evaluation
             # self.delta = 1
 

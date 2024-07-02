@@ -586,3 +586,10 @@ class DataProcessing():
     def umi2groundtruth(self):
         raw_file, true_file = self.raw_true_umi(self.config.umi_file, self.config.input_file)
         return raw_file, true_file
+    
+    def split_umi_read(self, original_data):
+        if not self.config.umi_in_read:
+            umi_dataset, read_dataset = self.extract_umis2fasta()
+        else:
+            umi_dataset, read_dataset = self.extract_umis(original_data, self.config.umi_start, self.config.umi_end, self.config.non_umi_start)
+        return umi_dataset, read_dataset

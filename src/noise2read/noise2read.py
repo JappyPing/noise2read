@@ -13,6 +13,7 @@ import os
 from noise2read.simulation import Simulation
 from noise2read.utils import custom_logger, usage
 from noise2read.data_preprocessing import DataProcessing
+from noise2read.umi_read_correction import UMIReadErrorCorrection
 # from contextlib import redirect_stdout
 import noise2read
 # from noise2read.utils import MemoryMonitor
@@ -414,6 +415,80 @@ def main():
                     DataAnalysis(logger, config).evaluation()
                     #MM.measure()
                     #MM.stop()
+                elif module_arg == "umi_read":
+                    ##
+                    if c_lst:
+                        config = Config(opts_dict[c_lst[0]], logger) 
+                        if i_lst:
+                            config.input_file = opts_dict[i_lst[0]]
+                        if not os.path.exists(config.input_file):
+                            logger.exception('Must set sequencing dataset in configuration.')
+                            sys.exit()
+                        if t_lst:
+                            config.ground_truth_data = opts_dict[t_lst[0]]
+                            if not os.path.exists(config.ground_truth_data):
+                                logger.error('Ground truth data does not exsit.')
+                    elif i_lst:
+                        config = Config(None, logger)  
+                        config.input_file = opts_dict[i_lst[0]]
+                        if not os.path.exists(config.input_file):
+                            logger.exception('Input file does not exsit.')
+                            sys.exit()
+                    else:
+                        logger.error('Must input configuration file or sequencing dataset.')
+                        sys.exit()
+                    ##############################################################
+                    if t_lst:
+                        config.ground_truth_data = opts_dict[t_lst[0]] 
+                        if not os.path.exists(config.ground_truth_data):
+                            logger.exception('Ground truth data does not exsit.')
+                            raise
+                    if d_lst:
+                        config.result_dir = opts_dict[d_lst[0]] 
+                    if p_lst:
+                        config.num_workers = int(opts_dict[p_lst[0]])      
+                    if a_lst:
+                        config.high_ambiguous = eval(opts_dict[a_lst[0]])
+                        # print(config.high_ambiguous)
+                    if config.num_workers <= 0:
+                        config.num_workers = available_cpu_cores
+                    if config.num_workers > available_cpu_cores:
+                        logger.error(f"Only {available_cpu_cores} available to use.") 
+                        config.num_workers = available_cpu_cores
+
+                    ### split umi and read
+                    DP = DataProcessing(logger, config)
+                    umi_dataset, read_dataset = DP.split_umi_read(config.input_file)
+                    # umi correction
+                    config.high_ambiguous=False
+                    DG = DataGneration(logger, config)
+                    genuine_df = DG.extract_umi_genuine_errs(umi_dataset)
+                    # ##############################################################
+                    EC = ErrorCorrection(logger, config)
+                    correct_umi_data = EC.umi_correction(umi_dataset, genuine_df)
+                    del DG, EC
+                    # read correction
+                    DG2 = DataGneration(logger, config)
+
+                    isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG2.simplify_data_files(config.input_file, edit_dis=1)      
+                    config.read_max_len = read_max_len
+                    EC2 = ErrorCorrection(logger, config)
+                    corrected_file = EC2.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
+                    if read_min_len > config.min_read_len:
+                        genuine_df, ambiguous_df = DG.simplify_data_files(corrected_file, edit_dis=2) 
+                        correct_read_data = EC.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
+                    else:
+                        correct_read_data = corrected_file
+                        logger.info("Error Correction finished.")
+                    del DG2
+                    # combine umi and read correction
+                    UMIREC = UMIReadErrorCorrection(logger, config)
+                    final_corrected_read_data = UMIREC.umi_read_correction(correct_umi_data, correct_read_data)
+                    # output corrected and deduplicated dataset
+                    if config.deduplication:
+                        EC2.get_deduplication(final_corrected_read_data)
+                    del EC2, UMIREC
+
 ############################################################################################################################
                 elif module_arg == "mimic_umi":   
                     if i_lst and t_lst:
