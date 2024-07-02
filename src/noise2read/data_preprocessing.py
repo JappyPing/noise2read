@@ -27,14 +27,15 @@ class DataProcessing():
             self.logger.info("Directory '%s' already exists" % self.config.result_dir)
         else:
             os.makedirs(self.config.result_dir)
-        if os.path.exists(self.config.result_dir + 'raw/'):
-            self.logger.info(f"Directory {self.config.result_dir}raw/ already exists")
-        else:
-            os.makedirs(self.config.result_dir + 'raw/')       
-        if os.path.exists(self.config.result_dir + 'true/'):
-            self.logger.info(f"Directory {self.config.result_dir}true/ already exists")
-        else:
-            os.makedirs(self.config.result_dir + 'true/') 
+        
+        # if os.path.exists(self.config.result_dir + 'raw/'):
+        #     self.logger.info(f"Directory {self.config.result_dir}raw/ already exists")
+        # else:
+        #     os.makedirs(self.config.result_dir + 'raw/')       
+        # if os.path.exists(self.config.result_dir + 'true/'):
+        #     self.logger.info(f"Directory {self.config.result_dir}true/ already exists")
+        # else:
+        #     os.makedirs(self.config.result_dir + 'true/') 
                
     def extract_umis(self, original_data, umi_start, umi_end, non_umi_start):
         record_iterator, ff_type = parse_data(original_data) 
@@ -494,6 +495,15 @@ class DataProcessing():
 
 
     def write_mimic_umis(self, raw_dataset, true_dataset):
+        if os.path.exists(self.config.result_dir + 'raw/'):
+            self.logger.info(f"Directory {self.config.result_dir}raw/ already exists")
+        else:
+            os.makedirs(self.config.result_dir + 'raw/')       
+        if os.path.exists(self.config.result_dir + 'true/'):
+            self.logger.info(f"Directory {self.config.result_dir}true/ already exists")
+        else:
+            os.makedirs(self.config.result_dir + 'true/') 
+
         true_records_dict, true_file_type = parse_data_dict(true_dataset)
 
         true_seqs_lst = []
@@ -584,6 +594,14 @@ class DataProcessing():
         return raw_file, true_file
 
     def umi2groundtruth(self):
+        if os.path.exists(self.config.result_dir + 'raw/'):
+            self.logger.info(f"Directory {self.config.result_dir}raw/ already exists")
+        else:
+            os.makedirs(self.config.result_dir + 'raw/')       
+        if os.path.exists(self.config.result_dir + 'true/'):
+            self.logger.info(f"Directory {self.config.result_dir}true/ already exists")
+        else:
+            os.makedirs(self.config.result_dir + 'true/') 
         raw_file, true_file = self.raw_true_umi(self.config.umi_file, self.config.input_file)
         return raw_file, true_file
     
