@@ -438,11 +438,6 @@ def main():
                         logger.error('Must input configuration file or sequencing dataset.')
                         sys.exit()
                     ##############################################################
-                    if t_lst:
-                        config.ground_truth_data = opts_dict[t_lst[0]] 
-                        if not os.path.exists(config.ground_truth_data):
-                            logger.exception('Ground truth data does not exsit.')
-                            raise
                     if d_lst:
                         config.result_dir = opts_dict[d_lst[0]] 
                     if p_lst:
@@ -470,7 +465,7 @@ def main():
                     # read correction
                     DG2 = DataGneration(logger, config)
 
-                    isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG2.simplify_data_files(config.input_file, edit_dis=1)      
+                    isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG2.simplify_data_files(read_dataset, edit_dis=1)      
                     config.read_max_len = read_max_len
                     EC2 = ErrorCorrection(logger, config)
                     corrected_file = EC2.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)

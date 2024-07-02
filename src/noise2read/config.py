@@ -276,9 +276,9 @@ class Config(object):
                 self.separator1_idx = 2 # default
 
             if conf.has_option("RealUMI", "separator2"):
-                self.separator1 = conf.get("RealUMI", "separator2")
+                self.separator2 = conf.get("RealUMI", "separator2")
             else:
-                self.separator1 = ' '  
+                self.separator2 = ' '  
             if conf.has_option("RealUMI", "separator2_idx"):
                 self.separator2_idx = conf.getint("RealUMI", "separator2_idx")
             else:
@@ -445,7 +445,7 @@ class Config(object):
             self.error_rate2 = 0.02
   
             self.deduplication = True
-
+            # UMIReadCorrection
             self.top_count = 3
             self.max_dis = 3
             # # Evaluation
