@@ -470,8 +470,8 @@ def main():
                     EC2 = ErrorCorrection(logger, config)
                     corrected_file = EC2.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
                     if read_min_len > config.min_read_len:
-                        genuine_df, ambiguous_df = DG.simplify_data_files(corrected_file, edit_dis=2) 
-                        correct_read_data = EC.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
+                        genuine_df, ambiguous_df = DG2.simplify_data_files(corrected_file, edit_dis=2) 
+                        correct_read_data = EC2.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
                     else:
                         correct_read_data = corrected_file
                         logger.info("Error Correction finished.")
