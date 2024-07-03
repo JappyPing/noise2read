@@ -484,6 +484,9 @@ def main():
                     # output corrected and deduplicated dataset
                     if config.deduplication:
                         EC2.get_deduplication(final_corrected_read_data)
+                        logger.info("UMI and read error correction and deduplication finished.")
+                    else:
+                        logger.info("UMI and read error correction finished.")
                     del EC2, UMIREC
 
 ############################################################################################################################
