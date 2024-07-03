@@ -698,7 +698,7 @@ class ErrorCorrection():
             seq_record = SeqRecord(Seq(read), id=record_id, description=" ".join(ids))
             seq_records.append(seq_record) 
             record_num += 1    
-        deduplicated_file = self.config.result_dir + self.base[0] + "_deduplicated.fasta"     
+        deduplicated_file = self.config.result_dir + self.base[0] + ".deduplicated.reads.fasta"     
         SeqIO.write(seq_records, deduplicated_file, "fasta")
 
 '''

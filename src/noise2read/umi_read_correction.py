@@ -58,10 +58,12 @@ class UMIReadErrorCorrection():
                 no_change_id_lst.extend(ids)
             else:
                 filtered_dict = {k: v for k, v in cur_read2count.items() if v > self.config.high_freq_thre}
-                sorted_dict = dict(sorted(filtered_dict.items(), key=lambda item: item[1], reverse=True))
 
-                top_reads = [item[0] for item in sorted_dict[:self.config.top_count]]
-                if top_reads:
+                if filtered_dict:
+                    sorted_dict = dict(sorted(filtered_dict.items(), key=lambda item: item[1], reverse=True))
+                    # top_reads = [item[0] for item in sorted_dict[:self.config.top_count]]
+                    sorted_items = list(sorted_dict.items())
+                    top_reads = [item[0] for item in sorted_items[:self.config.top_count]]
                     for id in ids:
                         cur_read = id2read_dict[id]
                         if cur_read in top_reads:
@@ -98,7 +100,7 @@ class UMIReadErrorCorrection():
         else:
             out_file_tye = read_file_type
 
-        final_corrected_read_file = self.config.result_dir + base + "." + out_file_tye
+        final_corrected_read_file = self.config.result_dir + base + ".corrected.reads." + out_file_tye
         with open(final_corrected_read_file, "w") as handle:
             SeqIO.write(corrected_read_records, handle, read_file_type)
 

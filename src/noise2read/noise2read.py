@@ -451,7 +451,7 @@ def main():
                         logger.error(f"Only {available_cpu_cores} available to use.") 
                         config.num_workers = available_cpu_cores
 
-                    ### split umi and read
+                    ## split umi and read
                     DP = DataProcessing(logger, config)
                     umi_dataset, read_dataset = DP.split_umi_read(config.input_file)
                     # umi correction
@@ -478,6 +478,8 @@ def main():
                     del DG2
                     # combine umi and read correction
                     UMIREC = UMIReadErrorCorrection(logger, config)
+                    # correct_umi_data = "/projects/BIOinfo/Jappy/Deduplication_ErrorCorrection/results/liver/deduplication/noise2read/umi_read/SRR28314008/umi_SRR28314008_corrected.fasta"
+                    # correct_read_data = "/projects/BIOinfo/Jappy/Deduplication_ErrorCorrection/results/liver/deduplication/noise2read/umi_read/SRR28314008/SRR28314008_corrected_corrected.fastq"
                     final_corrected_read_data = UMIREC.umi_read_correction(correct_umi_data, correct_read_data)
                     # output corrected and deduplicated dataset
                     if config.deduplication:
