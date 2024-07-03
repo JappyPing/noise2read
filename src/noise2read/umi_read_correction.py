@@ -45,7 +45,7 @@ class UMIReadErrorCorrection():
             read = str(item.seq)
             total_reads.append(read)
             reads2id_dict.setdefault(read, []).append(str(item.id))
-            id2read_dict.setdefault(str(item.id), []).append(read)  
+            id2read_dict[str(item.id)] = read 
         no_change_id_lst = []
         changed_id2read = {}
         for umi, ids in umis2id_dict.items():
