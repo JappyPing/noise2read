@@ -65,7 +65,7 @@ class DataProcessing():
         self.logger.info("Rewrite umi and non-umi Data")
         raw_base_name = original_data.split('/')[-1]
         umi_raw_dataset = self.config.result_dir + "umi_" + raw_base_name
-        non_umi_raw_dataset = self.config.result_dir + "umi_in_name_" + raw_base_name
+        non_umi_raw_dataset = self.config.result_dir + "read_" + raw_base_name
         with open(umi_raw_dataset, "w") as handle:
             SeqIO.write(umi_records, handle, ff_type)        
         with open(non_umi_raw_dataset, "w") as handle:

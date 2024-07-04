@@ -454,17 +454,28 @@ def main():
                     ## split umi and read
                     DP = DataProcessing(logger, config)
                     umi_dataset, read_dataset = DP.split_umi_read(config.input_file)
+                    ##############################################################
                     # umi correction
-                    config.high_ambiguous=False
+                    # config.high_ambiguous=False
+                    # DG = DataGneration(logger, config)
+                    # genuine_df = DG.extract_umi_genuine_errs(umi_dataset)
+                    # EC = ErrorCorrection(logger, config)
+                    # correct_umi_data = EC.umi_correction(umi_dataset, genuine_df)
                     DG = DataGneration(logger, config)
-                    genuine_df = DG.extract_umi_genuine_errs(umi_dataset)
-                    # ##############################################################
+                    umi_isolates_file, umi_non_isolates_file, umi_max_len, umi_min_len, umi_genuine_df, umi_ambiguous_df = DG.simplify_data_files(umi_dataset, edit_dis=1)      
+                    config.read_max_len = umi_max_len   
                     EC = ErrorCorrection(logger, config)
-                    correct_umi_data = EC.umi_correction(umi_dataset, genuine_df)
+                    umi_corrected_file = EC.simplify_correction(umi_isolates_file, umi_non_isolates_file, umi_genuine_df, umi_ambiguous_df)
+                    if umi_min_len > config.min_read_len:
+                        umi_ed2_genuine_df, umi_ed2_ambiguous_df = DG.simplify_data_files(umi_corrected_file, edit_dis=2) 
+                        correct_umi_data = EC.simplify_2nt_correction(umi_corrected_file, umi_ed2_genuine_df, umi_ed2_ambiguous_df)
+                    else:
+                        correct_umi_data = umi_corrected_file
+                        logger.info("UMI Error Correction finished.")
                     del DG, EC
+                    ##############################################################
                     # read correction
                     DG2 = DataGneration(logger, config)
-
                     isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG2.simplify_data_files(read_dataset, edit_dis=1)      
                     config.read_max_len = read_max_len
                     EC2 = ErrorCorrection(logger, config)
@@ -474,7 +485,7 @@ def main():
                         correct_read_data = EC2.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
                     else:
                         correct_read_data = corrected_file
-                        logger.info("Error Correction finished.")
+                        logger.info("Read Error Correction finished.")
                     del DG2
                     # combine umi and read correction
                     UMIREC = UMIReadErrorCorrection(logger, config)
