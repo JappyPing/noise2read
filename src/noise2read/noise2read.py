@@ -382,7 +382,6 @@ def main():
                     else:
                         logger.error('Must input configuration file or sequencing dataset.')
                         sys.exit()
-                        
                     if t_lst:
                         config.ground_truth_data = opts_dict[t_lst[0]] 
                         if not os.path.exists(config.ground_truth_data):
@@ -392,9 +391,6 @@ def main():
                         config.result_dir = opts_dict[d_lst[0]] 
                     if p_lst:
                         config.num_workers = int(opts_dict[p_lst[0]])  
-                    # if a_lst:
-                    #     config.high_ambiguous = eval(opts_dict[a_lst[0]])
-
                     if config.num_workers <= 0:
                         config.num_workers = available_cpu_cores
                     if config.num_workers > available_cpu_cores:
@@ -404,19 +400,69 @@ def main():
                     config.high_ambiguous=False
                     DG = DataGneration(logger, config)
                     genuine_df = DG.extract_umi_genuine_errs(config.input_file)
-                    #MM.measure()
-                    #gc.collect()
                     # ##############################################################
                     EC = ErrorCorrection(logger, config)
                     config.correct_data = EC.umi_correction(config.input_file, genuine_df)
                     del DG, EC
-                    #MM.measure()
-                    #gc.collect()
                     DataAnalysis(logger, config).evaluation()
-                    #MM.measure()
-                    #MM.stop()
+                elif module_arg == "simplify":
+                    if c_lst:
+                        config = Config(opts_dict[c_lst[0]], logger) 
+                        if i_lst:
+                            config.input_file = opts_dict[i_lst[0]]
+                        if not os.path.exists(config.input_file):
+                            logger.exception('Must set sequencing dataset in configuration.')
+                            sys.exit()
+                        if t_lst:
+                            config.ground_truth_data = opts_dict[t_lst[0]]
+                            if not os.path.exists(config.ground_truth_data):
+                                logger.error('Ground truth data does not exsit.')
+                    elif i_lst:
+                        config = Config(None, logger)  
+                        config.input_file = opts_dict[i_lst[0]]
+                        if not os.path.exists(config.input_file):
+                            logger.exception('Input file does not exsit.')
+                            sys.exit()
+                    else:
+                        logger.error('Must input configuration file or sequencing dataset.')
+                        sys.exit()
+                    ##############################################################
+                    if t_lst:
+                        config.ground_truth_data = opts_dict[t_lst[0]] 
+                        if not os.path.exists(config.ground_truth_data):
+                            logger.exception('Ground truth data does not exsit.')
+                            raise
+                    if d_lst:
+                        config.result_dir = opts_dict[d_lst[0]] 
+                    if p_lst:
+                        config.num_workers = int(opts_dict[p_lst[0]])      
+                    if config.num_workers <= 0:
+                        config.num_workers = available_cpu_cores
+                    if config.num_workers > available_cpu_cores:
+                        logger.error(f"Only {available_cpu_cores} available to use.") 
+                        config.num_workers = available_cpu_cores
+                    ################################
+                    config.correcting_umi = False
+                    read_DG = DataGneration(logger, config)
+                    read_isolates_file, read_non_isolates_file, read_max_len, read_min_len, read_1nt_df = read_DG.umi_read_data_files(config.input_file, edit_dis=1) 
+                    config.read_max_len = read_max_len   
+                    read_EC = ErrorCorrection(logger, config)
+                    read_1nt_corrected = read_EC.umi_read_correction(read_isolates_file, read_non_isolates_file, read_1nt_df)
+                    if read_min_len > config.min_read_len:
+                        read_2nt_df = read_DG.umi_read_data_files(read_1nt_corrected, edit_dis=2)
+                        config.correct_data = read_EC.umi_read_2nt_correction(read_1nt_corrected, read_2nt_df)
+                    else:
+                        config.correct_data = read_1nt_corrected
+                        logger.info("UMI Error Correction finished.")
+                    del read_DG
+                    ########################################
+                    DataAnalysis(logger, config).evaluation()
+                    # delete bcool result
+                    bcool_dir = os.path.join(config.result_dir, 'bcool/')
+                    if os.path.exists(bcool_dir):
+                        os.system("rm -rf %s" % bcool_dir)
+                ##################################################################################
                 elif module_arg == "umi_read":
-                    ##
                     if c_lst:
                         config = Config(opts_dict[c_lst[0]], logger) 
                         if i_lst:
@@ -450,7 +496,6 @@ def main():
                     if config.num_workers > available_cpu_cores:
                         logger.error(f"Only {available_cpu_cores} available to use.") 
                         config.num_workers = available_cpu_cores
-
                     ## split umi and read
                     DP = DataProcessing(logger, config)
                     umi_dataset, read_dataset = DP.split_umi_read(config.input_file)
@@ -487,15 +532,22 @@ def main():
                     ##############################################################
                     # combine umi and read correction
                     UMIREC = UMIReadErrorCorrection(logger, config)
-                    corrected_read_data = UMIREC.umi_read_error_correction(correct_umi_data, correct_read_data)
+                    config.correct_data = UMIREC.umi_read_error_correction(correct_umi_data, correct_read_data)
                     # output corrected and deduplicated dataset
                     if config.deduplication:
-                        read_EC.get_deduplication(corrected_read_data)
+                        read_EC.get_deduplication(config.correct_data)
                         logger.info("UMI and read error correction and deduplication finished.")
                     else:
                         logger.info("UMI and read error correction finished.")
                     del read_EC, UMIREC
-
+                    ########################################
+                    if config.umi_in_read:
+                        config.input_file = read_dataset
+                    DataAnalysis(logger, config).evaluation()
+                    # delete bcool result
+                    bcool_dir = os.path.join(config.result_dir, 'bcool/')
+                    if os.path.exists(bcool_dir):
+                        os.system("rm -rf %s" % bcool_dir)
                     ##############################################################
                     # umi correction
                     # config.high_ambiguous=False
