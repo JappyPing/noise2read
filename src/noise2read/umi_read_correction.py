@@ -93,6 +93,13 @@ class UMIReadErrorCorrection():
                 tmp_rec = SeqRecord(Seq(id2read_dict[cur_id]), id=cur_id, description=record_dict[cur_id].description)  
             corrected_read_records.append(tmp_rec)
 
+        for c_id, c_read in changed_id2read.items():
+            if read_file_type == 'fastq' or read_file_type == 'fq' or read_file_type == 'fastq.gz' or read_file_type == 'fq.gz':
+                tmp_rec = SeqRecord(Seq(c_read), id=c_id, description=record_dict[c_id].description, letter_annotations=record_dict[c_id].letter_annotations)  
+            else:
+                tmp_rec = SeqRecord(Seq(c_read), id=c_id, description=record_dict[c_id].description)  
+            corrected_read_records.append(tmp_rec)
+
         base = read_correct_data.split('/')[-1].split('_corrected')[0]
 
         if ".gz" in read_file_type:
