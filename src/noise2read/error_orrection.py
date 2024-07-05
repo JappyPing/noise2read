@@ -494,13 +494,14 @@ class ErrorCorrection():
         bases = orginal_file.split('/')[-1]
         prefix = bases.split('.')
         err_free_name_lst = list(set(total_name_lst) - set(err_name_lst))
-        corrected_err_file = self.config.result_dir + prefix[0] + '_err2cor.' + self.out_file_tye
+        corrected_err_file = self.config.result_dir + prefix[0] + '_err2cor.' + ori_file_type
         with open(corrected_err_file, "w") as handle:
-            SeqIO.write(err2cor_records, handle, self.out_file_tye)
+            SeqIO.write(err2cor_records, handle, ori_file_type)
 
-        err_free_reads_file = self.config.result_dir + prefix[0] + '_errfree.' + self.out_file_tye
+        err_free_reads_file = self.config.result_dir + prefix[0] + '_errfree.' + ori_file_type
         extract_records(self.config.result_dir, err_free_name_lst, orginal_file, err_free_reads_file)
-        corrected_file = self.config.result_dir + prefix[0] + '_corrected.' + self.out_file_tye
+        corrected_file = self.config.result_dir + prefix[0] + '_corrected.' + ori_file_type
+
         os.system("cat %s %s > %s" % (corrected_err_file, err_free_reads_file, corrected_file))
         if os.path.exists(corrected_err_file):
             os.system("rm %s" % corrected_err_file)
@@ -711,7 +712,10 @@ class ErrorCorrection():
             corrected_file (str): The corrected data filename including path.
         """
         file_type = parse_file_type(isolates_file)
-        corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + file_type  
+        if self.config.correcting_umi:
+            corrected_file = self.config.result_dir + self.base[0] + '_umi_corrected.' + file_type
+        else:
+            corrected_file = self.config.result_dir + self.base[0] + '_read_corrected.' + file_type  
         if not genuine_df.empty:
             self.logger.info("Correcting 1nt-edit-distance based Errors")
             non_isolates_correct = self.correct_errors(non_isolates_file, genuine_df)

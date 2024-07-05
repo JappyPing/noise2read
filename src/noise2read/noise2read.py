@@ -456,6 +456,7 @@ def main():
                     umi_dataset, read_dataset = DP.split_umi_read(config.input_file)
                     ##############################################################
                     # umi correction
+                    config.correcting_umi = True
                     umi_DG = DataGneration(logger, config)
                     umi_isolates_file, umi_non_isolates_file, umi_max_len, umi_min_len, umi_1nt_df = umi_DG.umi_read_data_files(umi_dataset, edit_dis=1) 
                     config.read_max_len = umi_max_len   
@@ -470,6 +471,7 @@ def main():
                     del umi_DG, umi_EC
                     ##############################################################
                     # read correction
+                    config.correcting_umi = False
                     read_DG = DataGneration(logger, config)
                     read_isolates_file, read_non_isolates_file, read_max_len, read_min_len, read_1nt_df = read_DG.umi_read_data_files(read_dataset, edit_dis=1) 
                     config.read_max_len = read_max_len   

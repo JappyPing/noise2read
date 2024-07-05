@@ -346,6 +346,11 @@ class Config(object):
             else:
                 self.max_dis = 3
 
+            if conf.has_option("UMIReadCorrection", "correcting_umi"):
+                self.correcting_umi = conf.getboolean("UMIReadCorrection", "correcting_umi")
+            else:
+                self.correcting_umi = True
+
             # # Evaluation
             # if conf.has_option("Evaluation", "delta"):
             #     self.delta = conf.getint("Evaluation", "delta")
@@ -448,6 +453,7 @@ class Config(object):
             # UMIReadCorrection
             self.top_count = 3
             self.max_dis = 3
+            self.correcting_umi = True
             # # Evaluation
             # self.delta = 1
 

@@ -102,7 +102,7 @@ class UMIReadErrorCorrection():
 
         final_corrected_read_file = self.config.result_dir + base + ".corrected.reads." + out_file_tye
         with open(final_corrected_read_file, "w") as handle:
-            SeqIO.write(corrected_read_records, handle, read_file_type)
+            SeqIO.write(corrected_read_records, handle, out_file_tye)
 
         if os.path.exists(read_correct_data):
             os.system("rm %s" % read_correct_data)

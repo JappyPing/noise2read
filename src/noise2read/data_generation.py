@@ -1057,11 +1057,23 @@ class DataGneration():
         file_type = parse_file_type(input_data)
 
         if file_type == 'fastq' or file_type == 'fq' or file_type == 'fastq.gz' or file_type == 'fq.gz':
-            isolates_file = self.config.result_dir + base[0] + '_isolates.fastq'
-            non_isolates_file = self.config.result_dir + base[0] + '_non_isolates.fastq'
+            if self.config.correcting_umi:
+                isolates_sufix = '_umi_isolates.fastq'
+                non_isolates_sufix = '_umi_non_isolates.fastq'
+            else:
+                isolates_sufix = '_read_isolates.fastq'
+                non_isolates_sufix = '_read_non_isolates.fastq'
+            isolates_file = self.config.result_dir + base[0] + isolates_sufix
+            non_isolates_file = self.config.result_dir + base[0] + non_isolates_sufix
         elif file_type == 'fasta' or file_type == 'fa' or file_type == 'fasta.gz' or file_type == 'fas.gz':
-            isolates_file = self.config.result_dir + base[0] + '_isolates.fasta'
-            non_isolates_file = self.config.result_dir + base[0] + '_non_isolates.fasta' 
+            if self.config.correcting_umi:
+                isolates_sufix = '_umi_isolates.fasta'
+                non_isolates_sufix = '_umi_non_isolates.fasta'
+            else:
+                isolates_sufix = '_read_isolates.fasta'
+                non_isolates_sufix = '_read_non_isolates.fasta'
+            isolates_file = self.config.result_dir + base[0] + isolates_sufix
+            non_isolates_file = self.config.result_dir + base[0] + non_isolates_sufix 
 
         extract_records(self.config.result_dir, name_lst, input_data, isolates_file)
         extract_records(self.config.result_dir, non_name_lst, input_data, non_isolates_file)
