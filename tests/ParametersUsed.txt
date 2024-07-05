@@ -1,2 +1,0 @@
-kSize:0	k-mer_solidity:2	unitig_solidity:0	aSize:31	mapping_effort:1000	missmatch_allowed:10 maximum_occurence:1 subsample_anchor:1
- 
