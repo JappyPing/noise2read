@@ -359,7 +359,7 @@ class DataGneration():
                     newline = self.err_type_classification(line)
                     # genuine_df.loc[len(genuine_df)] = newline
                     gen_lst.append(newline)
-                    sub_graph.nodes[node]['flag'] = True
+                sub_graph.nodes[node]['flag'] = True
             else:
                 continue   
         #gc.collect()
@@ -1642,9 +1642,7 @@ class DataGneration():
             nodes_lst = list(sub_graph.nodes)
             for node in nodes_lst:
                 node_count = sub_graph.nodes[node]['count']
-                node_degree = sub_graph.degree[node]
-                # if node_count <= self.config.max_error_freq and not sub_graph.nodes[node]['flag']:
-            
+                node_degree = sub_graph.degree[node]            
                 if node_degree >= 1 and node_count <= self.config.max_error_freq and not sub_graph.nodes[node]['flag']:
                     node_neis = [n for n in sub_graph.neighbors(node)]
                     nei_degree_count = []
@@ -1666,7 +1664,7 @@ class DataGneration():
                         else:
                             gen_lst.append(line)
                             del line  
-                        sub_graph.nodes[node]['flag'] = True
+                    sub_graph.nodes[node]['flag'] = True
                 else:
                     continue
         return gen_lst
