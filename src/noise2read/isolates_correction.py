@@ -59,7 +59,7 @@ class IsolatesErrorCorrection():
             self.logger.info("Isolated nodes Correction finished!")
             return corrected_isolates
         else:
-            self.logger.warning("Failed to correct extracted isolates using Bcool. But that is fine as noise2Read will use the original isolates for continued processing.")
+            self.logger.warning("Failed to correct extracted isolates using Bcool. noise2Read will use the original isolates for continued processing.")
             return self.isolates
 
     def freqency_seq_extraction(self, f_original, f_correct, frequency_file):

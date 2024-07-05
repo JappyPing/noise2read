@@ -55,8 +55,6 @@ class DataGneration():
             self.out_file_tye = self.file_type.split(".gz")[0] 
         else:
             self.out_file_tye = self.file_type
-        # Create an instance of the MemoryMonitor
-        #self.MM = MemoryMonitor(self.logger)
 
     def graph_summary(self, graph):
         """

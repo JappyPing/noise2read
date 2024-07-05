@@ -710,8 +710,8 @@ class ErrorCorrection():
         Returns:
             corrected_file (str): The corrected data filename including path.
         """
-        corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + self.out_file_tye  
-
+        file_type = parse_file_type(isolates_file)
+        corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + file_type  
         if not genuine_df.empty:
             self.logger.info("Correcting 1nt-edit-distance based Errors")
             non_isolates_correct = self.correct_errors(non_isolates_file, genuine_df)
