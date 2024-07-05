@@ -1056,10 +1056,12 @@ class DataGneration():
         bases = input_data.split('/')[-1]
         base = bases.split('.')
 
-        if self.file_type == 'fastq' or self.file_type == 'fq' or self.file_type == 'fastq.gz' or self.file_type == 'fq.gz':
+        file_type = parse_file_type(input_data)
+
+        if file_type == 'fastq' or file_type == 'fq' or file_type == 'fastq.gz' or file_type == 'fq.gz':
             isolates_file = self.config.result_dir + base[0] + '_isolates.fastq'
             non_isolates_file = self.config.result_dir + base[0] + '_non_isolates.fastq'
-        elif self.file_type == 'fasta' or self.file_type == 'fa' or self.file_type == 'fasta.gz' or self.file_type == 'fas.gz':
+        elif file_type == 'fasta' or file_type == 'fa' or file_type == 'fasta.gz' or file_type == 'fas.gz':
             isolates_file = self.config.result_dir + base[0] + '_isolates.fasta'
             non_isolates_file = self.config.result_dir + base[0] + '_non_isolates.fasta' 
 
