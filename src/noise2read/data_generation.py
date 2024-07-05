@@ -927,7 +927,7 @@ class DataGneration():
             genuine_df, negative_df, ambiguous_df = self.extract_err_samples(graph, edit_dis)
         #self.MM.measure()
 
-        isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
+        isolates_file, non_isolates_file = self.extract_isolates(self.config.input_file, graph, unique_seqs, seqs2id_dict)
         #self.MM.measure()
         #self.MM.stop()
         del graph
@@ -961,7 +961,7 @@ class DataGneration():
             #self.MM.measure()
             genuine_df, ambiguous_df = self.extract_simplify_genuine_ambi_errs(graph, edit_dis)
             #self.MM.measure()
-            isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
+            isolates_file, non_isolates_file = self.extract_isolates(self.config.input_file, graph, unique_seqs, seqs2id_dict)
             del graph
             #self.MM.measure()
             #self.MM.stop()
@@ -1018,7 +1018,7 @@ class DataGneration():
         #gc.collect()
         return negative_df
 
-    def extract_isolates(self, graph, unique_seqs, seqs2id_dict):
+    def extract_isolates(self, input_data, graph, unique_seqs, seqs2id_dict):
         """
         split the source file into two files of isolates and non-isolates based on constructed graph
 
@@ -1052,7 +1052,8 @@ class DataGneration():
         self.logger.debug("isolates name list: {}".format(len(name_lst)))
         self.logger.debug("non-isolates name list: {}".format(len(non_name_lst)))
 
-        bases = self.config.input_file.split('/')[-1]
+        # bases = self.config.input_file.split('/')[-1]
+        bases = input_data.split('/')[-1]
         base = bases.split('.')
 
         if self.file_type == 'fastq' or self.file_type == 'fq' or self.file_type == 'fastq.gz' or self.file_type == 'fq.gz':
@@ -1062,8 +1063,8 @@ class DataGneration():
             isolates_file = self.config.result_dir + base[0] + '_isolates.fasta'
             non_isolates_file = self.config.result_dir + base[0] + '_non_isolates.fasta' 
 
-        extract_records(self.config.result_dir, name_lst, self.config.input_file, isolates_file)
-        extract_records(self.config.result_dir, non_name_lst, self.config.input_file, non_isolates_file)
+        extract_records(self.config.result_dir, name_lst, input_data, isolates_file)
+        extract_records(self.config.result_dir, non_name_lst, input_data, non_isolates_file)
 
         self.logger.info("Done!")
         #gc.collect()
@@ -1530,7 +1531,7 @@ class DataGneration():
             self.logger.debug("Reads Max length: {}".format(seq_max_len))
             self.logger.debug("Reads Min length: {}".format(seq_min_len))
             genuine_df = self.extract_umi_read_errs(graph, edit_dis)
-            isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
+            isolates_file, non_isolates_file = self.extract_isolates(input_f, graph, unique_seqs, seqs2id_dict)
             del graph
             return isolates_file, non_isolates_file, seq_max_len, seq_min_len, genuine_df
         elif edit_dis == 2:
