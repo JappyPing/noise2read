@@ -51,13 +51,16 @@ class IsolatesErrorCorrection():
         else:
             os.system("bcool -u %s -t %s -o %s" % (self.isolates, self.num_workers, bcool_dir))
         bcool_isolates = self.output_dir + "bcool/reads_corrected.fa"
-        frequency_file = self.output_dir + self.base[0] + '_frequency.txt'
-        #self.MM.measure()
-        #gc.collect()
-        corrected_isolates = self.select_correction(self.correct_non_isolates, self.isolates, bcool_isolates, self.output_dir + self.base[0], frequency_file)
-        # os.system("rm %s" % bcool_isolates)
-        self.logger.info("Isolated nodes Correction finished!")
-        return corrected_isolates
+        if os.path.exists(bcool_isolates):
+            frequency_file = self.output_dir + self.base[0] + '_frequency.txt'
+
+            corrected_isolates = self.select_correction(self.correct_non_isolates, self.isolates, bcool_isolates, self.output_dir + self.base[0], frequency_file)
+            # os.system("rm %s" % bcool_isolates)
+            self.logger.info("Isolated nodes Correction finished!")
+            return corrected_isolates
+        else:
+            self.logger.warning("Failed to correct extracted isolates using Bcool. But that is fine as noise2Read will use the original isolates for continued processing.")
+            return self.isolates
 
     def freqency_seq_extraction(self, f_original, f_correct, frequency_file):
         correct_seq2name_dict = {}

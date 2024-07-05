@@ -1,0 +1,1 @@
+/data/pping/Repo/noise2read/tests//original_reads.fa
