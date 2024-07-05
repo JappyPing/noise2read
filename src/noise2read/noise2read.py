@@ -456,49 +456,89 @@ def main():
                     umi_dataset, read_dataset = DP.split_umi_read(config.input_file)
                     ##############################################################
                     # umi correction
+                    umi_DG = DataGneration(logger, config)
+                    umi_isolates_file, umi_non_isolates_file, umi_max_len, umi_min_len, umi_1nt_df = umi_DG.umi_read_data_files(umi_dataset, edit_dis=1) 
+                    config.read_max_len = umi_max_len   
+                    umi_EC = ErrorCorrection(logger, config)
+                    umi_1nt_corrected = umi_EC.umi_read_correction(umi_isolates_file, umi_non_isolates_file, umi_1nt_df)
+                    if umi_min_len > config.min_read_len:
+                        umi_2nt_df = umi_DG.umi_read_data_files(umi_1nt_corrected, edit_dis=2)
+                        correct_umi_data = umi_EC.umi_read_2nt_correction(umi_1nt_corrected, umi_2nt_df)
+                    else:
+                        correct_umi_data = umi_1nt_corrected
+                        logger.info("UMI Error Correction finished.")
+                    del umi_DG, umi_EC
+                    ##############################################################
+                    # read correction
+                    read_DG = DataGneration(logger, config)
+                    read_isolates_file, read_non_isolates_file, read_max_len, read_min_len, read_1nt_df = read_DG.umi_read_data_files(read_dataset, edit_dis=1) 
+                    config.read_max_len = read_max_len   
+                    read_EC = ErrorCorrection(logger, config)
+                    read_1nt_corrected = read_EC.umi_read_correction(read_isolates_file, read_non_isolates_file, read_1nt_df)
+                    if read_min_len > config.min_read_len:
+                        read_2nt_df = read_DG.umi_read_data_files(read_1nt_corrected, edit_dis=2)
+                        correct_read_data = read_EC.umi_read_2nt_correction(read_1nt_corrected, read_2nt_df)
+                    else:
+                        correct_read_data = read_1nt_corrected
+                        logger.info("UMI Error Correction finished.")
+                    del read_DG
+                    ##############################################################
+                    # combine umi and read correction
+                    UMIREC = UMIReadErrorCorrection(logger, config)
+                    corrected_read_data = UMIREC.umi_read_error_correction(correct_umi_data, correct_read_data)
+                    # output corrected and deduplicated dataset
+                    if config.deduplication:
+                        read_EC.get_deduplication(corrected_read_data)
+                        logger.info("UMI and read error correction and deduplication finished.")
+                    else:
+                        logger.info("UMI and read error correction finished.")
+                    del read_EC, UMIREC
+
+                    ##############################################################
+                    # umi correction
                     # config.high_ambiguous=False
                     # DG = DataGneration(logger, config)
                     # genuine_df = DG.extract_umi_genuine_errs(umi_dataset)
                     # EC = ErrorCorrection(logger, config)
                     # correct_umi_data = EC.umi_correction(umi_dataset, genuine_df)
-                    DG = DataGneration(logger, config)
-                    umi_isolates_file, umi_non_isolates_file, umi_max_len, umi_min_len, umi_genuine_df, umi_ambiguous_df = DG.simplify_data_files(umi_dataset, edit_dis=1)      
-                    config.read_max_len = umi_max_len   
-                    EC = ErrorCorrection(logger, config)
-                    umi_corrected_file = EC.simplify_correction(umi_isolates_file, umi_non_isolates_file, umi_genuine_df, umi_ambiguous_df)
-                    if umi_min_len > config.min_read_len:
-                        umi_ed2_genuine_df, umi_ed2_ambiguous_df = DG.simplify_data_files(umi_corrected_file, edit_dis=2) 
-                        correct_umi_data = EC.simplify_2nt_correction(umi_corrected_file, umi_ed2_genuine_df, umi_ed2_ambiguous_df)
-                    else:
-                        correct_umi_data = umi_corrected_file
-                        logger.info("UMI Error Correction finished.")
-                    del DG, EC
-                    ##############################################################
-                    # read correction
-                    DG2 = DataGneration(logger, config)
-                    isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG2.simplify_data_files(read_dataset, edit_dis=1)      
-                    config.read_max_len = read_max_len
-                    EC2 = ErrorCorrection(logger, config)
-                    corrected_file = EC2.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
-                    if read_min_len > config.min_read_len:
-                        genuine_df, ambiguous_df = DG2.simplify_data_files(corrected_file, edit_dis=2) 
-                        correct_read_data = EC2.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
-                    else:
-                        correct_read_data = corrected_file
-                        logger.info("Read Error Correction finished.")
-                    del DG2
-                    # combine umi and read correction
-                    UMIREC = UMIReadErrorCorrection(logger, config)
-                    # correct_umi_data = "/projects/BIOinfo/Jappy/Deduplication_ErrorCorrection/results/liver/deduplication/noise2read/umi_read/SRR28314008/umi_SRR28314008_corrected.fasta"
-                    # correct_read_data = "/projects/BIOinfo/Jappy/Deduplication_ErrorCorrection/results/liver/deduplication/noise2read/umi_read/SRR28314008/SRR28314008_corrected_corrected.fastq"
-                    final_corrected_read_data = UMIREC.umi_read_correction(correct_umi_data, correct_read_data)
-                    # output corrected and deduplicated dataset
-                    if config.deduplication:
-                        EC2.get_deduplication(final_corrected_read_data)
-                        logger.info("UMI and read error correction and deduplication finished.")
-                    else:
-                        logger.info("UMI and read error correction finished.")
-                    del EC2, UMIREC
+                    # DG = DataGneration(logger, config)
+                    # umi_isolates_file, umi_non_isolates_file, umi_max_len, umi_min_len, umi_genuine_df, umi_ambiguous_df = DG.simplify_data_files(umi_dataset, edit_dis=1)      
+                    # config.read_max_len = umi_max_len   
+                    # EC = ErrorCorrection(logger, config)
+                    # umi_corrected_file = EC.simplify_correction(umi_isolates_file, umi_non_isolates_file, umi_genuine_df, umi_ambiguous_df)
+                    # if umi_min_len > config.min_read_len:
+                    #     umi_ed2_genuine_df, umi_ed2_ambiguous_df = DG.simplify_data_files(umi_corrected_file, edit_dis=2) 
+                    #     correct_umi_data = EC.simplify_2nt_correction(umi_corrected_file, umi_ed2_genuine_df, umi_ed2_ambiguous_df)
+                    # else:
+                    #     correct_umi_data = umi_corrected_file
+                    #     logger.info("UMI Error Correction finished.")
+                    # del DG, EC
+                    # ##############################################################
+                    # # read correction
+                    # DG2 = DataGneration(logger, config)
+                    # isolates_file, non_isolates_file, read_max_len, read_min_len, genuine_df, ambiguous_df = DG2.simplify_data_files(read_dataset, edit_dis=1)      
+                    # config.read_max_len = read_max_len
+                    # EC2 = ErrorCorrection(logger, config)
+                    # corrected_file = EC2.simplify_correction(isolates_file, non_isolates_file, genuine_df, ambiguous_df)
+                    # if read_min_len > config.min_read_len:
+                    #     genuine_df, ambiguous_df = DG2.simplify_data_files(corrected_file, edit_dis=2) 
+                    #     correct_read_data = EC2.simplify_2nt_correction(corrected_file, genuine_df, ambiguous_df)
+                    # else:
+                    #     correct_read_data = corrected_file
+                    #     logger.info("Read Error Correction finished.")
+                    # del DG2
+                    # # combine umi and read correction
+                    # UMIREC = UMIReadErrorCorrection(logger, config)
+                    # # correct_umi_data = "/projects/BIOinfo/Jappy/Deduplication_ErrorCorrection/results/liver/deduplication/noise2read/umi_read/SRR28314008/umi_SRR28314008_corrected.fasta"
+                    # # correct_read_data = "/projects/BIOinfo/Jappy/Deduplication_ErrorCorrection/results/liver/deduplication/noise2read/umi_read/SRR28314008/SRR28314008_corrected_corrected.fastq"
+                    # final_corrected_read_data = UMIREC.umi_read_correction(correct_umi_data, correct_read_data)
+                    # # output corrected and deduplicated dataset
+                    # if config.deduplication:
+                    #     EC2.get_deduplication(final_corrected_read_data)
+                    #     logger.info("UMI and read error correction and deduplication finished.")
+                    # else:
+                    #     logger.info("UMI and read error correction finished.")
+                    # del EC2, UMIREC
 
 ############################################################################################################################
                 elif module_arg == "mimic_umi":   

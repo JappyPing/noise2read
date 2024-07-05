@@ -1430,7 +1430,247 @@ class DataGneration():
         # return high_ambi_lst, idx
         #gc.collect()
         return high_ambi_lst
-    
+
+    def extract_genuine_ambi_errs_subgraph(self, shared_obs, ii):
+        gen_lst = []
+        ambi_lst = []
+        sub_graphs, edit_dis = shared_obs 
+        sub_graph = sub_graphs[ii]
+        edges_lst = [e for e in sub_graph.edges()]
+        if len(edges_lst) > 0:
+            nodes_lst = list(sub_graph.nodes)
+            for node in nodes_lst:
+                node_count = sub_graph.nodes[node]['count']
+                node_degree = sub_graph.degree[node]
+                if node_count <= self.config.max_error_freq and not sub_graph.nodes[node]['flag']:
+                    node_neis = [n for n in sub_graph.neighbors(node)]
+                    if node_degree == 1:
+                        nei = node_neis[0]
+                        nei_count = sub_graph.nodes[nei]['count']
+                        nei_degree = sub_graph.degree[nei]
+                        # if nei_count >= self.config.high_freq_thre:
+                        if nei_count > self.config.high_freq_thre:
+                            line = [nei, nei_count, nei_degree, node, node_count, node_degree]
+                            if edit_dis == 1:
+                                newline = self.err_type_classification(line)
+                                # gen_df.loc[len(gen_df)] = newline
+                                gen_lst.append(newline)
+                                del line, newline 
+                            else:
+                                # gen_df.loc[len(gen_df)] = line 
+                                gen_lst.append(line)
+                                del line                                   
+                    # elif node_degree <= self.config.ambiguous_error_node_degree: # comment this line on 13 May 2023
+                    else:
+                        high_num = 0
+                        nei2count = []
+                        for nei in node_neis:
+                            nei_count = sub_graph.nodes[nei]['count']
+                            nei_degree = sub_graph.degree[nei]
+                            # if nei_count >= self.config.high_freq_thre:
+                            if nei_count > self.config.high_freq_thre:
+                                high_num += 1
+                                nei2count.append((nei, nei_count))
+                        if high_num == 1:             
+                            nei2count.sort(key=lambda x:x[1], reverse=True)
+                            first_nei, first_nei_count = nei2count[0]
+                            first_nei_degree = sub_graph.degree[first_nei]
+                            # if first_nei_count >= self.config.high_freq_thre:
+                            if first_nei_count > self.config.high_freq_thre:
+                                line = [first_nei, first_nei_count, first_nei_degree, node, node_count, node_degree]
+                                if edit_dis == 1:
+                                    newline = self.err_type_classification(line)
+                                    # gen_df.loc[len(gen_df)] = newline
+                                    gen_lst.append(newline)
+                                    del line, newline  
+                                else:
+                                    # gen_df.loc[len(gen_df)] = line 
+                                    gen_lst.append(line)
+                                    del line
+                        else:
+                            # ambiguous errors
+                            tmp_lst = []
+                            for cre_nei, cur_nei_count in nei2count:
+                                # if cur_nei_count >= self.config.high_freq_thre:
+                                if cur_nei_count > self.config.high_freq_thre:
+                                    cur_nei_degree = sub_graph.degree[nei]
+                                    line = [cre_nei, cur_nei_count, cur_nei_degree, node, node_count, node_degree]
+                                    if edit_dis == 1:
+                                        newline = self.err_type_classification(line)
+                                    else:
+                                        newline = line
+                                    # newline.insert(0, idx)
+                                    # ambi_df.loc[len(ambi_df)] = newline
+                                    tmp_lst.append(newline)
+                                    del newline 
+                            if tmp_lst:
+                                ambi_lst.append(tmp_lst)  
+                            # idx += 1 
+                    sub_graph.nodes[node]['flag'] = True        
+                else:
+                    continue
+        #gc.collect()
+        return [gen_lst, ambi_lst]
+
+    def umi_read_data_files(self, input_f, edit_dis):
+        """
+        function to return the results produced by DataGneration class
+
+        Args:
+            edit_dis (int): set edit distance 1 or 2 to search edges for constructing graph
+
+        Returns:
+            MultiVariables: MultiVariables for next step error correction
+        """
+        if edit_dis == 1:
+            graph, seqs_lens_lst, seqs2id_dict, unique_seqs = self.generate_graph(input_f, edit_dis)
+            seq_max_len = max(seqs_lens_lst)
+            seq_min_len = min(seqs_lens_lst)
+            self.logger.debug(seqs_lens_lst)
+            self.logger.debug("Reads Max length: {}".format(seq_max_len))
+            self.logger.debug("Reads Min length: {}".format(seq_min_len))
+            genuine_df = self.extract_umi_read_errs(graph, edit_dis)
+            isolates_file, non_isolates_file = self.extract_isolates(graph, unique_seqs, seqs2id_dict)
+            del graph
+            return isolates_file, non_isolates_file, seq_max_len, seq_min_len, genuine_df
+        elif edit_dis == 2:
+            self.logger.debug(input_f)
+            self.logger.info("Constructing 2nt-edit-distance based graph.")
+            graph, unique_seqs = self.generate_graph(input_f, edit_dis=2)
+            self.graph_summary(graph)  
+            genuine_df = self.extract_umi_read_errs(graph, edit_dis)
+
+            return genuine_df     
+
+    def extract_umi_read_errs(self, graph, edit_dis):
+        """
+        extract genuine and ambiguous errors from read graph
+
+        Args:
+            subgraphs (class): Subgraphs of graph constructed using NetworkX.
+            edit_dis (int): set edit distance 1 or 2 to search edges for constructing graph
+
+        Returns:
+            DataFrame: two pandas dataframes saving genuine and ambiguous errors
+        """
+        if edit_dis == 1:
+            genu_columns = ["StartRead","StartReadCount", "StartDegree", "ErrorTye","ErrorPosition", "StartErrKmer", "EndErrKmer", "EndRead", "EndReadCount", "EndDegree"]
+            genuine_csv = self.config.result_dir + "genuine1.csv"
+        elif edit_dis == 2: #or edit_dis == 3:
+            genu_columns = ["StartRead","StartReadCount", "StartDegree", "EndRead", "EndReadCount", "EndDegree"]
+            genuine_csv = self.config.result_dir + "genuine2.csv"
+
+        subgraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph) if len(c) >= 2 ]#
+        
+        self.logger.info("Extracting genuine and ambiguous errors...")
+        genuine_lst = []
+        chunk_size = len(subgraphs) // self.config.chunks_num
+
+        if chunk_size > 1:
+            groups = [subgraphs[i:i+chunk_size] for i in range(0, len(subgraphs), chunk_size)]
+
+            self.logger.debug(len(groups))
+            # Write each group of subgraphs to separate files
+            gexf_files = []
+            for i, group in enumerate(groups):
+                group_G = nx.Graph()
+                for subgraph_nodes in group:
+                    group_G.add_edges_from(graph.subgraph(subgraph_nodes).edges())
+                    for node in subgraph_nodes:
+                        # self.logger.debug(node)
+                        group_G.nodes[node].update(graph.nodes[node])
+                # Generate the file name for the group
+                file_name = self.config.result_dir + f"group_{i}.gexf"
+
+                # Write the group of subgraphs to the file
+                nx.write_gexf(group_G, file_name)
+                gexf_files.append(file_name)
+            del groups, subgraphs, graph
+            ####
+            for gexf_file in gexf_files:
+                cur_graph = nx.read_gexf(gexf_file)
+                sub_graphs = [cur_graph.subgraph(c).copy() for c in nx.connected_components(cur_graph)]
+                try:
+                    subgraph_num = len(sub_graphs)
+                    shared_obs = sub_graphs, edit_dis
+                    with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                        cur_genuine_lsts = pool.imap(self.extract_umi_read_errs_subgraph, range(subgraph_num))
+                    del shared_obs    
+                except KeyboardInterrupt:
+                    # Handle termination signal (Ctrl+C)
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                except Exception:
+                    # Handle other exceptions
+                    pool.terminate()  # Terminate the WorkerPool before exiting
+                    raise
+                for item in cur_genuine_lsts:
+                    genuine_lst.extend(item)
+
+                os.remove(gexf_file)
+                del cur_graph, sub_graphs
+        else:
+            try:
+                subgraph_num = len(subgraphs)
+                shared_obs = subgraphs, edit_dis
+                with WorkerPool(self.config.num_workers, shared_objects=shared_obs, start_method='fork') as pool:
+                    cur_genuine_lsts = pool.imap(self.extract_umi_read_errs_subgraph, range(subgraph_num))
+                del shared_obs, subgraphs, graph
+            except KeyboardInterrupt:
+                pool.terminate()  # Terminate the WorkerPool before exiting
+            except Exception:
+                # Handle other exceptions
+                pool.terminate()  # Terminate the WorkerPool before exiting
+                raise
+            
+            for item in cur_genuine_lsts:
+                genuine_lst.extend(item)
+
+        genuine_df = pd.DataFrame(genuine_lst, columns=genu_columns)
+
+        if self.config.verbose:
+            genuine_df.to_csv(genuine_csv, index=False)  
+        self.logger.info("Done!")
+
+        return genuine_df
+
+    def extract_umi_read_errs_subgraph(self, shared_obs, ii):
+        gen_lst = []
+        sub_graphs, edit_dis = shared_obs 
+        sub_graph = sub_graphs[ii]
+        edges_lst = [e for e in sub_graph.edges()]
+        if len(edges_lst) > 0:
+            nodes_lst = list(sub_graph.nodes)
+            for node in nodes_lst:
+                node_count = sub_graph.nodes[node]['count']
+                node_degree = sub_graph.degree[node]
+                # if node_count <= self.config.max_error_freq and not sub_graph.nodes[node]['flag']:
+            
+                if node_degree >= 1 and node_count <= self.config.max_error_freq and not sub_graph.nodes[node]['flag']:
+                    node_neis = [n for n in sub_graph.neighbors(node)]
+                    nei_degree_count = []
+                    for nei in node_neis:
+                        nei_count = sub_graph.nodes[nei]['count']
+                        nei_degree = sub_graph.degree[nei]
+                        # nei2count.append((nei, nei_count))
+                        tt = nei_degree + nei_count
+                        nei_degree_count.append((nei, tt, nei_count))
+                    nei_degree_count.sort(key=lambda x:x[1], reverse=True)
+                    first_nei, tt, first_nei_count = nei_degree_count[0]
+                    first_nei_degree = sub_graph.degree[first_nei]
+                    if first_nei_count > self.config.high_freq_thre:
+                        line = [first_nei, first_nei_count, first_nei_degree, node, node_count, node_degree]
+                        if edit_dis == 1:
+                            newline = self.err_type_classification(line)
+                            gen_lst.append(newline)
+                            del line, newline 
+                        else:
+                            gen_lst.append(line)
+                            del line  
+                        sub_graph.nodes[node]['flag'] = True
+                else:
+                    continue
+        return gen_lst
+
     '''
     def extract_high_ambiguous_errs(self, subgraphs, idx):
         """
@@ -1560,88 +1800,6 @@ class DataGneration():
             ambiguous_df.to_csv(ambiguous_csv, index=False)    
         return genuine_df, ambiguous_df
     '''
-
-    def extract_genuine_ambi_errs_subgraph(self, shared_obs, ii):
-        gen_lst = []
-        ambi_lst = []
-        sub_graphs, edit_dis = shared_obs 
-        sub_graph = sub_graphs[ii]
-        edges_lst = [e for e in sub_graph.edges()]
-        if len(edges_lst) > 0:
-            nodes_lst = list(sub_graph.nodes)
-            for node in nodes_lst:
-                node_count = sub_graph.nodes[node]['count']
-                node_degree = sub_graph.degree[node]
-                if node_count <= self.config.max_error_freq and not sub_graph.nodes[node]['flag']:
-                    node_neis = [n for n in sub_graph.neighbors(node)]
-                    if node_degree == 1:
-                        nei = node_neis[0]
-                        nei_count = sub_graph.nodes[nei]['count']
-                        nei_degree = sub_graph.degree[nei]
-                        # if nei_count >= self.config.high_freq_thre:
-                        if nei_count > self.config.high_freq_thre:
-                            line = [nei, nei_count, nei_degree, node, node_count, node_degree]
-                            if edit_dis == 1:
-                                newline = self.err_type_classification(line)
-                                # gen_df.loc[len(gen_df)] = newline
-                                gen_lst.append(newline)
-                                del line, newline 
-                            else:
-                                # gen_df.loc[len(gen_df)] = line 
-                                gen_lst.append(line)
-                                del line                                   
-                    # elif node_degree <= self.config.ambiguous_error_node_degree: # comment this line on 13 May 2023
-                    else:
-                        high_num = 0
-                        nei2count = []
-                        for nei in node_neis:
-                            nei_count = sub_graph.nodes[nei]['count']
-                            nei_degree = sub_graph.degree[nei]
-                            # if nei_count >= self.config.high_freq_thre:
-                            if nei_count > self.config.high_freq_thre:
-                                high_num += 1
-                                nei2count.append((nei, nei_count))
-                        if high_num == 1:             
-                            nei2count.sort(key=lambda x:x[1], reverse=True)
-                            first_nei, first_nei_count = nei2count[0]
-                            first_nei_degree = sub_graph.degree[first_nei]
-                            # if first_nei_count >= self.config.high_freq_thre:
-                            if first_nei_count > self.config.high_freq_thre:
-                                line = [first_nei, first_nei_count, first_nei_degree, node, node_count, node_degree]
-                                if edit_dis == 1:
-                                    newline = self.err_type_classification(line)
-                                    # gen_df.loc[len(gen_df)] = newline
-                                    gen_lst.append(newline)
-                                    del line, newline  
-                                else:
-                                    # gen_df.loc[len(gen_df)] = line 
-                                    gen_lst.append(line)
-                                    del line
-                        else:
-                            # ambiguous errors
-                            tmp_lst = []
-                            for cre_nei, cur_nei_count in nei2count:
-                                # if cur_nei_count >= self.config.high_freq_thre:
-                                if cur_nei_count > self.config.high_freq_thre:
-                                    cur_nei_degree = sub_graph.degree[nei]
-                                    line = [cre_nei, cur_nei_count, cur_nei_degree, node, node_count, node_degree]
-                                    if edit_dis == 1:
-                                        newline = self.err_type_classification(line)
-                                    else:
-                                        newline = line
-                                    # newline.insert(0, idx)
-                                    # ambi_df.loc[len(ambi_df)] = newline
-                                    tmp_lst.append(newline)
-                                    del newline 
-                            if tmp_lst:
-                                ambi_lst.append(tmp_lst)  
-                            # idx += 1 
-                    sub_graph.nodes[node]['flag'] = True        
-                else:
-                    continue
-        #gc.collect()
-        return [gen_lst, ambi_lst]
-
 
     '''
     def extract_high_ambiguous_errs(self, subgraphs):

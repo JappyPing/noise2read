@@ -23,7 +23,7 @@ class UMIReadErrorCorrection():
         self.logger = logger
         self.config = config
 
-    def umi_read_correction(self, umi_correct_data, read_correct_data):
+    def umi_read_error_correction(self, umi_correct_data, read_correct_data):
         # load umi data
         umi_record_iterator, umi_file_type = parse_data(umi_correct_data)
         umis2id_dict = {}

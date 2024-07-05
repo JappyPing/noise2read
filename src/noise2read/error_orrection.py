@@ -701,6 +701,68 @@ class ErrorCorrection():
         deduplicated_file = self.config.result_dir + self.base[0] + ".deduplicated.reads.fasta"     
         SeqIO.write(seq_records, deduplicated_file, "fasta")
 
+    def umi_read_correction(self, isolates_file, non_isolates_file, genuine_df):
+        """
+        Args:
+            isolates_file (str):  The isolates' filename with path.
+            non_isolates_file (str):  The non-isolates' filename with path
+            genuine_df (DataFrame): pandas dataframe containing positive samples for training
+        Returns:
+            corrected_file (str): The corrected data filename including path.
+        """
+        corrected_file = self.config.result_dir + self.base[0] + '_corrected.' + self.out_file_tye  
+
+        if not genuine_df.empty:
+            self.logger.info("Correcting 1nt-edit-distance based Errors")
+            non_isolates_correct = self.correct_errors(non_isolates_file, genuine_df)
+            self.logger.info('1nt-edit-distance based Errors Correction Finished')
+        else:
+            self.logger.error("No genuine and ambiguous errors identified, failed to do error correction!")
+            non_isolates_correct = non_isolates_file
+            sys.exit(1)
+
+        # # bcool correction
+        IEC = IsolatesErrorCorrection(self.logger, self.config.num_workers, isolates_file, non_isolates_correct, self.config.result_dir, self.config.iso_change_detail)
+        corrected_isolates = IEC.bcool_correct_isolates() 
+        if corrected_isolates and non_isolates_correct:
+            os.system("cat %s %s > %s" % (corrected_isolates, non_isolates_correct, corrected_file))
+        else:
+            self.logger.error("No corrected_isolates and/or non_isolates_correct, failed to do error correction")
+        del IEC
+
+        if os.path.exists(isolates_file):
+            os.system("rm %s" % isolates_file)
+        if os.path.exists(non_isolates_file):
+            os.system("rm %s" % non_isolates_file)
+        if os.path.exists(corrected_isolates):   
+            os.system("rm %s" % corrected_isolates)
+        if os.path.exists(non_isolates_correct):     
+            os.system("rm %s" % non_isolates_correct)
+
+        return corrected_file
+
+    def umi_read_2nt_correction(self, data_set, genuine_df):       
+        """
+        correcting ambiguous errors in 2nt-edit-distance-based read graph
+
+        Args:
+            data_set (str): raw data filename including path
+            genuine_df (DataFrame): pandas dataframe containing positive samples for training
+            ambiguous_df (DataFrame): pandas dataframe containing ambiguous samples for prediction
+
+        Returns:
+            str: corrected data filename including path
+        """
+        ##self.MM.start()
+        if not genuine_df.empty:
+            correct_file = self.all_in_one_2nt_correct_errors(data_set, genuine_df)
+            os.system("rm %s" % data_set)
+            del genuine_df
+            self.logger.info("2nt-edit-distance based Errors Correction Finished")
+            return correct_file
+        else:
+            return data_set
+
 '''
     def correct_amplicon_errors(self, orginal_file, df_data):
         """
