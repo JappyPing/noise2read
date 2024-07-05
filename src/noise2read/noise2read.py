@@ -627,7 +627,6 @@ def main():
                         if not os.path.exists(config.correct_data):
                             logger.exception('Corrected data does not exsit.')
                             sys.exit()      
-
                         if d_lst:
                             config.result_dir = opts_dict[d_lst[0]]
                     elif i_lst and r_lst:

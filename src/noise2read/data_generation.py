@@ -1663,10 +1663,11 @@ class DataGneration():
                         nei_count = sub_graph.nodes[nei]['count']
                         nei_degree = sub_graph.degree[nei]
                         # nei2count.append((nei, nei_count))
-                        tt = nei_degree + nei_count
-                        nei_degree_count.append((nei, tt, nei_count))
+                        # tt = nei_degree + nei_count
+                        ss = (nei_count/node_count) * (nei_degree/node_degree)
+                        nei_degree_count.append((nei, ss, nei_count))
                     nei_degree_count.sort(key=lambda x:x[1], reverse=True)
-                    first_nei, tt, first_nei_count = nei_degree_count[0]
+                    first_nei, ss, first_nei_count = nei_degree_count[0]
                     first_nei_degree = sub_graph.degree[first_nei]
                     if first_nei_count > self.config.high_freq_thre:
                         line = [first_nei, first_nei_count, first_nei_degree, node, node_count, node_degree]

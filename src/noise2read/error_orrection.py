@@ -694,7 +694,7 @@ class ErrorCorrection():
         record_num = 1
         for read, ids in seqs2id_dict.items():
             frequency = len(ids)
-            record_id = f"read {record_num}, counts: {frequency}"
+            record_id = f"read {record_num}, abundance: {frequency}"
 
             seq_record = SeqRecord(Seq(read), id=record_id, description=" ".join(ids))
             seq_records.append(seq_record) 
