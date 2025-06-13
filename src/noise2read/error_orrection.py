@@ -317,10 +317,10 @@ class ErrorCorrection():
         record_dict, ori_file_type = parse_data_dict(orginal_file)
         seq2id = {}
         total_name_lst = []
-        for id in record_dict:
-            seq = str(record_dict[id].seq)
-            seq2id.setdefault(seq, []).append(id)
-            total_name_lst.append(id)
+        for record_id in record_dict:
+            seq = str(record_dict[record_id].seq)
+            seq2id.setdefault(seq, []).append(record_id)
+            total_name_lst.append(record_id)
         err2cor_records = []
         err_name_lst = []
         for row_index, row in df_data.iterrows():
@@ -471,10 +471,10 @@ class ErrorCorrection():
         record_dict, ori_file_type = parse_data_dict(orginal_file)
         seq2id = {}
         total_name_lst = []
-        for id in record_dict:
-            seq = str(record_dict[id].seq)
-            seq2id.setdefault(seq, []).append(id)
-            total_name_lst.append(id)
+        for record_id in record_dict:
+            seq = str(record_dict[record_id].seq)
+            seq2id.setdefault(seq, []).append(record_id)
+            total_name_lst.append(record_id)
         err2cor_records = []
         err_name_lst = []
         for row_index, row in df_data.iterrows():
@@ -544,10 +544,10 @@ class ErrorCorrection():
         record_dict, ori_file_type = parse_data_dict(orginal_file)
         seq2id = {}
         total_name_lst = []
-        for id in record_dict:
-            seq = str(record_dict[id].seq)
-            seq2id.setdefault(seq, []).append(id)
-            total_name_lst.append(id)
+        for record_id in record_dict:
+            seq = str(record_dict[record_id].seq)
+            seq2id.setdefault(seq, []).append(record_id)
+            total_name_lst.append(record_id)
             
         err2cor_records = []
         err_name_lst = []

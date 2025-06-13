@@ -122,14 +122,18 @@ def parse_data(data_set):
 
 def parse_data_index(data_set):
     file_type = parse_file_type(data_set)
-    if file_type == 'fastq.gz' or file_type == 'fq.gz' or file_type == 'fa.gz' or file_type == 'fasta.gz':
+
+    if file_type in {'fastq.gz', 'fq.gz', 'fa.gz', 'fasta.gz'}:
         ff_type = file_type.split('.')[0]
-        handle = gzip.open(data_set, 'rt')
-        records = SeqIO.index(handle, ff_type)
-        return records, ff_type
+        
+        # Convert list to dictionary with record IDs as keys
+        with gzip.open(data_set, 'rt') as handle:
+            records = {rec.id: rec for rec in SeqIO.parse(handle, ff_type)}
+
     else:
-        records = SeqIO.index(data_set, file_type)     
-        return records, file_type
+        records = SeqIO.index(data_set, file_type)  # Dictionary-like object
+
+    return records, file_type
 
 def parse_data_dict(data_set):
     file_type = parse_file_type(data_set)

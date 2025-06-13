@@ -76,7 +76,7 @@ Create virtual environments to run noise2read.
 
 .. code-block:: console
 
-   git clone https://github.com/Jappy0/noise2read.git
+   git clone https://github.com/JappyPing/noise2read.git
 
 .. code-block:: console 
 
