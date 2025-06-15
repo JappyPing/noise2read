@@ -1139,7 +1139,9 @@ class DataGneration():
         
         self.logger.debug("Searching edges for constructing " + str(edit_dis) + "nt-edit-distance read graph...")
         #############################################################################################################
-        if self.config.reads_chunks_num == 1:
+        chunk_size = highseq_num // self.config.reads_chunks_num
+
+        if self.config.reads_chunks_num == 1 or chunk_size <= 1:
             try:
                 with WorkerPool(self.config.num_workers, shared_objects=shared_unique_seqs, start_method='fork') as pool:
                     if edit_dis == 1:
@@ -1156,9 +1158,7 @@ class DataGneration():
                 # Handle other exceptions
                 pool.terminate()  # Terminate the WorkerPool before exiting
                 raise
-        # if chunk_size > 1:
-        else:
-            chunk_size = len(high_freq) // self.config.reads_chunks_num
+        elif chunk_size > 1:
             groups = [high_freq[i:i+chunk_size] for i in range(0, len(high_freq), chunk_size)]
             for group in groups:
                 try:
@@ -1248,7 +1248,7 @@ class DataGneration():
         self.logger.debug(data_set)
         #self.MM.start()
         # if self.seq_min_len > 30:   
-        self.logger.info("Constructing 2nt-edit-distance based graph.")
+        #self.logger.info("Constructing 2nt-edit-distance based graph.")
         graph, unique_seqs = self.generate_graph(data_set, edit_dis=2)
         #self.MM.measure()
         self.graph_summary(graph)
